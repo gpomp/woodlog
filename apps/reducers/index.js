@@ -1,11 +1,11 @@
 'use strict'
-import ExReducer from './exReducer';
+import TreeReducer from './treeReducer';
 
 import { combineReducers } from 'redux'
 
 
 const rootReducer = combineReducers({
-  ex: ExReducer
+  tree: TreeReducer
 });
 
 export default rootReducer
