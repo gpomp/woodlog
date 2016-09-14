@@ -1,6 +1,5 @@
 import {
-  CHANGETREE,
-  save
+  CHANGETREE
 } from '../actions/treeActions'
 
 const initialState = {

@@ -3,6 +3,7 @@
 
 export const CHANGETREE = "CHANGE_TREE";
 export const SHOWTREE = "SHOW_TREE";
+export const SHOWLIST = "SHOW_LIST";
 
 export const change = treeData => ({
   type: CHANGETREE,
@@ -23,6 +24,17 @@ export const change = treeData => ({
   })
 });
 
+
+
+export const getList = () => ({
+  type: SHOWLIST,
+  payload: new Promise(resolve => {
+
+    global.storage.getAllDataForKey('tree').then(ret => {
+      resolve({data: ret});
+    });
+  })
+});
 
 
 /*export const show = id => ({

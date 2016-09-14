@@ -35,9 +35,9 @@ export default class App extends Component {
     return (
       <Router>
         <Scene key="root">
-          <Scene key="List" component={List} title="Tree List" />
+          <Scene key="List" component={List} title="Tree List" initial={true} />
           <Scene key="Tree" component={Tree} title="Bonzai" />
-          <Scene key="Edit" component={Edit} title="Edit Bonzai" initial={true} />
+          <Scene key="Edit" component={Edit} title="Edit Bonzai" />
         </Scene>
       </Router>
     )
