@@ -1,5 +1,6 @@
 import {
-  CHANGETREE
+  CHANGETREE,
+  SHOWTREE
 } from '../actions/treeActions'
 
 const initialState = {
@@ -13,11 +14,17 @@ const initialState = {
 export default TreeReducer = (state = initialState, action) => {
   switch (action.type) {
     case `${CHANGETREE}_PENDING`:
+    case `${SHOWTREE}_PENDING`:
       return {
         state, isPending: true
       }
     break;
     case `${CHANGETREE}_FULFILLED`:
+      return {
+        ...state, id: action.payload.id, rawData: action.payload.rawData, isPending: false
+      }
+    break;
+    case `${SHOWTREE}_FULFILLED`:
       return {
         ...state, id: action.payload.id, rawData: action.payload.rawData, isPending: false
       }

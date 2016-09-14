@@ -12,13 +12,15 @@ import * as TreeActions from '../actions/treeActions';
 class Tree extends Component {
 
   componentWillMount () {
-
+    console.log("will mount", this.props.nextId);
+    this.props.actions.show(this.props.nextId);
   }
 
   render () {
     return(
-      <View style={styles.container}>
-        <Text>TREE {this.props.id}</Text>
+      <View style={styles.container}> 
+        <Text>TREE {this.props.nextId}</Text>
+        <Text>{this.props.tree.rawData.species}</Text>
       </View>
     );
   }

@@ -1,11 +1,15 @@
 'use strict'
 
+import { Actions as NavActions } from 'react-native-router-flux';
+
 import React, {Component} from 'react';
 import {
   View, StyleSheet, Text
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+
+import TreeItem from '../components/TreeItem';
 
 import * as TreeActions from '../actions/treeActions';
 
@@ -15,15 +19,16 @@ class List extends Component {
     this.props.actions.getList();
   }
 
-  getTree () {
-
+  onNavClick (key) {
+    NavActions.Tree({nextId: key});
   }
 
   render () {
     let trees = [];
     if(this.props.initialized) {
-      trees = this.props.list.map((t) => {
-        return <Text>{t.species}</Text>;
+      trees = this.props.list.map((t, i) => {
+        const k = `tree-${i}`;
+        return <TreeItem label={ t.species } key={k} ukey={ i } onNavClick={ this.onNavClick.bind(this) }/>
       });
     }
     return(

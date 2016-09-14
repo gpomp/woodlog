@@ -37,7 +37,7 @@ export const getList = () => ({
 });
 
 
-/*export const show = id => ({
+export const show = id => ({
   type: SHOWTREE,
   payload: new Promise(resolve => {
 
@@ -45,8 +45,7 @@ export const getList = () => ({
       key: 'tree',
       id: id
     }).then(res => {
-      console.log(res);
-      resolve(res);
+      resolve({rawData: res, id: id});
     });
   })
-});*/
+});
