@@ -3,7 +3,6 @@ import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 
 const styles = StyleSheet.create({
   button: {
-    flex: 1,
     padding: 20,
     backgroundColor: 'lightgray',
     alignItems: 'center',

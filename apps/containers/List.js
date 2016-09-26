@@ -4,7 +4,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  View, StyleSheet, Text
+  View, StyleSheet, Text, TouchableOpacity
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -23,6 +23,10 @@ class List extends Component {
     NavActions.Tree({nextId: key});
   }
 
+  onAddClick () {
+    NavActions.Edit();
+  }
+
   render () {
     let trees = [];
     if(this.props.initialized) {
@@ -33,8 +37,10 @@ class List extends Component {
     }
     return(
     <View style={styles.container}>
-      <Text>LIST</Text>
       {trees}
+      <TouchableOpacity key="add-tree" onPress={() => { this.onAddClick() }} style={styles.button}>
+        <Text>Add Bonsai</Text>
+      </TouchableOpacity>
     </View>
   );
     
@@ -47,8 +53,13 @@ class List extends Component {
 const styles =  StyleSheet.create({
   container: {
     marginTop: 70,
-    flex: 1,
-      justifyContent: 'center'
+    flex: 1
+  },
+  button: {
+    padding: 20,
+    backgroundColor: 'lightgray',
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });
 

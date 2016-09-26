@@ -12,7 +12,7 @@ export default ListReducer = (state = initialState, action) => {
   switch (action.type) {
     case `${SHOWLIST}_PENDING`:
       return {
-        state, isPending: true
+        ...state, isPending: true
       }
     break;
     case `${SHOWLIST}_FULFILLED`:

@@ -4,8 +4,9 @@
 export const CHANGETREE = "CHANGE_TREE";
 export const SHOWTREE = "SHOW_TREE";
 export const SHOWLIST = "SHOW_LIST";
+export const SAVENOTE = "SAVE_NOTE";
 
-export const change = treeData => ({
+export const change = (treeData, id) => ({
   type: CHANGETREE,
   payload: new Promise(resolve => {
 
@@ -16,10 +17,10 @@ export const change = treeData => ({
     }
 
     global.storage.getIdsForKey('tree').then(ids => {
-      tree.id = ids.length;
+      tree.id = id === -1 ? ids.length : id;
+
       global.storage.save(tree);
       resolve(tree);
-      //NavActions.Tree({ id });
     });
   })
 });
@@ -49,3 +50,14 @@ export const show = id => ({
     });
   })
 });
+
+export const saveNote = (note, id) => {
+
+  return {
+    type: SAVENOTE,
+    payload: {note, id}
+  }
+
+  
+
+};

@@ -7,6 +7,7 @@ import { AsyncStorage } from 'react-native';
 import Tree from './containers/Tree';
 import List from './containers/List';
 import Edit from './containers/Edit';
+import Notes from './containers/Notes';
 
 export default class App extends Component {
   constructor(props) {
@@ -37,6 +38,7 @@ export default class App extends Component {
         <Scene key="root">
           <Scene key="List" component={List} title="Tree List" initial={true} />
           <Scene key="Tree" component={Tree} title="Bonzai" />
+          <Scene key="Notes" component={Notes} title="Notes"/>
           <Scene key="Edit" component={Edit} title="Edit Bonzai" />
         </Scene>
       </Router>

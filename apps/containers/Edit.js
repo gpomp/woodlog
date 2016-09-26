@@ -44,21 +44,28 @@ class Edit extends Component {
   }
 
   handleFormFocus (formData) {
-
   }
 
   handleFormChange (formData) {
-    this.formData = formData;
+    this.formData = Object.assign({}, this.formData, formData);
+  }
+
+  componentWillMount() {
+    this.formData = Object.assign({}, this.props.tree, this.formData);
+  }
+
+  componentWillUpdate(nextProps) {
+    
   }
 
   componentDidUpdate(prevProps, prevState) { 
-    if(prevProps.id !== this.props.id) {
+    // if(prevProps.id !== this.props.id) {
       if(this.props.id !== -1) {
-        NavActions.Tree({id: this.props.id});
+        NavActions.Tree({nextId: this.props.id});
       } else {
         NavActions.List();
       }
-    }
+    // }
   }
 
   onNavClick (key) {
@@ -71,7 +78,7 @@ class Edit extends Component {
         }
       break;
       case SAVE:
-        this.props.actions.change(this.formData);
+        this.props.actions.change(this.formData, this.props.id);
       break;
       case ADDPHOTO:
         this.showImagePicker();
@@ -111,6 +118,10 @@ class Edit extends Component {
   }
 
   render () {
+    console.log()
+    const { name, species, age, potType, style, height, trunkWidth, canopyWidth, Source, date } = this.props.tree;
+
+
     return(
       <View style={styles.container}>
         <Form
@@ -118,19 +129,21 @@ class Edit extends Component {
           onFocus={this.handleFormFocus.bind(this)}
           onChange={this.handleFormChange.bind(this)}
           label="Bonsai info">
-            <InputField ref='name' placeholder='Bonsai Name'/>
-            <InputField ref='species' placeholder='Bonsai Type'/>
+            <InputField ref='name' placeholder='Bonsai Name' value={name}/>
+            <InputField ref='species' placeholder='Bonsai Type' value={species}/>
             <InputField 
               ref='age' placeholder='Age'
+              value={age}
               validationFunction = {(value) => { return !isNaN(value); }}
             />
-            <InputField ref='potType' placeholder='pot Type'/>
-            <InputField ref='style' placeholder='pot Type'/>
-            <InputField ref='height' placeholder='Height'/>
-            <InputField ref='trunkWidth' placeholder='Trunk Width'/>
-            <InputField ref='canopyWidth' placeholder='Canopy Width'/>
-            <InputField ref='Source' placeholder='Source'/>
+            <InputField ref='potType' placeholder='pot Type' value={potType}/>
+            <InputField ref='style' placeholder='style' value={style}/>
+            <InputField ref='height' placeholder='Height' value={height}/>
+            <InputField ref='trunkWidth' placeholder='Trunk Width' value={trunkWidth}/>
+            <InputField ref='canopyWidth' placeholder='Canopy Width' value={canopyWidth}/>
+            <InputField ref='Source' placeholder='Source' value={Source}/>
             <DatePickerField ref='date'
+             value={date}
               minimumDate={new Date('1/1/1900')}
               maximumDate={new Date()} mode='date' placeholder='Date Acquired'/>
           </Form>
