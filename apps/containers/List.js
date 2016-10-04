@@ -13,10 +13,16 @@ import TreeItem from '../components/TreeItem';
 
 import * as TreeActions from '../actions/treeActions';
 
+
 class List extends Component {
 
   componentWillMount () {
+    this.props.actions.reset();
     this.props.actions.getList();
+  }
+
+  componentDidUpdate() {
+
   }
 
   onNavClick (key) {

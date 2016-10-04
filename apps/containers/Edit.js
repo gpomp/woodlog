@@ -5,8 +5,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 import React, {Component} from 'react';
 import {
   View,
-  StyleSheet,
-  Platform
+  StyleSheet
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -17,24 +16,10 @@ import { Form, InputField,
       } from 'react-native-form-generator';
 import * as TreeActions from '../actions/treeActions';
 
-import ImagePicker from 'react-native-image-picker';
-
 import BottomNav from '../components/BottomNav';
 
 export const SAVE = "save";
 export const CANCEL = "cancel";
-export const ADDPHOTO = "addPhoto";
-
-const IPOptions = {
-  title: 'Add photo to album...',
-  customButtons: [
-    {name: 'fb', title: 'Choose Photo from Facebook'},
-  ],
-  storageOptions: {
-    skipBackup: true,
-    path: 'woodlog'
-  }
-};
 
 class Edit extends Component {
 
@@ -80,48 +65,11 @@ class Edit extends Component {
       case SAVE:
         this.props.actions.change(this.formData, this.props.id);
       break;
-      case ADDPHOTO:
-        this.showImagePicker();
-      break;
     }
-
-    
-  }
-
-  showImagePicker () {
-    ImagePicker.showImagePicker(IPOptions, (response) => {
-      console.log('Response = ', response);
-
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      }
-      else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      }
-      else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      }
-      else {
-        // You can display the image using either data...
-        const source = {uri: 'data:image/jpeg;base64,' + response.data, isStatic: true};
-
-        // or a reference to the platform specific asset location
-        if (Platform.OS === 'ios') {
-          const source = {uri: response.uri.replace('file://', ''), isStatic: true};
-        } else {
-          const source = {uri: response.uri, isStatic: true};
-        }
-
-        
-      }
-    });
   }
 
   render () {
-    console.log()
     const { name, species, age, potType, style, height, trunkWidth, canopyWidth, Source, date } = this.props.tree;
-
-
     return(
       <View style={styles.container}>
         <Form
@@ -148,7 +96,7 @@ class Edit extends Component {
               maximumDate={new Date()} mode='date' placeholder='Date Acquired'/>
           </Form>
           <BottomNav 
-            items={ [ { label: 'Add Photo', key: 'addPhoto' }, { label: 'Save', key: 'save' }, { label: 'Cancel', key: 'cancel' } ] } 
+            items={ [ { label: 'Save', key: 'save' }, { label: 'Cancel', key: 'cancel' } ] } 
             onNavClick = {this.onNavClick.bind(this)} />
       </View>
     );

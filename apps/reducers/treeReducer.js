@@ -1,15 +1,29 @@
 import {
   CHANGETREE,
   SHOWTREE,
-  SAVENOTE
+  SAVENOTE,
+  REMOVENOTE,
+  RESET,
+  SAVENEWPHOTO,
+  DELETEPHOTO
 } from '../actions/treeActions'
 
 const initialState = {
   key: 'tree',  
   id: -1,
   rawData: {
-    name: '', species: '', age: '', potType: '', style: '', height: '', trunkWidth: '', canopyWidth: '', Source: '', date: '', notes:[]
-
+    name: '', 
+    species: '', 
+    age: '', 
+    potType: '', 
+    style: '', 
+    height: '', 
+    trunkWidth: '', 
+    canopyWidth: '', 
+    Source: '', 
+    date: '', 
+    notes:[],
+    photos: []
   },
   expires: null,
   isPending: false,
@@ -17,6 +31,7 @@ const initialState = {
 }
 
 export default TreeReducer = (state = initialState, action) => {
+  let stateCopy;
   switch (action.type) {
     case `${CHANGETREE}_PENDING`:
     case `${SHOWTREE}_PENDING`:
@@ -25,7 +40,6 @@ export default TreeReducer = (state = initialState, action) => {
       }
     break;
     case `${CHANGETREE}_FULFILLED`:
-    console.log('tree data to save')
       return {
         ...state, id: action.payload.id, rawData: Object.assign({}, state.rawData, action.payload.rawData), isPending: false
       }
@@ -35,19 +49,60 @@ export default TreeReducer = (state = initialState, action) => {
         ...state, id: action.payload.id, rawData: Object.assign({}, state.rawData, action.payload.rawData), isPending: false, initialized: true
       }
     break;
-    case SAVENOTE:
-
-
-      const {text, date} = action.payload.note;
-      const stateCopy = Object.assign({}, state);
-      const noteCopy = stateCopy.rawData.notes;
-      if(action.payload.id === -1) noteCopy.push({text, date});
-      else noteCopy[action.payload.id] = action.payload.note;
-
+    case RESET:
+      return {
+        ...state, id: -1, rawData: Object.assign({}, state.rawData, initialState.rawData), isPending: false, initialized: false
+      }
+    break;
+    case `${SAVENEWPHOTO}_FULFILLED`:
+      stateCopy = Object.assign({}, state);
+      stateCopy.rawData.photos.push(action.payload.id);
       global.storage.save(stateCopy);
 
       return {
-        ...state, rawData: Object.assign({}, state.rawData, { notes: noteCopy })
+        ...state, rawData: stateCopy.rawData
+      }
+    break;
+    case `${DELETEPHOTO}_FULFILLED`:
+      stateCopy = Object.assign({}, state);
+      let arrayID = -1;
+      for (var i = 0; i < stateCopy.rawData.photos.length; i++) {
+        if(stateCopy.rawData.photos[i] === action.payload.id) {
+          arrayID = i;
+          break;
+        }
+      }
+      if(arrayID >= 0) {
+        stateCopy.rawData.photos.splice(arrayID, 1);
+      }
+      global.storage.save(stateCopy);
+
+      return {
+        ...state, rawData: stateCopy.rawData
+      }      
+    break;
+    case REMOVENOTE:
+      stateCopy = Object.assign({}, state);
+
+      stateCopy.rawData.notes.splice(action.payload.id, 1);
+      global.storage.save(stateCopy);
+
+      return {
+        ...state, rawData: stateCopy.rawData
+      }      
+    break;
+    case SAVENOTE:
+      const {note, date} = action.payload.note;
+      stateCopy = Object.assign({}, state);
+      const noteCopy = stateCopy.rawData.notes;
+      if(isNaN(action.payload.id) || action.payload.id < 0) {
+        noteCopy.push({note, date});
+      }
+      else noteCopy[action.payload.id] = action.payload.note;
+      global.storage.save(stateCopy);
+
+      return {
+        ...state, rawData: stateCopy.rawData
       }
     break;
     default:

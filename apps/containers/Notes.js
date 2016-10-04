@@ -18,6 +18,10 @@ import { Form, InputField,
 
 class Notes extends Component {
 
+  constructor(props) {
+    super(props);
+  }
+
   componentWillMount () {
 
   }
@@ -32,14 +36,19 @@ class Notes extends Component {
   saveNote () {
     this.formData.id = -1;
     this.props.actions.saveNote(this.formData);
+    this.onNoteUpdate();
+  }
+
+  onNoteUpdate () {
+    this.forceUpdate();
   }
 
   render () {
     const { notes } = this.props;
-
+    const d = new Date();
     const noteList = notes.map((n, i) => {
-      const k = `tree-${i}`;
-      return <Note date={ n.date } text={ t.text } key={k} />
+      const k = `tree-note-${i}`;
+      return <Note date={ n.date } note={ n.note } arrayID={i} key={k} onNoteUpdate={this.onNoteUpdate.bind(this)} />
     });
 
     return(
@@ -54,8 +63,12 @@ class Notes extends Component {
           label="Add a Note">
             <InputField ref='note' placeholder='Your Note' />
             <DatePickerField ref='date'
-              minimumDate={new Date('1/1/1900')}
-              maximumDate={new Date()} mode='date' placeholder='Date Acquired'/>
+              format='YYYY/MM/DD'
+              minimumDate={new Date('1900/1/1')}
+              maximumDate={new Date()} mode='date' placeholder='Date Acquired'
+              date={new Date()}
+            />
+              
           </Form>
           <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
           <Text>Save Note</Text>

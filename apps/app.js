@@ -35,11 +35,11 @@ export default class App extends Component {
   render() {
     return (
       <Router>
-        <Scene key="root">
-          <Scene key="List" component={List} title="Tree List" initial={true} />
-          <Scene key="Tree" component={Tree} title="Bonzai" />
+        <Scene type='replace' key="root">
+          <Scene type='replace' key="List" component={List} title="Tree List" initial={true} />
+          <Scene type='replace' key="Tree" component={Tree} title="Bonzai" />
           <Scene key="Notes" component={Notes} title="Notes"/>
-          <Scene key="Edit" component={Edit} title="Edit Bonzai" />
+          <Scene type='replace' key="Edit" component={Edit} title="Edit Bonzai" />
         </Scene>
       </Router>
     )

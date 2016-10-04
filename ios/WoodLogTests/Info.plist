@@ -20,5 +20,9 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Adding Bonsai Photo</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Adding bonsai Photo</string>
 </dict>
 </plist>

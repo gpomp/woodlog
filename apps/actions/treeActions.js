@@ -5,6 +5,11 @@ export const CHANGETREE = "CHANGE_TREE";
 export const SHOWTREE = "SHOW_TREE";
 export const SHOWLIST = "SHOW_LIST";
 export const SAVENOTE = "SAVE_NOTE";
+export const REMOVENOTE = "REMOVE_NOTE";
+export const RESET = "RESET_TREE";
+
+export const SAVENEWPHOTO = "SAVE_NEW_PHOTO";
+export const DELETEPHOTO = "DELETE_PHOTO";
 
 export const change = (treeData, id) => ({
   type: CHANGETREE,
@@ -37,6 +42,10 @@ export const getList = () => ({
   })
 });
 
+export const reset = () => {
+  return { type: RESET };
+}
+
 
 export const show = id => ({
   type: SHOWTREE,
@@ -57,7 +66,42 @@ export const saveNote = (note, id) => {
     type: SAVENOTE,
     payload: {note, id}
   }
-
-  
-
 };
+
+export const removeNote = (id) => {
+
+  return {
+    type: REMOVENOTE,
+    payload: {id}
+  }
+};
+
+export const savePhoto = (src) => ({
+  type: SAVENEWPHOTO,
+  payload: new Promise(resolve => {
+
+    global.storage.getIdsForKey('img').then(ids => {
+
+      const img = {
+        key: 'img',
+        id: ids.length,
+        rawData: { src: src },
+        expires: null
+      }
+
+      global.storage.save(img);
+      resolve({id: img.id});
+    });
+  })
+});
+
+export const removePhoto = (id) => ({
+  type: DELETEPHOTO,
+  payload: new Promise(resolve => {
+    global.storage.remove({
+      key: 'img', id: id
+    }).then(res => {
+      resolve({id: id});
+    });
+  })
+});

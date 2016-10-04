@@ -38,6 +38,10 @@
 	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>NSCameraUsageDescription</key>
+	<string>Adding Bonsai Photo</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Adding Bonsai Photo</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
