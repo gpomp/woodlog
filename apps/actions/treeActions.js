@@ -1,4 +1,4 @@
-
+import RNFS from 'react-native-fs';
 
 
 export const CHANGETREE = "CHANGE_TREE";
@@ -98,10 +98,21 @@ export const savePhoto = (src) => ({
 export const removePhoto = (id) => ({
   type: DELETEPHOTO,
   payload: new Promise(resolve => {
-    global.storage.remove({
-      key: 'img', id: id
+
+    global.storage.load({
+      key: 'img',
+      id: id
     }).then(res => {
-      resolve({id: id});
+      RNFS.unlink(res.src)
+      .then(() => {
+        global.storage.remove({
+          key: 'img', id: id
+        }).then(res => {
+          resolve({id: id});
+        });
+      })
     });
+
+    
   })
 });

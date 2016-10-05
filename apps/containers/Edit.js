@@ -9,14 +9,30 @@ import {
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import t from 'tcomb-form-native';
 
-import { Form, InputField,
-        Separator, SwitchField, LinkField ,
-        PickerField, DatePickerField
-      } from 'react-native-form-generator';
 import * as TreeActions from '../actions/treeActions';
 
 import BottomNav from '../components/BottomNav';
+
+const Form = t.form.Form;
+
+const Tree = t.struct({
+  name: t.String,
+  type: t.maybe(t.String),
+  age: t.maybe(t.Number),
+  potType: t.maybe(t.String),
+  style: t.maybe(t.String),
+  height: t.maybe(t.Number), 
+  trunkWidth: t.maybe(t.Number), 
+  canopyWidth: t.maybe(t.Number), 
+  Source: t.maybe(t.String), 
+  date: t.maybe(t.Date)
+});
+
+const formOptions = {
+  auto: 'placeholders'
+};
 
 export const SAVE = "save";
 export const CANCEL = "cancel";
@@ -28,15 +44,9 @@ class Edit extends Component {
     this.formData = {};
   }
 
-  handleFormFocus (formData) {
-  }
-
-  handleFormChange (formData) {
-    this.formData = Object.assign({}, this.formData, formData);
-  }
-
   componentWillMount() {
     this.formData = Object.assign({}, this.props.tree, this.formData);
+    this.formData.date = new Date(this.formData.date);
   }
 
   componentWillUpdate(nextProps) {
@@ -63,7 +73,20 @@ class Edit extends Component {
         }
       break;
       case SAVE:
-        this.props.actions.change(this.formData, this.props.id);
+        const validation = this.refs.editTree.validate();
+        if(validation.errors.length > 0) {
+
+        } else {
+          this.formData = Object.assign(this.formData, validation.value);
+
+          for(const prop in this.formData) {
+            if(this.formData[prop] === null) {
+              this.formData[prop] = '';
+            }
+          }
+
+          this.props.actions.change(this.formData, this.props.id);
+        }
       break;
     }
   }
@@ -72,29 +95,12 @@ class Edit extends Component {
     const { name, species, age, potType, style, height, trunkWidth, canopyWidth, Source, date } = this.props.tree;
     return(
       <View style={styles.container}>
-        <Form
-          ref='editTree'
-          onFocus={this.handleFormFocus.bind(this)}
-          onChange={this.handleFormChange.bind(this)}
-          label="Bonsai info">
-            <InputField ref='name' placeholder='Bonsai Name' value={name}/>
-            <InputField ref='species' placeholder='Bonsai Type' value={species}/>
-            <InputField 
-              ref='age' placeholder='Age'
-              value={age}
-              validationFunction = {(value) => { return !isNaN(value); }}
-            />
-            <InputField ref='potType' placeholder='pot Type' value={potType}/>
-            <InputField ref='style' placeholder='style' value={style}/>
-            <InputField ref='height' placeholder='Height' value={height}/>
-            <InputField ref='trunkWidth' placeholder='Trunk Width' value={trunkWidth}/>
-            <InputField ref='canopyWidth' placeholder='Canopy Width' value={canopyWidth}/>
-            <InputField ref='Source' placeholder='Source' value={Source}/>
-            <DatePickerField ref='date'
-             value={date}
-              minimumDate={new Date('1/1/1900')}
-              maximumDate={new Date()} mode='date' placeholder='Date Acquired'/>
-          </Form>
+          <Form
+            ref="editTree"
+            type={Tree}
+            options={formOptions}
+            value={this.formData}
+          />
           <BottomNav 
             items={ [ { label: 'Save', key: 'save' }, { label: 'Cancel', key: 'cancel' } ] } 
             onNavClick = {this.onNavClick.bind(this)} />

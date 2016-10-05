@@ -19,7 +19,9 @@ import Photo from '../components/Photo';
 const { width, height } = Dimensions.get('window');
 
 const IPOptions = {
-  title: 'Add photo to album...',
+  title: 'Add a picture to this Bonsai...',
+  allowsEditing: true,
+  noData: true,
   storageOptions: {
     skipBackup: true,
     path: 'woodlog'
@@ -37,6 +39,20 @@ class Tree extends Component {
   componentWillMount () {
     this.setState({saving: false});
     this.props.actions.show(this.props.nextId);
+
+    /*global.storage.load({
+      key: 'tree',
+      id: this.props.nextId
+    }).then((res) => {
+      const resCopy = Object.assign({}, res);
+      resCopy.type = '';
+      global.storage.save({
+        key: 'tree',
+        id: this.props.nextId,
+        rawData: resCopy,
+        expires: null
+      })
+    });*/
   }
 
   componentDidUpdate () {
@@ -76,15 +92,14 @@ class Tree extends Component {
       }
       else {
         // You can display the image using either data...
-        const source = {uri: 'data:image/jpeg;base64,' + response.data, isStatic: true};
+        let source; // = {uri: 'data:image/jpeg;base64,' + response.data, isStatic: true, isURL: false};
 
-        // or a reference to the platform specific asset location
         if (Platform.OS === 'ios') {
-          const source = {uri: response.uri.replace('file://', ''), isStatic: true};
+          source = {uri: response.uri.replace('file://', ''), isStatic: true};
         } else {
-          const source = {uri: response.uri, isStatic: true};
+          source = {uri: response.uri, isStatic: true};
         }
-
+        console.log(source);
         this.props.actions.savePhoto(source.uri);
         this.setState({ saving: true });
       }
@@ -117,7 +132,11 @@ class Tree extends Component {
     const list = [];
 
     for(const name in this.props.tree) {
-      if(this.props.tree[name].constructor === Array) continue;
+      if(this.props.tree[name].constructor === Array || this.props.tree[name] === null) continue;
+      if(this.props.tree[name].constructor === Date) {
+        list.push(<Text key={`prop-${name}`}>{name} {this.props.tree[name].toString()}</Text>);
+        continue;
+      }
       list.push(<Text key={`prop-${name}`}>{name} {this.props.tree[name]}</Text>);
     }
 

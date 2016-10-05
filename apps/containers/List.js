@@ -14,12 +14,16 @@ import TreeItem from '../components/TreeItem';
 import * as TreeActions from '../actions/treeActions';
 const { width, height } = Dimensions.get('window');
 
+import {removeAllImages} from '../utils/debug';
+
 
 class List extends Component {
 
   componentWillMount () {
     this.props.actions.reset();
     this.props.actions.getList();
+
+    // removeAllImages();
   }
 
   componentDidUpdate() {
@@ -44,6 +48,7 @@ class List extends Component {
     }
     return(
     <ScrollView style={styles.container}>
+      <Text style={styles.title}>Woodlog</Text>
       {trees}
       <TouchableOpacity key="add-tree" onPress={() => { this.onAddClick() }} style={styles.button}>
         <Text>Add Bonsai</Text>
@@ -66,6 +71,13 @@ const styles =  StyleSheet.create({
     marginTop: 5,
     padding: 20,
     backgroundColor: 'lightgray',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  title: {
+    fontFamily: 'Seattle Sans',
+    color: 'black',
+    fontSize: 30,
     alignItems: 'center',
     justifyContent: 'center'
   }

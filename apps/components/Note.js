@@ -1,15 +1,23 @@
 import React, {Component} from 'react';
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 
-import { Form, InputField,
-        Separator, SwitchField, LinkField ,
-        PickerField, DatePickerField
-      } from 'react-native-form-generator';
-
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import * as TreeActions from '../actions/treeActions';
+
+import t from 'tcomb-form-native';
+
+const Form = t.form.Form;
+
+const NoteModel = t.struct({
+  date: t.Date,
+  note: t.String
+});
+
+const formOptions = {
+  auto: 'placeholders'
+};
 
 const styles = StyleSheet.create({
   button: {
@@ -30,8 +38,14 @@ class Note extends Component {
   }
 
   componentWillMount() {
+
     this.formData = Object.assign({}, this.props, this.formData);
     this.setState({ editMode: false, saving: false });
+
+    this.defaultValues = {
+      note: this.props.note,
+      date: new Date(this.props.date)
+    }
   }
 
   editNote () {
@@ -40,8 +54,16 @@ class Note extends Component {
   }
 
   saveNote () {
-    this.props.actions.saveNote(this.formData, this.props.arrayID);
-    this.setState({ saving: true });
+    const validation = this.refs.editNote.validate();
+    if(validation.errors.length > 0) {
+
+    } else {
+      this.formData = Object.assign({}, validation.value);
+      this.props.actions.saveNote(this.formData, this.props.arrayID);
+      this.setState({ saving: true });
+    }
+
+    
   }
 
   cancelNote () {
@@ -53,10 +75,6 @@ class Note extends Component {
     this.setState({ saving: true });
   }
 
-  handleFormFocus () {
-
-  }
-
   componentDidUpdate () {
     if(this.state.saving) {
       this.setState({ editMode: false, saving: false });
@@ -64,36 +82,28 @@ class Note extends Component {
     }    
   }
 
-  handleFormChange (formData) {
-    this.formData = Object.assign({}, this.formData, formData);
-  }
-
-  renderEdit (date, note) {
+  renderEdit () {
     return (<View ref="formView"> 
               <Form
-                  ref='editNote'
-                  onFocus={this.handleFormFocus.bind(this)}
-                  onChange={this.handleFormChange.bind(this)}
-                  label="Edit Note">
-                    <DatePickerField ref='date' date={date}
-                      minimumDate={new Date('1/1/1900')}
-                      maximumDate={new Date()} mode='date' placeholder='Date Acquired'/>
-                    <InputField ref='note' placeholder='Your Note' value={note} />
-                </Form>
-                <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
-                  <Text>Save</Text>
-                </TouchableOpacity>
+                ref="editNote"
+                type={NoteModel}
+                options={formOptions}
+                value={this.defaultValues}
+              />
+              <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
+                <Text>Save</Text>
+              </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => { this.cancelNote() }} style={styles.button}>
-                  <Text>Cancel</Text>
-                </TouchableOpacity>
+              <TouchableOpacity onPress={() => { this.cancelNote() }} style={styles.button}>
+                <Text>Cancel</Text>
+              </TouchableOpacity>
             </View>);
   }
 
   renderNote (date, note) {
     const d = new Date(date);
     return (<View ref="NoteView"> 
-              <Text>{`${d.getFullYear()}/${d.getMonth()}/${d.getDay()}`}</Text>
+              <Text>{`${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`}</Text>
               <Text>{note}</Text>
               <TouchableOpacity onPress={() => { this.editNote() }} style={styles.button}>
                 <Text>Edit</Text>
@@ -108,7 +118,7 @@ class Note extends Component {
     const { date, note } = this.props;
 
     return (this.state.editMode ? 
-              this.renderEdit(date, note) :
+              this.renderEdit() :
               this.renderNote(date, note));
   }
 }

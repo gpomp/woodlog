@@ -11,10 +11,18 @@ import * as TreeActions from '../actions/treeActions';
 
 import Note from '../components/Note';
 
-import { Form, InputField,
-        Separator, SwitchField, LinkField ,
-        PickerField, DatePickerField
-      } from 'react-native-form-generator';
+import t from 'tcomb-form-native';
+
+const Form = t.form.Form;
+
+const NoteModel = t.struct({
+  note: t.String,
+  date: t.Date
+});
+
+const formOptions = {
+  auto: 'placeholders'
+};
 
 class Notes extends Component {
 
@@ -23,20 +31,22 @@ class Notes extends Component {
   }
 
   componentWillMount () {
-
+    this.defaultValues = {
+      note: '',
+      date: new Date()
+    }
   }
 
-  handleFormFocus (formData) {
-  }
+  saveNote () {    
+    const validation = this.refs.addNote.validate();
+    if(validation.errors.length > 0) {
 
-  handleFormChange (formData) {
-    this.formData = Object.assign({}, this.formData, formData);
-  }
-
-  saveNote () {
-    this.formData.id = -1;
-    this.props.actions.saveNote(this.formData);
-    this.onNoteUpdate();
+    } else {
+      const formData = Object.assign({}, validation.value);
+      formData.id = -1;
+      this.props.actions.saveNote(formData);
+      this.onNoteUpdate();
+    }
   }
 
   onNoteUpdate () {
@@ -57,20 +67,12 @@ class Notes extends Component {
         {noteList}
         <Text>Add Note</Text>
         <Form
-          ref='addNote'
-          onFocus={this.handleFormFocus.bind(this)}
-          onChange={this.handleFormChange.bind(this)}
-          label="Add a Note">
-            <InputField ref='note' placeholder='Your Note' />
-            <DatePickerField ref='date'
-              format='YYYY/MM/DD'
-              minimumDate={new Date('1900/1/1')}
-              maximumDate={new Date()} mode='date' placeholder='Date Acquired'
-              date={new Date()}
-            />
-              
-          </Form>
-          <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
+          ref="addNote"
+          type={NoteModel}
+          options={formOptions}
+          value={this.defaultValues}
+        />
+        <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
           <Text>Save Note</Text>
         </TouchableOpacity>
       </View>

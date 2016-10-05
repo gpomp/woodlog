@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
   image: {
     flex: 1,
     width,
-    height: 60,    
+    height: 200,    
     alignItems: 'center',
     justifyContent: 'center'
   }
@@ -51,9 +51,7 @@ export default class TreeItem extends Component {
     return (<TouchableHighlight key={ukey} onPress={() => { this.props.onNavClick(ukey) }} style={styles.button}>
               <View>
                 {(this.props.photos.length > 0) ?
-                  <Image resizeMode="cover" source={this.imgSRC} style={styles.image} >
-                    {childrens}
-                  </Image>
+                  <Image resizeMode="cover" source={this.imgSRC} style={styles.image} />
                   : childrens}
                 
               </View>

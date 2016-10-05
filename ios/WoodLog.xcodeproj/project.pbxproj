@@ -22,6 +22,8 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
+		2E25010B1DA5AF3500A54012 /* SEASANS.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 2E25010A1DA5AF3500A54012 /* SEASANS.TTF */; };
+		2E5634761DA5683400414506 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E5634731DA567BD00414506 /* libRNFS.a */; };
 		2EBF18321D84EDD400CD4B8A /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EBF18311D84EC3C00CD4B8A /* libRNImagePicker.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		E02D506CE42D47C1896DC5DA /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6109669B8CE24C208D7C275F /* libRNImagePicker.a */; };
@@ -91,6 +93,13 @@
 			remoteGlobalIDString = 83CBBA2E1A601D0E00E9B192;
 			remoteInfo = React;
 		};
+		2E5634721DA567BD00414506 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2E5634641DA567BD00414506 /* RNFS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F12AFB9B1ADAF8F800E0535D;
+			remoteInfo = RNFS;
+		};
 		2EBF18301D84EC3C00CD4B8A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2EBF18221D84EC3C00CD4B8A /* RNImagePicker.xcodeproj */;
@@ -141,6 +150,8 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = WoodLog/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = WoodLog/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
+		2E25010A1DA5AF3500A54012 /* SEASANS.TTF */ = {isa = PBXFileReference; lastKnownFileType = file; path = SEASANS.TTF; sourceTree = "<group>"; };
+		2E5634641DA567BD00414506 /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		2EBF18221D84EC3C00CD4B8A /* RNImagePicker.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNImagePicker.xcodeproj; path = "../node_modules/react-native-image-picker/ios/RNImagePicker.xcodeproj"; sourceTree = "<group>"; };
 		6109669B8CE24C208D7C275F /* libRNImagePicker.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNImagePicker.a; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
@@ -161,6 +172,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E5634761DA5683400414506 /* libRNFS.a in Frameworks */,
 				2EBF18321D84EDD400CD4B8A /* libRNImagePicker.a in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
@@ -274,6 +286,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		2E5634651DA567BD00414506 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2E5634731DA567BD00414506 /* libRNFS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		2EBF18231D84EC3C00CD4B8A /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -327,6 +347,8 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				2E25010A1DA5AF3500A54012 /* SEASANS.TTF */,
+				2E5634641DA567BD00414506 /* RNFS.xcodeproj */,
 				2EBF18221D84EC3C00CD4B8A /* RNImagePicker.xcodeproj */,
 				13B07FAE1A68108700A75B9A /* WoodLog */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -372,9 +394,9 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "WoodLog" */;
 			buildPhases = (
 				13B07F871A680F5B00A75B9A /* Sources */,
+				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
-				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 			);
 			buildRules = (
 			);
@@ -457,6 +479,10 @@
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 				},
 				{
+					ProductGroup = 2E5634651DA567BD00414506 /* Products */;
+					ProjectRef = 2E5634641DA567BD00414506 /* RNFS.xcodeproj */;
+				},
+				{
 					ProductGroup = 2EEC4D631DA42C5C00A85963 /* Products */;
 					ProjectRef = E5364E51D685404CA1495801 /* RNImagePicker.xcodeproj */;
 				},
@@ -530,6 +556,13 @@
 			remoteRef = 146834031AC3E56700842450 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		2E5634731DA567BD00414506 /* libRNFS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNFS.a;
+			remoteRef = 2E5634721DA567BD00414506 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		2EBF18311D84EC3C00CD4B8A /* libRNImagePicker.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -572,6 +605,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E25010B1DA5AF3500A54012 /* SEASANS.TTF in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 			);
