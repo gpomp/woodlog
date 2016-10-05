@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity, Image, TouchableHighlight} from 'react-native';
 
 const styles = StyleSheet.create({
   button: {
-    padding: 20,
+    padding: 5,
     backgroundColor: 'lightgray',
     alignItems: 'center',
     justifyContent: 'center',
@@ -11,12 +11,11 @@ const styles = StyleSheet.create({
     marginBottom: 3
   },
   photo: {
-    borderRadius: 75,
-    width: 150,
-    height: 150
+    width: 100,
+    height: 100
   },
   photoView: {
-
+    width: 100
   }
 });
 
@@ -37,7 +36,6 @@ export default class Photo extends Component {
   }
 
   removeImage () {
-    console.log('remove image photo');
     this.props.removeImage(this.props.id);
   }
 
@@ -49,9 +47,12 @@ export default class Photo extends Component {
     const src = {uri: this.state.src, isStatic: true};
 
     return (<View style={styles.photoView}>
-      <Image source={src}  style={styles.photo} />
+      <TouchableHighlight onPress={() => {this.props.onPhotoClick(this.props.arrayID);}}>
+        <Image source={src}  style={styles.photo} />
+      </TouchableHighlight>
+
       <TouchableOpacity onPress={() => { this.removeImage(); }} style={styles.button}>
-        <Text>Remove</Text>
+        <Text>X</Text>
       </TouchableOpacity>
     </View>);
   }

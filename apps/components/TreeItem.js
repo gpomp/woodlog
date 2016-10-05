@@ -1,14 +1,19 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, Text, TouchableHighlight, Image, Dimensions} from 'react-native';
+const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   button: {
-    padding: 20,
-    backgroundColor: 'lightgray',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 3,
     marginBottom: 3
+  },
+  image: {
+    flex: 1,
+    width,
+    height: 60,    
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });
 
@@ -17,10 +22,41 @@ export default class TreeItem extends Component {
     super(props);
   }
 
+  componentWillMount () {
+    this.setState({ init: false });
+    this.imgSRC = {};
+    if(this.props.photos.length > 0) {
+      const pID = this.props.photos[0];
+      global.storage.load({
+        key: 'img',
+        id: pID
+      }).then(res => {
+        this.imgSRC = {uri: res.src, isStatic: true};
+        this.setState({ init: true });
+      });
+    } else {
+      this.setState({ init: true })
+    }
+  }
+
   render() {
     const { ukey, label } = this.props;
-    return (<TouchableOpacity key={ukey} onPress={() => { this.props.onNavClick(ukey) }} style={styles.button}>
-              <Text>{label}</Text>
-            </TouchableOpacity>);
+    console.log('tree item state!', this.state.init);
+    if(!this.state.init) {
+      return null;
+    }
+
+    const childrens = <Text>{label}</Text>;
+
+    return (<TouchableHighlight key={ukey} onPress={() => { this.props.onNavClick(ukey) }} style={styles.button}>
+              <View>
+                {(this.props.photos.length > 0) ?
+                  <Image resizeMode="cover" source={this.imgSRC} style={styles.image} >
+                    {childrens}
+                  </Image>
+                  : childrens}
+                
+              </View>
+            </TouchableHighlight>);
   }
 }

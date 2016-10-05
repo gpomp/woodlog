@@ -4,7 +4,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  View, StyleSheet, Text, Platform
+  ScrollView, Dimensions, StyleSheet, Text, Platform, View
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -16,6 +16,7 @@ import ImagePicker from 'react-native-image-picker';
 import BottomNav from '../components/BottomNav';
 
 import Photo from '../components/Photo';
+const { width, height } = Dimensions.get('window');
 
 const IPOptions = {
   title: 'Add photo to album...',
@@ -34,7 +35,15 @@ export const ADDPHOTO = 'add_Photo';
 class Tree extends Component {
 
   componentWillMount () {
+    this.setState({saving: false});
     this.props.actions.show(this.props.nextId);
+  }
+
+  componentDidUpdate () {
+    if(this.state.saving) {
+      this.setState({ saving: false });
+      this.forceUpdate();
+    }    
   }
 
   onNavClick (key) {
@@ -56,8 +65,6 @@ class Tree extends Component {
 
   showImagePicker () {
     ImagePicker.showImagePicker(IPOptions, (response) => {
-      console.log('Response = ', response);
-
       if (response.didCancel) {
         console.log('User cancelled image picker');
       }
@@ -79,22 +86,21 @@ class Tree extends Component {
         }
 
         this.props.actions.savePhoto(source.uri);
-        
+        this.setState({ saving: true });
       }
     });
   }
 
   removeImage (id) {
-    console.log('remove image', id);
     this.props.actions.removePhoto(id);
+    this.setState({ saving: true });
   }
 
   getPhotoList () {
     let photos = [];
     photos = this.props.tree.photos.map((p, i) => {
-    console.log('GET PHOTOS', p, i);
       const k = `photos-${i}`;
-      return <Photo key={k} id={p} removeImage={this.removeImage.bind(this)}/>
+      return <Photo key={k} id={p} arrayID={i} removeImage={this.removeImage.bind(this)} onPhotoClick={(id) => {NavActions.SlideShow({nextId: id})}}/>
     });
 
     return photos;
@@ -102,7 +108,9 @@ class Tree extends Component {
 
   render () {
 
-    if(!this.props.initialized) return (<View style={styles.container}></View>);
+    if(!this.props.initialized) {
+      return null;
+    }
 
     const { tree } = this.props;
 
@@ -114,22 +122,27 @@ class Tree extends Component {
     }
 
     return(
-      <View style={styles.container}> 
+      <ScrollView style={styles.container}> 
         {list}
-        {this.getPhotoList()}
+        <View style={styles.photoContainer}>
+          {this.getPhotoList()}
+        </View>
         <BottomNav 
           items={ [ { label: 'See Notes', key: SEENOTES }, { label: 'Add Photo', key: ADDPHOTO }, { label: 'Edit', key: EDIT }, { label: 'Back', key: BACK } ] } 
           onNavClick = {this.onNavClick.bind(this)} />
-      </View>
+      </ScrollView>
     );
   }
 }
 
 const styles =  StyleSheet.create({
   container: {
-    marginTop: 70,
-    flex: 1,
-      justifyContent: 'center'
+    width, height,
+    marginTop: 68
+  },
+  photoContainer: {
+    flex: 1, 
+    flexDirection: 'row'
   }
 });
 

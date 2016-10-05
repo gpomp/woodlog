@@ -4,7 +4,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  View, StyleSheet, Text, TouchableOpacity
+  ScrollView, Dimensions, StyleSheet, Text, TouchableOpacity
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -12,6 +12,7 @@ import { connect } from 'react-redux'
 import TreeItem from '../components/TreeItem';
 
 import * as TreeActions from '../actions/treeActions';
+const { width, height } = Dimensions.get('window');
 
 
 class List extends Component {
@@ -38,16 +39,16 @@ class List extends Component {
     if(this.props.initialized) {
       trees = this.props.list.map((t, i) => {
         const k = `tree-${i}`;
-        return <TreeItem label={ t.species } key={k} ukey={ i } onNavClick={ this.onNavClick.bind(this) }/>
+        return <TreeItem label={ t.species } photos={ t.photos } key={k} ukey={ i } onNavClick={ this.onNavClick.bind(this) }/>
       });
     }
     return(
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {trees}
       <TouchableOpacity key="add-tree" onPress={() => { this.onAddClick() }} style={styles.button}>
         <Text>Add Bonsai</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
     
     
@@ -58,10 +59,11 @@ class List extends Component {
 
 const styles =  StyleSheet.create({
   container: {
-    marginTop: 70,
-    flex: 1
+    marginTop: 68,
+    width, height
   },
   button: {
+    marginTop: 5,
     padding: 20,
     backgroundColor: 'lightgray',
     alignItems: 'center',
