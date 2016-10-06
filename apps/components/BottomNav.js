@@ -1,16 +1,27 @@
 import React, {Component} from 'react';
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 
+import { width, REG_PADDING, textReg } from '../utils/globalStyles';
+
 const styles = StyleSheet.create({
-  button: {
-    width: 100,
-    height: 30,
+	container: {
+		flexDirection: 'row', 
+		alignItems: 'center', 
+		justifyContent: 'space-around', 
+		flex: 1, 
+		width: width - REG_PADDING * 2,
+		marginTop: 30
+	},
+	button: {
     padding: 10,
-    backgroundColor: 'lightgray',
     alignItems: 'center',
     justifyContent: 'center',
     margin: 3
-  }
+  },
+  textButton: Object.assign({}, textReg, {
+  	fontSize: 20,
+  	opacity: 1
+  })
 });
 
 export default class BottomNav extends Component {
@@ -23,12 +34,12 @@ export default class BottomNav extends Component {
 
     const navItems = items.map((navItem) => {
     	return <TouchableOpacity key={navItem.key} onPress={() => { this.props.onNavClick(navItem.key) }} style={styles.button}>
-          <Text>{navItem.label}</Text>
+          <Text style={styles.textButton}>{navItem.label.toUpperCase()}</Text>
         </TouchableOpacity>
     });
 
     return (
-      <View style={{alignItems: 'center', justifyContent: 'center' }}>
+      <View style={styles.container}>
       	{navItems}
       </View>
     );

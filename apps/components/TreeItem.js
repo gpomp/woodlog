@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {StyleSheet, View, Text, TouchableHighlight, Image, Dimensions} from 'react-native';
 const { width, height } = Dimensions.get('window');
 
-import {REG_PADDING} from '../utils/globalStyles';
+import {REG_PADDING, BLANK_IMAGE} from '../utils/globalStyles';
 
 const styles = StyleSheet.create({
   button: {
@@ -47,7 +47,11 @@ export default class TreeItem extends Component {
 
     return (<TouchableHighlight key={ukey} onPress={() => { this.props.onNavClick(ukey) }} style={styles.button}>
                 {(this.props.photos.length > 0) ?
-                  <Image resizeMode="cover" source={this.imgSRC} style={styles.image} />
+                  <Image 
+                    resizeMode="cover" 
+                    defaultSource={require('../../assets/blank.jpg')}
+                    source={this.imgSRC}
+                    style={styles.image} />
                   : childrens}
             </TouchableHighlight>);
   }

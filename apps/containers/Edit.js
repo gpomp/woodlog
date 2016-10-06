@@ -4,7 +4,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  View,
+  ScrollView,
   StyleSheet
 } from 'react-native'
 import { bindActionCreators } from 'redux'
@@ -15,13 +15,20 @@ import * as TreeActions from '../actions/treeActions';
 
 import BottomNav from '../components/BottomNav';
 
-import {formStyleSheet} from '../utils/globalStyles';
+import {
+  container as ctnStyles, 
+  formStyleSheet, 
+  bigFormStyleSheet,
+  mediumFieldSS,
+  autoFieldSS
+} from '../utils/globalStyles';
+
+import {mergeDeep} from '../utils/utils';
 
 const Form = t.form.Form;
 t.form.Form.stylesheet = formStyleSheet;
-console.log('stylesheet', t.form.Form.stylesheet);
 
-const Tree = t.struct({
+const TreeStruct = {
   name: t.String,
   type: t.maybe(t.String),
   age: t.maybe(t.Number),
@@ -30,14 +37,86 @@ const Tree = t.struct({
   height: t.maybe(t.Number), 
   trunkWidth: t.maybe(t.Number), 
   canopyWidth: t.maybe(t.Number), 
-  Source: t.maybe(t.String), 
-  date: t.maybe(t.Date)
-});
+  date: t.maybe(t.Date),
+  Source: t.maybe(t.String)
+};
+
+const Tree = t.struct(TreeStruct);
+
+const field = {
+  autoCapitalize: 'characters'
+};
+
+const isLabel = {
+  name: false,
+  type: false,
+  age: false,
+  potType: false,
+  style: false,
+  height: true,
+  trunkWidth: true,
+  canopyWidth: true,
+  Source: true,
+  date: true
+}
+
+const ph = {
+  name: 'BONSAI NAME',
+  type: 'BONSAI TYPE',
+  age: 'BONSAI AGE',
+  potType: 'POT TYPE',
+  style: 'BONSAI STYLE',
+  height: 'HEIGHT',
+  trunkWidth: 'TRUNK WIDTH',
+  canopyWidth: 'CANOPY WIDTH',
+  Source: 'PROVENANCE',
+  date: 'COLLECTED ON'
+};
+
+const ss = {
+  name: { s: bigFormStyleSheet, opts: {  }},
+  height: { s: mediumFieldSS, opts: { multiline: true }},
+  trunkWidth: { s: mediumFieldSS, opts: { multiline: true }},
+  canopyWidth: { s: mediumFieldSS, opts: { multiline: true }},
+  date: { s: mediumFieldSS, 
+    opts: {
+      config: {
+        format: (date) => {
+          const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+          const m = date.getMonth() + 1;
+          const month = m < 10 ? (`0${m}`) : m;
+          return `${month}  ${day}  ${date.getFullYear()}`;
+        }
+      }, multiline: true
+    }
+  },
+  Source: {s: autoFieldSS, opts: { multiline: true }}
+}
 
 const formOptions = {
   auto: 'placeholders',
+  autoCapitalize: 'characters',
+  fields: {},
   stylesheet: formStyleSheet
 };
+
+for(var name in TreeStruct) {
+  let copy = Object.assign({}, field);
+  if(isLabel[name]) {
+    copy.label = ph[name];
+    copy.placeholder = '';
+  } else {
+    copy.placeholder = ph[name];
+  }
+  
+  if(ss[name]) {
+    copy.stylesheet = mergeDeep({}, formStyleSheet);
+    copy.stylesheet = mergeDeep(copy.stylesheet, ss[name].s);
+    copy = mergeDeep(copy, ss[name].opts);
+
+  }
+  formOptions.fields[name] = copy;
+}
 
 export const SAVE = "save";
 export const CANCEL = "cancel";
@@ -66,6 +145,10 @@ class Edit extends Component {
         NavActions.List();
       }
     // }
+  }
+
+  onChange (value) {
+    console.log('value', value);
   }
 
   onNavClick (key) {
@@ -99,17 +182,18 @@ class Edit extends Component {
   render () {
     const { name, species, age, potType, style, height, trunkWidth, canopyWidth, Source, date } = this.props.tree;
     return(
-      <View style={styles.container}>
+      <ScrollView style={styles.container} style={styles.container}>
           <Form
             ref="editTree"
             type={Tree}
             options={formOptions}
             value={this.formData}
+            onChange={this.onChange.bind(this)}
           />
           <BottomNav 
             items={ [ { label: 'Save', key: 'save' }, { label: 'Cancel', key: 'cancel' } ] } 
             onNavClick = {this.onNavClick.bind(this)} />
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -128,11 +212,7 @@ const dispatchToProps = (dispatch) => {
 }
 
 const styles =  StyleSheet.create({
-  container: {
-    marginTop: 70,
-    flex: 1,
-      justifyContent: 'center'
-  }
+  container: Object.assign({}, ctnStyles),
 });
 
 export default connect(stateToProps, dispatchToProps)(Edit)

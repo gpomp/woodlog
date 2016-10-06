@@ -1,7 +1,9 @@
 
 
 import { Dimensions } from 'react-native';
-const { width, height } = Dimensions.get('window');
+export const { width, height } = Dimensions.get('window');
+
+
 
 export const LOGO_IMAGE = require('../../assets/logo.png');
 export const BLANK_IMAGE = require('../../assets/blank.jpg');
@@ -19,10 +21,11 @@ export const textReg = {
 	fontFamily: 'Seattle Sans',
 	color: '#383735',
 	fontSize: 33,
+	letterSpacing: 1.3,
 	opacity: 0.6
 }
 
-var LABEL_COLOR = '#FF0000';
+var LABEL_COLOR = '#242424';
 var INPUT_COLOR = '#242424';
 var ERROR_COLOR = '#FF0000';
 var HELP_COLOR = '#FF0000';
@@ -30,81 +33,93 @@ var BORDER_COLOR = '#797979';
 var DISABLED_COLOR = '#FF0000';
 var DISABLED_BACKGROUND_COLOR = '#FF0000';
 var FONT_SIZE = 20;
-var FONT_WEIGHT = '500';
+var BIG_FONT_SIZE = 25;
 var FONT = 'Seattle Sans'
+
+export const bigFormStyleSheet = {
+	textbox: {
+		normal: {
+    	fontSize: BIG_FONT_SIZE,
+      height: 45
+  	}
+	},
+	formGroup: {		
+  	normal: {
+  		borderBottomWidth: 3,
+      height: 20
+  	}
+	}
+};
 
 export const formStyleSheet = {
   fieldset: {
   },
   // the style applied to the container of all inputs
   formGroup: {
-    normal: {  	
+    normal: {
+    	flexDirection: 'row',
+    	flex: 1,
+    	alignItems: 'center',
     	borderBottomColor: BORDER_COLOR,
     	borderBottomWidth: 1,
       paddingLeft: 30,
       paddingRight: 30,
-      paddingTop:10,
-      paddingBottom:10
+      paddingTop:0,
+      paddingBottom:0,
+      marginBottom: 3
     },
     error: {
-      marginBottom: 10
     }
   },
   controlLabel: {
     normal: {
       color: LABEL_COLOR,
       fontSize: FONT_SIZE,
-      marginBottom: 7,
-      fontWeight: FONT_WEIGHT
+      fontFamily: FONT,
+      padding: 7,
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+      letterSpacing: 1.3
     },
     // the style applied when a validation error occours
     error: {
       color: ERROR_COLOR,
-      fontSize: FONT_SIZE,
-      marginBottom: 7,
-      fontWeight: FONT_WEIGHT
+      fontSize: FONT_SIZE
     }
   },
   helpBlock: {
     normal: {
       color: HELP_COLOR,
-      fontSize: FONT_SIZE,
-      marginBottom: 2
+      fontSize: FONT_SIZE
     },
     // the style applied when a validation error occours
     error: {
       color: HELP_COLOR,
-      fontSize: FONT_SIZE,
-      marginBottom: 2
+      fontSize: FONT_SIZE
     }
   },
   errorBlock: {
     fontSize: FONT_SIZE,
-    marginBottom: 2,
     color: ERROR_COLOR
   },
   textbox: {
     normal: {
       color: INPUT_COLOR,
       fontSize: FONT_SIZE,
+    	flex: 1,
       height: 36,
       padding: 7,
-      borderRadius: 4,
-      borderColor: BORDER_COLOR,
-      borderWidth: 0,
-      marginBottom: 5,
-      fontFamily: FONT
+      fontFamily: FONT,
+      letterSpacing: 1.3
     },
     // the style applied when a validation error occours
     error: {
       color: INPUT_COLOR,
       fontSize: FONT_SIZE,
+    	flex: 1,
       height: 36,
       padding: 7,
-      borderRadius: 4,
-      borderColor: ERROR_COLOR,
-      borderWidth: 1,
-      marginBottom: 5
+      fontFamily: FONT,
+      letterSpacing: 1.3
     },
     // the style applied when the textbox is not editable
     notEditable: {
@@ -114,27 +129,22 @@ export const formStyleSheet = {
       borderRadius: 4,
       borderColor: BORDER_COLOR,
       borderWidth: 0,
-      marginBottom: 5,
       color: DISABLED_COLOR,
       backgroundColor: DISABLED_BACKGROUND_COLOR
     }
   },
   checkbox: {
     normal: {
-      marginBottom: 4
     },
     // the style applied when a validation error occours
     error: {
-      marginBottom: 4
     }
   },
   select: {
     normal: {
-      marginBottom: 4
     },
     // the style applied when a validation error occours
     error: {
-      marginBottom: 4
     }
   },
   pickerTouchable: {
@@ -161,11 +171,10 @@ export const formStyleSheet = {
   },
   datepicker: {
     normal: {
-      marginBottom: 4
+
     },
     // the style applied when a validation error occours
     error: {
-      marginBottom: 4
     }
   },
   dateTouchable: {
@@ -174,17 +183,15 @@ export const formStyleSheet = {
   },
   dateValue: {
     normal: {
+      backgroundColor: 'rgba(0, 0, 0, 0)',
       color: INPUT_COLOR,
       fontSize: FONT_SIZE,
-      padding: 7,
-      marginBottom: 5,
-      fontFamily: 'Seattle Sans'
+      fontFamily: FONT
     },
     error: {
       color: ERROR_COLOR,
       fontSize: FONT_SIZE,
-      padding: 7,
-      marginBottom: 5
+      padding: 7
     }
   },
   buttonText: {
@@ -198,8 +205,59 @@ export const formStyleSheet = {
     borderColor: '#48BBEC',
     borderWidth: 1,
     borderRadius: 8,
-    marginBottom: 10,
     alignSelf: 'stretch',
     justifyContent: 'center'
+  }
+};
+
+export const autoFieldSS = {
+	formGroup: {
+    normal: {
+    	justifyContent: 'space-between',
+    	borderBottomWidth: 0,
+    	flex: 1,
+    	paddingRight: 0
+    }
+  },
+  textbox: {
+		normal: {
+    	borderBottomColor: BORDER_COLOR,
+    	borderBottomWidth: 1
+  	}
+	}
+};
+
+export const mediumFieldSS = {
+	formGroup: {
+    normal: {
+    	justifyContent: 'space-between',
+    	borderBottomWidth: 0,
+    	flex: 1,
+    	paddingRight: 0
+    }
+  },
+  textbox: {
+		normal: {
+    	width: (width - REG_PADDING * 2 - 30) / 2,
+    	borderBottomColor: BORDER_COLOR,
+    	borderBottomWidth: 1
+  	}
+	},
+	controlLabel: {
+    normal: {
+    	width: (width - REG_PADDING * 2 - 30) / 2
+    }
+  },
+  dateTouchable: {
+    normal: {
+    	borderBottomColor: BORDER_COLOR,
+    	borderBottomWidth: 1,
+    }
+  },
+  dateValue: {
+    normal: {
+      letterSpacing: 1.3,
+    	width: (width - REG_PADDING * 2 - 30) / 2
+    }
   }
 };
