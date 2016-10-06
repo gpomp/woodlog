@@ -2,18 +2,15 @@ import React, {Component} from 'react';
 import {StyleSheet, View, Text, TouchableHighlight, Image, Dimensions} from 'react-native';
 const { width, height } = Dimensions.get('window');
 
+import {REG_PADDING} from '../utils/globalStyles';
+
 const styles = StyleSheet.create({
   button: {
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 3
   },
   image: {
-    flex: 1,
-    width,
-    height: 200,    
-    alignItems: 'center',
-    justifyContent: 'center'
+    height: 200,
+    width: width - REG_PADDING * 2
   }
 });
 
@@ -31,7 +28,7 @@ export default class TreeItem extends Component {
         key: 'img',
         id: pID
       }).then(res => {
-        this.imgSRC = {uri: res.src, isStatic: true};
+        this.imgSRC = {uri: res.src, isStatic: true, width, height};
         this.setState({ init: true });
       });
     } else {
@@ -46,15 +43,12 @@ export default class TreeItem extends Component {
       return null;
     }
 
-    const childrens = <Text>{label}</Text>;
+    const childrens = <Text>This is a bonsai</Text>;
 
     return (<TouchableHighlight key={ukey} onPress={() => { this.props.onNavClick(ukey) }} style={styles.button}>
-              <View>
                 {(this.props.photos.length > 0) ?
                   <Image resizeMode="cover" source={this.imgSRC} style={styles.image} />
                   : childrens}
-                
-              </View>
             </TouchableHighlight>);
   }
 }

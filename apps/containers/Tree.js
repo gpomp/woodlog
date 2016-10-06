@@ -132,7 +132,8 @@ class Tree extends Component {
     const list = [];
 
     for(const name in this.props.tree) {
-      if(this.props.tree[name].constructor === Array || this.props.tree[name] === null) continue;
+      if(this.props.tree[name] === null ||
+        this.props.tree[name].constructor === Array) continue;
       if(this.props.tree[name].constructor === Date) {
         list.push(<Text key={`prop-${name}`}>{name} {this.props.tree[name].toString()}</Text>);
         continue;
@@ -157,7 +158,8 @@ class Tree extends Component {
 const styles =  StyleSheet.create({
   container: {
     width, height,
-    marginTop: 68
+    padding: 20,
+    paddingTop: 68
   },
   photoContainer: {
     flex: 1, 

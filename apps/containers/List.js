@@ -4,7 +4,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  ScrollView, Dimensions, StyleSheet, Text, TouchableOpacity
+  ScrollView, View, Dimensions, StyleSheet, Text, TouchableOpacity, Image
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -15,6 +15,13 @@ import * as TreeActions from '../actions/treeActions';
 const { width, height } = Dimensions.get('window');
 
 import {removeAllImages} from '../utils/debug';
+
+import {
+  LOGO_IMAGE, 
+  BLANK_IMAGE, 
+  container as ctnStyles, 
+  textReg as textStyle, 
+  REG_PADDING} from '../utils/globalStyles';
 
 
 class List extends Component {
@@ -48,11 +55,15 @@ class List extends Component {
     }
     return(
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Woodlog</Text>
-      {trees}
+      <View style={styles.viewLogo}>
+        <Image source={LOGO_IMAGE} style={styles.logoStyles} />
+      </View>
       <TouchableOpacity key="add-tree" onPress={() => { this.onAddClick() }} style={styles.button}>
-        <Text>Add Bonsai</Text>
+        <Image resizeMode="cover" source={BLANK_IMAGE} style={styles.blankImage}>
+          <Text style={styles.addTree}>ADD A NEW TREE</Text>
+        </Image>
       </TouchableOpacity>
+      {trees}
     </ScrollView>
   );
     
@@ -63,14 +74,32 @@ class List extends Component {
 }
 
 const styles =  StyleSheet.create({
-  container: {
-    marginTop: 68,
-    width, height
+  container: Object.assign({}, ctnStyles),
+
+  viewLogo: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+
   },
   button: {
-    marginTop: 5,
-    padding: 20,
-    backgroundColor: 'lightgray',
+    marginBottom: 3
+  },
+  blankImage: {
+    width: width - REG_PADDING * 2,
+    height: 200,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  addTree: Object.assign({
+    letterSpacing: 2,
+    backgroundColor: 'rgba(0,0,0,0)'
+  }, textStyle),
+
+  logoStyles: {
+    width: 90,
+    height: 90,
+    marginBottom: 25,
     alignItems: 'center',
     justifyContent: 'center'
   },

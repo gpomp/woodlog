@@ -37,11 +37,11 @@ export default class App extends Component {
     return (
       <Router>
         <Scene type='replace' key="root">
-          <Scene type='replace' key="List" component={List} title="Tree List" initial={true} />
-          <Scene type='replace' key="Tree" component={Tree} title="Bonzai" />
+          <Scene type='replace' key="List" component={List} title="Tree List" initial={true} hideNavBar={true}/>
+          <Scene type='replace' key="Tree" component={Tree} title="Bonsai" />
           <Scene key="Notes" component={Notes} title="Notes"/>
           <Scene key="SlideShow" component={SlideShow} title="Slide Show"/>
-          <Scene type='replace' key="Edit" component={Edit} title="Edit Bonzai" />
+          <Scene type='replace' key="Edit" component={Edit} title="Edit Bonsai"  hideNavBar={true}/>
         </Scene>
       </Router>
     )

@@ -15,7 +15,11 @@ import * as TreeActions from '../actions/treeActions';
 
 import BottomNav from '../components/BottomNav';
 
+import {formStyleSheet} from '../utils/globalStyles';
+
 const Form = t.form.Form;
+t.form.Form.stylesheet = formStyleSheet;
+console.log('stylesheet', t.form.Form.stylesheet);
 
 const Tree = t.struct({
   name: t.String,
@@ -31,7 +35,8 @@ const Tree = t.struct({
 });
 
 const formOptions = {
-  auto: 'placeholders'
+  auto: 'placeholders',
+  stylesheet: formStyleSheet
 };
 
 export const SAVE = "save";
