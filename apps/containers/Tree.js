@@ -4,7 +4,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  ScrollView, Dimensions, StyleSheet, Text, Platform, View
+  ScrollView, StyleSheet, Text, Platform, View
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -16,7 +16,8 @@ import ImagePicker from 'react-native-image-picker';
 import BottomNav from '../components/BottomNav';
 
 import Photo from '../components/Photo';
-const { width, height } = Dimensions.get('window');
+
+import { width, height, REG_PADDING, container as ctnStyles, textReg, TEXT_PADDING, BIG_FONT_SIZE, monthNames } from '../utils/globalStyles';
 
 const IPOptions = {
   title: 'Add a picture to this Bonsai...',
@@ -55,7 +56,7 @@ class Tree extends Component {
     });*/
   }
 
-  componentDidUpdate () {
+  componentDidUpdate () {    
     if(this.state.saving) {
       this.setState({ saving: false });
       this.forceUpdate();
@@ -99,7 +100,6 @@ class Tree extends Component {
         } else {
           source = {uri: response.uri, isStatic: true};
         }
-        console.log(source);
         this.props.actions.savePhoto(source.uri);
         this.setState({ saving: true });
       }
@@ -121,6 +121,20 @@ class Tree extends Component {
     return photos;
   }
 
+  getFormatedDate (d) {
+    const date = new Date(d);
+    const day = date.getDate() + 1;
+    let dim = 'th';
+    if(day === 1 || day === 11 || day === 21) dim = 'st';
+    if(day === 2 || day === 12 || day === 22) dim = 'nd';
+    if(day === 3 || day === 13 || day === 23) dim = 'rd';
+    return `${monthNames[date.getMonth()]} ${day}${dim} ${date.getFullYear()}`;
+  }
+
+  getProp (p) {
+    return p === null || p === undefined || p === 'undefined' ? '' : p.toString().toUpperCase();
+  }
+
   render () {
 
     if(!this.props.initialized) {
@@ -131,19 +145,20 @@ class Tree extends Component {
 
     const list = [];
 
-    for(const name in this.props.tree) {
-      if(this.props.tree[name] === null ||
-        this.props.tree[name].constructor === Array) continue;
-      if(this.props.tree[name].constructor === Date) {
-        list.push(<Text key={`prop-${name}`}>{name} {this.props.tree[name].toString()}</Text>);
-        continue;
-      }
-      list.push(<Text key={`prop-${name}`}>{name} {this.props.tree[name]}</Text>);
-    }
-
     return(
       <ScrollView style={styles.container}> 
-        {list}
+        <Text style={styles.title}>{this.getProp(tree.name)}</Text>
+        <Text style={styles.text}>{this.getProp(tree.species)}</Text>
+        <Text style={styles.text}>{this.getProp(tree.age)}</Text>
+        <Text style={styles.text}>{this.getProp(tree.potType)}</Text>
+        <Text style={styles.text}>{this.getProp(tree.style)}</Text>
+        <Text>{"\n"}</Text>
+        <Text style={styles.text}>{this.getProp(tree.height)}"</Text>
+        <Text style={styles.text}>{this.getProp(tree.trunkWidth)}"</Text>
+        <Text style={styles.text}>{this.getProp(tree.canopyWidth)}"</Text>
+        <Text>{"\n"}</Text>
+        <Text style={styles.text}>{this.getProp(tree.Source)}</Text>
+        <Text style={styles.text}>DATE ACQUIRED {this.getFormatedDate(tree.date).toUpperCase()}</Text>
         <View style={styles.photoContainer}>
           {this.getPhotoList()}
         </View>
@@ -156,14 +171,26 @@ class Tree extends Component {
 }
 
 const styles =  StyleSheet.create({
-  container: {
-    width, height,
-    padding: 20,
-    paddingTop: 68
-  },
+  container: Object.assign({}, ctnStyles, {}),
+  title: Object.assign({}, textReg, {
+    fontSize: 35,
+    opacity: 1,
+    paddingLeft: TEXT_PADDING,
+    paddingRight: TEXT_PADDING
+  }),
+  text: Object.assign({}, textReg, {
+    fontSize: 15,
+    opacity: 1,
+    paddingLeft: TEXT_PADDING,
+    paddingRight: TEXT_PADDING
+  }),
   photoContainer: {
     flex: 1, 
-    flexDirection: 'row'
+    flexDirection: 'row',
+    paddingLeft: TEXT_PADDING,
+    paddingRight: TEXT_PADDING,
+    marginTop: 10,
+    marginBottom: 10
   }
 });
 
@@ -171,7 +198,8 @@ const stateToProps = (state) => {
   return {
     id: state.tree.id,  
     initialized: state.tree.initialized,  
-    tree: state.tree.rawData
+    tree: state.tree.rawData,
+    isPending: state.tree.isPending
   }
 }
 

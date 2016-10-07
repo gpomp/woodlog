@@ -50,7 +50,7 @@ class List extends Component {
     if(this.props.initialized) {
       trees = this.props.list.map((t, i) => {
         const k = `tree-${i}`;
-        return <TreeItem label={ t.species } photos={ t.photos } key={k} ukey={ i } onNavClick={ this.onNavClick.bind(this) }/>
+        return <TreeItem label={ t.name } photos={ t.photos } key={k} ukey={ i } onNavClick={ this.onNavClick.bind(this) }/>
       });
     }
     return(

@@ -8,26 +8,98 @@ import * as TreeActions from '../actions/treeActions';
 
 import t from 'tcomb-form-native';
 
+import { width, 
+          height, 
+          REG_PADDING, 
+          container as ctnStyles, 
+          textReg, 
+          TEXT_PADDING, 
+          BIG_FONT_SIZE, 
+          formStyleSheet,
+          mediumFieldSS,
+          monthNames,
+          formatDate } from '../utils/globalStyles';
+
+import {mergeDeep} from '../utils/utils';
+
 const Form = t.form.Form;
+t.form.Form.stylesheet = formStyleSheet;
 
 const NoteModel = t.struct({
-  date: t.Date,
-  note: t.String
+  note: t.String,
+  date: t.Date
+});
+
+const ctnWidth = width - REG_PADDING * 2 - TEXT_PADDING * 2;
+
+let datess = mergeDeep({}, formStyleSheet);
+datess = mergeDeep(datess, mediumFieldSS);
+
+let notess = mergeDeep({}, formStyleSheet);
+notess = mergeDeep(notess, {
+  textbox: {
+    normal: {
+      height: 200
+    }
+  }
 });
 
 const formOptions = {
-  auto: 'placeholders'
+  auto: 'placeholders',
+  autoCapitalize: 'characters',
+  stylesheet: formStyleSheet,
+  fields: {
+    note: {
+      stylesheet: notess,
+      placeholder: 'YOUR NOTE',
+      multiline: true
+    },
+    date: {
+      stylesheet: datess,
+      label: 'NOTE\'S DATE',
+      config: {
+        format: formatDate
+      }
+    }
+  }
 };
 
 const styles = StyleSheet.create({
   button: {
-    width: 100,
-    height: 30,
-    padding: 10,
-    backgroundColor: 'lightgray',
     alignItems: 'center',
     justifyContent: 'center',
     margin: 3
+  },
+  textButton: Object.assign({}, textReg, {
+    fontSize: 15,
+    opacity: 1
+  }),
+  title: Object.assign({}, textReg, {
+    opacity: 1
+  }),
+  btnCtn: {
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-around', 
+    flex: 1, 
+    width: ctnWidth
+  },
+  ctn: {
+    flexDirection: 'row', 
+    alignItems: 'flex-start', 
+    justifyContent: 'center', 
+    flex: 1, 
+    width: ctnWidth
+  },
+  textCtn: {
+    flex: ctnWidth * 0.75
+  },
+  textText: Object.assign({}, textReg, {
+    opacity: 1,
+    fontSize: 11
+  }),
+  dateCtn: {
+    flex: ctnWidth * 0.25
   }
 });
 
@@ -90,27 +162,36 @@ class Note extends Component {
                 options={formOptions}
                 value={this.defaultValues}
               />
-              <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
-                <Text>Save</Text>
-              </TouchableOpacity>
+              <View style={styles.btnCtn}>
+                <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
+                  <Text style={styles.textButton}>SAVE</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => { this.cancelNote() }} style={styles.button}>
-                <Text>Cancel</Text>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={() => { this.cancelNote() }} style={styles.button}>
+                  <Text style={styles.textButton}>CANCEL</Text>
+                </TouchableOpacity>
+              </View>
             </View>);
   }
 
   renderNote (date, note) {
     const d = new Date(date);
-    return (<View ref="NoteView"> 
-              <Text>{`${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`}</Text>
-              <Text>{note}</Text>
-              <TouchableOpacity onPress={() => { this.editNote() }} style={styles.button}>
-                <Text>Edit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => { this.removeNote() }} style={styles.button}>
-                <Text>Remove</Text>
-              </TouchableOpacity>
+    return (<View style={{width: width - REG_PADDING * 2, flexDirection: 'column', alignItems: 'center'}} ref="NoteView"> 
+              <View style={styles.ctn}>
+                <View style={styles.textCtn}>
+                  <Text style={styles.textText}>{note}</Text>
+                </View>
+                <View style={styles.dateCtn}>
+                  <Text style={styles.textText}>{`${d.getFullYear()}`}</Text>
+                  <Text style={styles.textText}>{`${monthNames[d.getMonth()]} ${d.getDate()}`}</Text>
+                  <TouchableOpacity onPress={() => { this.editNote() }} style={styles.button}>
+                    <Text style={styles.textButton}>EDIT</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { this.removeNote() }} style={styles.button}>
+                    <Text style={styles.textButton}>REMOVE</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>);
   }
 

@@ -20,10 +20,16 @@ import {
   formStyleSheet, 
   bigFormStyleSheet,
   mediumFieldSS,
-  autoFieldSS
+  dateFieldSS,
+  autoFieldSS,
+  formatDate,
+  width,
+  height,
+  REG_PADDING
 } from '../utils/globalStyles';
 
 import {mergeDeep} from '../utils/utils';
+import datepicker from '../components/DatePickerCustomTemplate'
 
 const Form = t.form.Form;
 t.form.Form.stylesheet = formStyleSheet;
@@ -78,14 +84,13 @@ const ss = {
   height: { s: mediumFieldSS, opts: { multiline: true }},
   trunkWidth: { s: mediumFieldSS, opts: { multiline: true }},
   canopyWidth: { s: mediumFieldSS, opts: { multiline: true }},
-  date: { s: mediumFieldSS, 
+  date: { s: dateFieldSS, 
     opts: {
+      //template: datepicker,
       config: {
-        format: (date) => {
-          const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
-          const m = date.getMonth() + 1;
-          const month = m < 10 ? (`0${m}`) : m;
-          return `${month}  ${day}  ${date.getFullYear()}`;
+        format: formatDate,
+        pickerTouch: (collapsed) => {
+          console.log('collapsed', collapsed);
         }
       }, multiline: true
     }
@@ -188,6 +193,7 @@ class Edit extends Component {
             type={Tree}
             options={formOptions}
             value={this.formData}
+            style={styles.formStyles}
             onChange={this.onChange.bind(this)}
           />
           <BottomNav 
@@ -213,6 +219,11 @@ const dispatchToProps = (dispatch) => {
 
 const styles =  StyleSheet.create({
   container: Object.assign({}, ctnStyles),
+  formStyles: {
+    flexDirection: 'row',
+    height,
+    width: width - REG_PADDING * 2
+  }
 });
 
 export default connect(stateToProps, dispatchToProps)(Edit)

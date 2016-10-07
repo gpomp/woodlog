@@ -35,6 +35,8 @@ export default TreeReducer = (state = initialState, action) => {
   switch (action.type) {
     case `${CHANGETREE}_PENDING`:
     case `${SHOWTREE}_PENDING`:
+    case `${SAVENEWPHOTO}_PENDING`:
+    case `${DELETEPHOTO}_PENDING`:
       return {
         ...state, isPending: true
       }
@@ -60,7 +62,7 @@ export default TreeReducer = (state = initialState, action) => {
       global.storage.save(stateCopy);
 
       return {
-        ...state, rawData: stateCopy.rawData
+        ...state, rawData: stateCopy.rawData, isPending: false
       }
     break;
     case `${DELETEPHOTO}_FULFILLED`:
@@ -78,7 +80,7 @@ export default TreeReducer = (state = initialState, action) => {
       global.storage.save(stateCopy);
 
       return {
-        ...state, rawData: stateCopy.rawData
+        ...state, rawData: stateCopy.rawData, isPending: false
       }      
     break;
     case REMOVENOTE:

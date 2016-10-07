@@ -1,16 +1,17 @@
 'use strict'
 
-import { Actions as NavActions } from 'react-native-router-flux';
-
 import React, {Component} from 'react';
 import {
-  View, Image, StyleSheet,Dimensions, Text
+  View, Image, StyleSheet, Text, TouchableOpacity
 } from 'react-native'
+import { Actions as NavActions } from 'react-native-router-flux';
+
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import Swiper from 'react-native-swiper';
-const { width, height } = Dimensions.get('window');
+
+import {textReg, width, height} from '../utils/globalStyles';
 
 
 class PhotoSlideShow extends Component {
@@ -49,6 +50,9 @@ class PhotoSlideShow extends Component {
       <Swiper style={styles.wrapper} showsButtons={false} index={this.props.nextId}>
         {this.getImageList()}
       </Swiper>
+      <TouchableOpacity onPress={() => { NavActions.pop(); }} style={styles.button}>
+        <Text style={styles.buttonText}>X</Text>
+      </TouchableOpacity>
     </View>);    
   }
 
@@ -64,7 +68,23 @@ const styles =  StyleSheet.create({
   viewStyle: {
         width,
     height
-  }
+  },
+  button: {
+    position: 'absolute',
+    top: 25,
+    right: 15,
+    backgroundColor: 'black',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  buttonText: Object.assign({}, textReg, {
+    color: 'white',
+    opacity: 1,
+    fontSize: 10
+  })
 });
 
 

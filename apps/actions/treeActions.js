@@ -98,21 +98,28 @@ export const savePhoto = (src) => ({
 export const removePhoto = (id) => ({
   type: DELETEPHOTO,
   payload: new Promise(resolve => {
-
+    // Get the img url
     global.storage.load({
       key: 'img',
       id: id
     }).then(res => {
-      RNFS.unlink(res.src)
-      .then(() => {
-        global.storage.remove({
-          key: 'img', id: id
-        }).then(res => {
+      // Remove image from storage
+      global.storage.remove({
+        key: 'img', id: id
+      }).then(res => {
+        if(res === null) {
+          resolve({id: id});
+          return;
+        }
+        RNFS.unlink(res.src)
+        .then(() => {
+          resolve({id: id});
+        }).catch(err => {
           resolve({id: id});
         });
-      })
+      });     
+    }).catch(err => {
+      resolve({id: id});
     });
-
-    
   })
 });

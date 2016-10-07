@@ -1,8 +1,9 @@
 'use strict'
+import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  View, StyleSheet, Text, TouchableOpacity
+  ScrollView, StyleSheet, Text, TouchableOpacity
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -13,15 +14,58 @@ import Note from '../components/Note';
 
 import t from 'tcomb-form-native';
 
+import { width, 
+          height, 
+          REG_PADDING, 
+          container as ctnStyles, 
+          textReg, 
+          TEXT_PADDING, 
+          BIG_FONT_SIZE, 
+          formStyleSheet,
+          mediumFieldSS,
+          formatDate } from '../utils/globalStyles';
+
+import {mergeDeep} from '../utils/utils';
+
+
 const Form = t.form.Form;
+t.form.Form.stylesheet = formStyleSheet;
 
 const NoteModel = t.struct({
   note: t.String,
   date: t.Date
 });
 
+let datess = mergeDeep({}, formStyleSheet);
+datess = mergeDeep(datess, mediumFieldSS);
+
+let notess = mergeDeep({}, formStyleSheet);
+notess = mergeDeep(notess, {
+  textbox: {
+    normal: {
+      height: 200
+    }
+  }
+});
+
 const formOptions = {
-  auto: 'placeholders'
+  auto: 'placeholders',
+  autoCapitalize: 'characters',
+  stylesheet: formStyleSheet,
+  fields: {
+    note: {
+      stylesheet: notess,
+      placeholder: 'YOUR NOTE',
+      multiline: true
+    },
+    date: {
+      stylesheet: datess,
+      label: 'NOTE\'S DATE',
+      config: {
+        format: formatDate
+      }
+    }
+  }
 };
 
 class Notes extends Component {
@@ -62,38 +106,42 @@ class Notes extends Component {
     });
 
     return(
-      <View style={styles.container}> 
-        <Text>Notes</Text>
+      <ScrollView style={styles.container}> 
+        <Text style={styles.title}>NOTES</Text>
         {noteList}
-        <Text>Add Note</Text>
-        <Form
+        <Text style={{ marginTop: 30 }}>ADD NOTE</Text>
+        <Form 
           ref="addNote"
           type={NoteModel}
           options={formOptions}
           value={this.defaultValues}
         />
         <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
-          <Text>Save Note</Text>
+          <Text style={styles.textButton}>SAVE NOTE</Text>
         </TouchableOpacity>
-      </View>
+        <TouchableOpacity onPress={() => { NavActions.pop(); }} style={styles.button}>
+          <Text style={styles.textButton}>BACK</Text>
+        </TouchableOpacity>
+      </ScrollView>
     );
   }
 }
 
 const styles =  StyleSheet.create({
-  container: {
-    marginTop: 70,
-    justifyContent: 'center'
-  },
+  container: Object.assign({}, ctnStyles, {}),
   button: {
-    width: 100,
-    height: 30,
     padding: 10,
-    backgroundColor: 'lightgray',
     alignItems: 'center',
     justifyContent: 'center',
     margin: 3
-  }
+  },
+  textButton: Object.assign({}, textReg, {
+    fontSize: 20,
+    opacity: 1
+  }),
+  title: Object.assign({}, textReg, {
+    opacity: 1
+  })
 });
 
 const stateToProps = (state) => {
