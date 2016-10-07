@@ -33,7 +33,7 @@ export const monthNames = ["January", "February", "March", "April", "May", "June
 var LABEL_COLOR = '#242424';
 var INPUT_COLOR = '#242424';
 var ERROR_COLOR = '#FF0000';
-var HELP_COLOR = '#FF0000';
+var HELP_COLOR = '#242424';
 var BORDER_COLOR = '#797979';
 var DISABLED_COLOR = '#FF0000';
 var DISABLED_BACKGROUND_COLOR = '#FF0000';
@@ -47,22 +47,6 @@ export const formatDate = (date) => {
   const month = m < 10 ? (`0${m}`) : m;
   return `${month}  ${day}  ${date.getFullYear()}`;
 }
-
-export const bigFormStyleSheet = {
-	textbox: {
-		normal: {
-    	fontSize: BIG_FONT_SIZE,
-      height: 45,
-      flex: 0
-  	}
-	},
-	formGroup: {		
-  	normal: {
-  		borderBottomWidth: 3,
-      height: 20
-  	}
-	}
-};
 
 export const formStyleSheet = {
   fieldset: {
@@ -97,6 +81,7 @@ export const formStyleSheet = {
     // the style applied when a validation error occours
     error: {
       color: ERROR_COLOR,
+      fontFamily: FONT,
       fontSize: FONT_SIZE
     }
   },
@@ -225,6 +210,19 @@ export const formStyleSheet = {
   }
 };
 
+export const bigFormStyleSheet = {
+	textbox: {
+		normal: {
+    	fontSize: BIG_FONT_SIZE,
+  	}
+	},
+	formGroup: {		
+  	normal: {
+  		borderBottomWidth: 3
+  	}
+	}
+};
+
 export const autoFieldSS = {
 	formGroup: {
     normal: {
@@ -249,20 +247,21 @@ export const mediumFieldSS = {
     	borderBottomWidth: 0,
       flex: 0,
     	paddingRight: 0,
-    	width: (width - REG_PADDING * 2 - TEXT_PADDING),
     	flexWrap: 'wrap'
     }
   },
   textbox: {
 		normal: {
-    	flex: 0.5,
+    	width: (width - REG_PADDING * 2 - TEXT_PADDING) * 0.5,
+      flex: -1,
     	borderBottomColor: BORDER_COLOR,
     	borderBottomWidth: 1
   	}
 	},
 	controlLabel: {
     normal: {
-    	flex: 0.5
+      flex: -1,
+    	width: (width - REG_PADDING * 2 - TEXT_PADDING) * 0.5
     }
   }
 };
@@ -272,38 +271,92 @@ export const dateFieldSS = {
     normal: {
     	flexDirection: 'row',
     	borderBottomWidth: 0,
+    	alignItems: 'flex-start',
       flex: 0,
     	paddingRight: 0,
     	width: (width - REG_PADDING * 2 - TEXT_PADDING),
-    	flexWrap: 'wrap',
-    	
-    	alignItems: 'flex-start',
-    	position: 'relative'
+    	flexWrap: 'wrap'
     }
   },
 	controlLabel: {
     normal: {
-    	flex: 0
+    	position: 'absolute',
+    	top: 0,
+    	left: TEXT_PADDING,
+    	width: (width - REG_PADDING * 2 - TEXT_PADDING) * 0.5
     }
   },
   dateTouchable: {
     normal: {
-    	flex: 0,
+    	padding: 7,
     	borderBottomColor: BORDER_COLOR,
-    	borderBottomWidth: 1
+    	borderBottomWidth: 1,
+    	width: (width - REG_PADDING * 2 - TEXT_PADDING) * 0.5
     }
   },
   dateValue: {
     normal: {
-    	flex: 0.5,
-      letterSpacing: 1.3
+      letterSpacing: 1.3,
+    	textAlign: 'center'
     }
   },
   datepicker: {
     normal: {
-    	flex: -1,
+    	flex: 0,
+    	marginTop: 30,
     	width: (width - REG_PADDING * 2 - TEXT_PADDING)
     	
+    }
+  }
+}
+
+export const nestedStructSS = {
+	fieldset: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		alignItems: 'flex-start',
+		paddingLeft: TEXT_PADDING
+	},
+
+	controlLabel: {
+		normal: {
+			flex: -1,
+			width: (width - REG_PADDING * 2 - TEXT_PADDING) * 0.5,
+    	height: 36
+		}
+	},
+
+	formGroup: {
+		normal: {
+			flex: -1,
+			alignItems: 'flex-start',
+			borderBottomWidth: 0,
+			flexDirection: 'row',
+			flexWrap: 'wrap',
+			paddingLeft: 0,
+			paddingRight: 0
+		}
+	},
+
+	textbox: {
+		normal: {
+			width: 33,
+			flex: -1,
+			paddingLeft: 5,
+			paddingRight: 5,
+    	borderBottomColor: BORDER_COLOR,
+    	borderBottomWidth: 1,
+    	textAlign: 'center'
+		}
+	},
+	helpBlock: {
+    normal: {
+    	flex: -1,
+    	height: 36,
+    	paddingLeft: 8,
+    	paddingRight: 8,
+    	paddingTop: 7,
+    	paddingBottom: 7
     }
   }
 }

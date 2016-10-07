@@ -16,11 +16,13 @@ import { width,
           TEXT_PADDING, 
           BIG_FONT_SIZE, 
           formStyleSheet,
+          dateFieldSS,
           mediumFieldSS,
           monthNames,
           formatDate } from '../utils/globalStyles';
 
 import {mergeDeep} from '../utils/utils';
+import datepicker from '../components/DatePickerCustomTemplate';
 
 const Form = t.form.Form;
 t.form.Form.stylesheet = formStyleSheet;
@@ -33,11 +35,16 @@ const NoteModel = t.struct({
 const ctnWidth = width - REG_PADDING * 2 - TEXT_PADDING * 2;
 
 let datess = mergeDeep({}, formStyleSheet);
-datess = mergeDeep(datess, mediumFieldSS);
+datess = mergeDeep(datess, dateFieldSS);
 
 let notess = mergeDeep({}, formStyleSheet);
 notess = mergeDeep(notess, {
   textbox: {
+    formGroup: {
+      normal: {
+        backgroundColor: 'white'
+      }
+    },
     normal: {
       height: 200
     }
@@ -55,6 +62,7 @@ const formOptions = {
       multiline: true
     },
     date: {
+      template: datepicker,
       stylesheet: datess,
       label: 'NOTE\'S DATE',
       config: {

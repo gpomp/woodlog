@@ -22,6 +22,7 @@ import {
   mediumFieldSS,
   dateFieldSS,
   autoFieldSS,
+  nestedStructSS,
   formatDate,
   width,
   height,
@@ -29,7 +30,8 @@ import {
 } from '../utils/globalStyles';
 
 import {mergeDeep} from '../utils/utils';
-import datepicker from '../components/DatePickerCustomTemplate'
+import datepicker from '../components/DatePickerCustomTemplate';
+import TextBoxCustomTemplate from '../components/TextBoxCustomTemplate';
 
 const Form = t.form.Form;
 t.form.Form.stylesheet = formStyleSheet;
@@ -40,6 +42,11 @@ const TreeStruct = {
   age: t.maybe(t.Number),
   potType: t.maybe(t.String),
   style: t.maybe(t.String),
+  potSize: t.struct({
+    width: t.maybe(t.Number),
+    height: t.maybe(t.Number),
+    depth: t.maybe(t.Number)
+  }),
   height: t.maybe(t.Number), 
   trunkWidth: t.maybe(t.Number), 
   canopyWidth: t.maybe(t.Number), 
@@ -81,21 +88,19 @@ const ph = {
 
 const ss = {
   name: { s: bigFormStyleSheet, opts: {  }},
-  height: { s: mediumFieldSS, opts: { multiline: true }},
-  trunkWidth: { s: mediumFieldSS, opts: { multiline: true }},
-  canopyWidth: { s: mediumFieldSS, opts: { multiline: true }},
+  potSize: { s: nestedStructSS },
+  height: { s: mediumFieldSS, opts: { template: TextBoxCustomTemplate }},
+  trunkWidth: { s: mediumFieldSS, opts: { template: TextBoxCustomTemplate }},
+  canopyWidth: { s: mediumFieldSS, opts: { template: TextBoxCustomTemplate }},
   date: { s: dateFieldSS, 
     opts: {
-      //template: datepicker,
+      template: datepicker,
       config: {
-        format: formatDate,
-        pickerTouch: (collapsed) => {
-          console.log('collapsed', collapsed);
-        }
+        format: formatDate
       }, multiline: true
     }
   },
-  Source: {s: autoFieldSS, opts: { multiline: true }}
+  Source: {s: autoFieldSS, opts: { template: TextBoxCustomTemplate }}
 }
 
 const formOptions = {
@@ -121,6 +126,35 @@ for(var name in TreeStruct) {
 
   }
   formOptions.fields[name] = copy;
+}
+
+const potFO = {
+  width: {
+    template: TextBoxCustomTemplate,
+    autoCapitalize: 'characters',
+    label: 'POT SIZE',
+    placeholder: 'W\"',
+    help: 'x'
+  },
+  height: {
+    template: TextBoxCustomTemplate,
+    autoCapitalize: 'characters',
+    placeholder: 'H\"',
+    help: 'x'
+  },
+  depth: {
+    template: TextBoxCustomTemplate,
+    autoCapitalize: 'characters',
+    placeholder: 'D\"'
+  }
+}
+
+const nestedst = mergeDeep({}, formStyleSheet);
+nestedst = mergeDeep(nestedst, nestedStructSS);
+
+formOptions.fields.potSize = {
+  stylesheet: nestedst,
+  fields: potFO
 }
 
 export const SAVE = "save";

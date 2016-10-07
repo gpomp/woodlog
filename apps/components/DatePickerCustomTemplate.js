@@ -42,14 +42,14 @@ class DatePickerCustomTemplate extends React.Component {
     }
     const height = (this.state.isCollapsed) ? 0 : UIPICKER_HEIGHT;
     return (
-      <View>
+      <View style={{alignItems: 'flex-end'}}>
         <TouchableOpacity style={touchableStyle}
           onPress={() => {
             animation(this.state.height, Object.assign({
               toValue: (this.state.isCollapsed) ? UIPICKER_HEIGHT : 0
             }, animationConfig)).start();
             this.setState({isCollapsed: !this.state.isCollapsed});
-            locals.config.pickerTouch(this.state.isCollapsed ? UIPICKER_HEIGHT : 0);
+            //locals.config.pickerTouch(    this.state.isCollapsed ? UIPICKER_HEIGHT : 0);
           }}>
           <Text style={dateValueStyle}>
             {formattedValue}
@@ -63,7 +63,7 @@ class DatePickerCustomTemplate extends React.Component {
             maximumDate={locals.maximumDate}
             minimumDate={locals.minimumDate}
             minuteInterval={locals.minuteInterval}
-            mode={locals.mode}
+            mode="date"
             onDateChange={(value) => locals.onChange(value)}
             timeZoneOffsetInMinutes={locals.timeZoneOffsetInMinutes}
             style={[datepickerStyle, {height: height}]}

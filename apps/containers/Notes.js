@@ -23,7 +23,9 @@ import { width,
           BIG_FONT_SIZE, 
           formStyleSheet,
           mediumFieldSS,
+          dateFieldSS,
           formatDate } from '../utils/globalStyles';
+import datepicker from '../components/DatePickerCustomTemplate';
 
 import {mergeDeep} from '../utils/utils';
 
@@ -37,10 +39,15 @@ const NoteModel = t.struct({
 });
 
 let datess = mergeDeep({}, formStyleSheet);
-datess = mergeDeep(datess, mediumFieldSS);
+datess = mergeDeep(datess, dateFieldSS);
 
 let notess = mergeDeep({}, formStyleSheet);
 notess = mergeDeep(notess, {
+  formGroup: {
+    normal: {
+      backgroundColor: 'white'
+    }
+  },
   textbox: {
     normal: {
       height: 200
@@ -59,6 +66,7 @@ const formOptions = {
       multiline: true
     },
     date: {
+      template: datepicker,
       stylesheet: datess,
       label: 'NOTE\'S DATE',
       config: {

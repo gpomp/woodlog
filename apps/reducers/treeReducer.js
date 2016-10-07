@@ -17,6 +17,11 @@ const initialState = {
     age: null, 
     potType: '', 
     style: '', 
+    potSize: {
+      width: null,
+      height: null,
+      depth: null
+    },
     height: null, 
     trunkWidth: null, 
     canopyWidth: null, 
