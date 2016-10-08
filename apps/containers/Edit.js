@@ -5,6 +5,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 import React, {Component} from 'react';
 import {
   ScrollView,
+  View,
   StyleSheet
 } from 'react-native'
 import { bindActionCreators } from 'redux'
@@ -17,6 +18,7 @@ import BottomNav from '../components/BottomNav';
 
 import {
   container as ctnStyles, 
+  contentContainer, 
   formStyleSheet, 
   bigFormStyleSheet,
   mediumFieldSS,
@@ -219,20 +221,20 @@ class Edit extends Component {
   }
 
   render () {
-    const { name, species, age, potType, style, height, trunkWidth, canopyWidth, Source, date } = this.props.tree;
+    //const { name, species, age, potType, style, height, trunkWidth, canopyWidth, Source, date } = this.props.tree;
     return(
-      <ScrollView style={styles.container} style={styles.container}>
+      <ScrollView style={styles.container} style={styles.container} contentContainerStyle={styles.contentContainer}>
           <Form
-            ref="editTree"
-            type={Tree}
-            options={formOptions}
-            value={this.formData}
-            style={styles.formStyles}
-            onChange={this.onChange.bind(this)}
-          />
-          <BottomNav 
-            items={ [ { label: 'Save', key: 'save' }, { label: 'Cancel', key: 'cancel' } ] } 
-            onNavClick = {this.onNavClick.bind(this)} />
+              ref="editTree"
+              type={Tree}
+              options={formOptions}
+              value={this.formData}
+              style={styles.formStyles}
+              onChange={this.onChange.bind(this)}
+            />
+            <BottomNav 
+              items={ [ { label: 'Save', key: 'save' }, { label: 'Cancel', key: 'cancel' } ] } 
+              onNavClick = {this.onNavClick.bind(this)} />
       </ScrollView>
     );
   }
@@ -252,12 +254,13 @@ const dispatchToProps = (dispatch) => {
 }
 
 const styles =  StyleSheet.create({
-  container: Object.assign({}, ctnStyles),
+  container: Object.assign({  }, ctnStyles),
   formStyles: {
     flexDirection: 'row',
     height,
     width: width - REG_PADDING * 2
-  }
+  },
+  contentContainer: Object.assign({}, contentContainer)
 });
 
 export default connect(stateToProps, dispatchToProps)(Edit)

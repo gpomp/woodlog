@@ -17,7 +17,16 @@ import BottomNav from '../components/BottomNav';
 
 import Photo from '../components/Photo';
 
-import { width, height, REG_PADDING, container as ctnStyles, textReg, TEXT_PADDING, BIG_FONT_SIZE, monthNames } from '../utils/globalStyles';
+import { width, 
+        height, 
+        REG_PADDING, 
+        container as ctnStyles, 
+        contentContainer, 
+        textReg, 
+        TEXT_PADDING, 
+        BIG_FONT_SIZE, 
+        monthNames 
+      } from '../utils/globalStyles';
 
 const IPOptions = {
   title: 'Add a picture to this Bonsai...',
@@ -146,7 +155,7 @@ class Tree extends Component {
     const list = [];
 
     return(
-      <ScrollView style={styles.container}> 
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
         <Text style={styles.title}>{this.getProp(tree.name)}</Text>
         <Text style={styles.text}>{this.getProp(tree.species)}</Text>
         <Text style={styles.text}>{this.getProp(tree.age)}</Text>
@@ -172,20 +181,25 @@ class Tree extends Component {
 
 const styles =  StyleSheet.create({
   container: Object.assign({}, ctnStyles, {}),
+  contentContainer: Object.assign({}, contentContainer),
   title: Object.assign({}, textReg, {
     fontSize: 35,
     opacity: 1,
     paddingLeft: TEXT_PADDING,
-    paddingRight: TEXT_PADDING
+    paddingRight: TEXT_PADDING,
+    textAlign: 'left',
+    width: width - REG_PADDING * 2 - TEXT_PADDING * 2
   }),
   text: Object.assign({}, textReg, {
     fontSize: 15,
     opacity: 1,
     paddingLeft: TEXT_PADDING,
-    paddingRight: TEXT_PADDING
+    paddingRight: TEXT_PADDING,
+    textAlign: 'left',
+    width: width - REG_PADDING * 2 - TEXT_PADDING * 2
   }),
   photoContainer: {
-    flex: 1, 
+    flex: 0 , 
     flexDirection: 'row',
     paddingLeft: TEXT_PADDING,
     paddingRight: TEXT_PADDING,

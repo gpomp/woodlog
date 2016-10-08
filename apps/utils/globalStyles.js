@@ -18,6 +18,13 @@ export const container = {
   backgroundColor:'#f2f2f2'
 };
 
+export const contentContainer = {
+  height, 
+  flexDirection: 'column', 
+  alignItems: 'center', 
+  justifyContent: 'center'
+}
+
 export const textReg = {
 	fontFamily: 'Seattle Sans',
 	color: '#383735',

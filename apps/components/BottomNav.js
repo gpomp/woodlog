@@ -6,9 +6,9 @@ import { width, REG_PADDING, textReg } from '../utils/globalStyles';
 const styles = StyleSheet.create({
 	container: {
 		flexDirection: 'row', 
-		alignItems: 'center', 
+		alignItems: 'flex-start', 
 		justifyContent: 'space-around', 
-		flex: 1, 
+		flex: 0, 
 		width: width - REG_PADDING * 2,
 		marginTop: 30
 	},
