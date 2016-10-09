@@ -10,12 +10,14 @@ export const BLANK_IMAGE = require('../../assets/blank.jpg');
 
 export const REG_PADDING = 20;
 export const TEXT_PADDING = 30;
+export const BG_COLOR = '#f2f2f2';
 
 export const container = {
 	padding: REG_PADDING,
   width, height,
   overflow: 'hidden',
-  backgroundColor:'#f2f2f2'
+  backgroundColor:BG_COLOR,
+  position: 'relative'
 };
 
 export const contentContainer = {

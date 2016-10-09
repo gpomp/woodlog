@@ -4,7 +4,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  ScrollView, StyleSheet, Text, Platform, View
+  ScrollView, StyleSheet, Text, Platform, View, Animated, Easing
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -16,6 +16,7 @@ import ImagePicker from 'react-native-image-picker';
 import BottomNav from '../components/BottomNav';
 
 import Photo from '../components/Photo';
+import TreeItem from '../components/TreeItem';
 
 import { width, 
         height, 
@@ -25,6 +26,7 @@ import { width,
         textReg, 
         TEXT_PADDING, 
         BIG_FONT_SIZE, 
+        BG_COLOR,
         monthNames 
       } from '../utils/globalStyles';
 
@@ -45,8 +47,13 @@ export const BACK = 'back';
 export const ADDPHOTO = 'add_Photo';
 
 class Tree extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { opacity: new Animated.Value(0) };
+  }
 
   componentWillMount () {
+
     this.setState({saving: false});
     this.props.actions.show(this.props.nextId);
 
@@ -65,11 +72,36 @@ class Tree extends Component {
     });*/
   }
 
+  componentDidMount () {
+    this.animateIn();
+  }
+
   componentDidUpdate () {    
     if(this.state.saving) {
       this.setState({ saving: false });
       this.forceUpdate();
-    }    
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.id !== this.props.id;
+  }
+
+  animateIn () {
+    this.state.opacity.setValue(0); 
+    this.refs.treeItem.animateIn();
+    Animated.timing(this.state.opacity, {
+      toValue: 1,
+      duration: 500,
+      delay: 1000
+    }).start(event => {
+      if(event.finished) {
+
+        this.refs.scrollView.scrollEnabled = true;
+        this.refs.bottomNav.animateIn();
+      }
+    });
+
   }
 
   onNavClick (key) {
@@ -146,42 +178,69 @@ class Tree extends Component {
 
   render () {
 
-    if(!this.props.initialized) {
-      return null;
-    }
+    console.log('RENDER TREE');
 
     const { tree } = this.props;
 
     const list = [];
 
     return(
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}> 
-        <Text style={styles.title}>{this.getProp(tree.name)}</Text>
-        <Text style={styles.text}>{this.getProp(tree.species)}</Text>
-        <Text style={styles.text}>{this.getProp(tree.age)}</Text>
-        <Text style={styles.text}>{this.getProp(tree.potType)}</Text>
-        <Text style={styles.text}>{this.getProp(tree.style)}</Text>
-        <Text>{"\n"}</Text>
-        <Text style={styles.text}>{this.getProp(tree.height)}"</Text>
-        <Text style={styles.text}>{this.getProp(tree.trunkWidth)}"</Text>
-        <Text style={styles.text}>{this.getProp(tree.canopyWidth)}"</Text>
-        <Text>{"\n"}</Text>
-        <Text style={styles.text}>{this.getProp(tree.Source)}</Text>
-        <Text style={styles.text}>DATE ACQUIRED {this.getFormatedDate(tree.date).toUpperCase()}</Text>
-        <View style={styles.photoContainer}>
-          {this.getPhotoList()}
-        </View>
-        <BottomNav 
-          items={ [ { label: 'See Notes', key: SEENOTES }, { label: 'Add Photo', key: ADDPHOTO }, { label: 'Edit', key: EDIT }, { label: 'Back', key: BACK } ] } 
-          onNavClick = {this.onNavClick.bind(this)} />
-      </ScrollView>
+      <View style={{backgroundColor: BG_COLOR}}>
+
+        <TreeItem
+            ref="treeItem"
+            label={ tree.name } 
+            photos={ tree.photos } 
+            key={0} ukey={0}
+            fromY={this.props.imgPos}
+            toY={0}
+            fromOpacity={1}
+            onNavClick={ () => {} }
+            styles={{ paddingLeft: REG_PADDING, paddingRight: REG_PADDING, paddingTop: REG_PADDING }} />
+
+        <ScrollView ref="scrollView" style={styles.container}>
+
+          <Animated.View style={[styles.textView, {opacity: this.state.opacity}]}>
+
+            <Text style={styles.title}>{this.getProp(tree.name)}</Text>
+            <Text style={styles.text}>{this.getProp(tree.species)}</Text>
+            <Text style={styles.text}>{this.getProp(tree.age)}</Text>
+            <Text style={styles.text}>{this.getProp(tree.potType)}</Text>
+            <Text style={styles.text}>{this.getProp(tree.style)}</Text>
+            <Text>{"\n"}</Text>
+            <Text style={styles.text}>{this.getProp(tree.height)}"</Text>
+            <Text style={styles.text}>{this.getProp(tree.trunkWidth)}"</Text>
+            <Text style={styles.text}>{this.getProp(tree.canopyWidth)}"</Text>
+            <Text>{"\n"}</Text>
+            <Text style={styles.text}>{this.getProp(tree.Source)}</Text>
+            <Text style={styles.text}>{this.getProp(tree.potSize.width)}" x {this.getProp(tree.potSize.height)}" x {this.getProp(tree.potSize.depth)}"</Text>
+            <Text style={styles.text}>DATE ACQUIRED {this.getFormatedDate(tree.date).toUpperCase()}</Text>
+            <View style={styles.photoContainer}>
+              {this.getPhotoList()}
+            </View>
+
+          </Animated.View>
+          <BottomNav 
+            ref="bottomNav"
+            buttons={ [ { label: 'See Notes', key: SEENOTES }, { label: 'Add Photo', key: ADDPHOTO }, { label: 'Edit', key: EDIT }, { label: 'Back', key: BACK } ] } 
+            onNavClick = {this.onNavClick.bind(this)} />
+        </ScrollView>
+      </View>
     );
   }
 }
 
 const styles =  StyleSheet.create({
-  container: Object.assign({}, ctnStyles, {}),
-  contentContainer: Object.assign({}, contentContainer),
+  container: Object.assign({}, ctnStyles, {
+    padding: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0)' 
+  }),
+  textView: {
+    backgroundColor:BG_COLOR,
+    marginTop: 220,
+    padding: REG_PADDING
+  },
+
   title: Object.assign({}, textReg, {
     fontSize: 35,
     opacity: 1,

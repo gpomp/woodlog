@@ -1,12 +1,16 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, Text, TouchableHighlight, Image, Dimensions} from 'react-native';
-const { width, height } = Dimensions.get('window');
+import {StyleSheet, View, Text, TouchableHighlight, Image, Animated, Easing} from 'react-native';
 
-import {REG_PADDING, BLANK_IMAGE, textReg as textStyle} from '../utils/globalStyles';
+import {REG_PADDING, BLANK_IMAGE, textReg as textStyle, width, height} from '../utils/globalStyles';
 
 const styles = StyleSheet.create({
+  view: {
+    position: 'absolute',
+    top: 0,
+    left: 0
+  },
   button: {
-    marginBottom: 3
+    
   },
   image: {
     height: 200,
@@ -27,6 +31,8 @@ const styles = StyleSheet.create({
 export default class TreeItem extends Component {
   constructor(props) {
     super(props);
+
+    this.state = { y: new Animated.Value(this.props.fromY), opacity: new Animated.Value(this.props.fromOpacity) };
   }
 
   componentWillMount () {
@@ -47,6 +53,43 @@ export default class TreeItem extends Component {
     } else {
       this.setState({ init: true, error: true })
     }
+  }
+
+  componentDidMount () {
+  }
+
+  animateIn () {
+    this.state.opacity.setValue(this.props.fromOpacity);
+    this.state.y.setValue(this.props.fromY);
+    const id = this.props.ukey;
+
+    Animated.parallel([
+      Animated.timing(this.state.y, {
+        toValue: this.props.toY,
+        easing: Easing.inOut(Easing.exp),
+        duration: 1000,
+        delay: id * 100
+      }),
+      Animated.timing(this.state.opacity, {
+        toValue: this.props.toOpacity,
+        duration: 1000,
+        delay: id * 100
+      })
+    ]).start();
+  }
+
+  animateOut () {
+    Animated.parallel([
+      Animated.timing(this.state.y, { 
+        toValue: this.state.y + 20,
+        easing: Easing.out(Easing.exp),
+        duration: 300
+      }),
+      Animated.timing(this.state.opacity, {
+        toValue: 0,
+        duration: 300
+      })
+    ]).start();
   }
 
   renderImage (label) {
@@ -75,9 +118,24 @@ export default class TreeItem extends Component {
       return null;
     }
 
-    return (<TouchableHighlight key={ukey} onPress={() => { this.props.onNavClick(ukey) }} style={styles.button}>
-                {this.renderImage(label === null ? '' : label)}
-            </TouchableHighlight>);
+    return (
+      <Animated.View style={[this.props.styles, styles.view, { 
+        opacity: this.state.opacity, 
+        transform: [{translateY: this.state.y}] 
+      }]}>
+        <TouchableHighlight key={ukey} onPress={() => { this.props.onNavClick(ukey) }} style={styles.button}>
+          {this.renderImage(label === null ? '' : label)}
+        </TouchableHighlight>
+      </Animated.View>
+      );
     
   }
 }
+
+TreeItem.defaultProps = {
+  fromOpacity: 0,
+  toOpacity: 1,  
+  fromY: 0,
+  toY: 0,
+  styles: {}
+};
