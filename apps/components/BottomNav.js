@@ -5,16 +5,17 @@ import { width, REG_PADDING, textReg } from '../utils/globalStyles';
 
 const styles = StyleSheet.create({
 	container: {
+		flexDirection: 'row', 
+		alignItems: 'flex-start', 
+		justifyContent: 'space-around', 
 		flex: 0, 
-		width: width - REG_PADDING * 2,
-		marginTop: 30
+		width: width
 	},
 	button: {
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 3,
-    backgroundColor: 'red'
+    margin: 3
   },
   textButton: Object.assign({}, textReg, {
   	fontSize: 20,
@@ -28,62 +29,73 @@ export default class BottomNav extends Component {
   }
 
   componentWillMount () {
-  	const buttons = this.props.buttons;
-    this.state = { opacity: buttons.map(v => {
+    this.state = { opacity: this.props.buttons.map(v => {
     	return new Animated.Value(0);
-    }), tx: buttons.map(v => {
-    	return new Animated.Value(-20);
+    }), tx: this.props.buttons.map(v => {
+    	return new Animated.Value(40);
     }) };
   	
   }
 
   animateIn () {
-
   	this.state.opacity.map(anim => anim.setValue(0));
-  	this.state.tx.map(anim => anim.setValue(-20));
+  	this.state.tx.map(anim => anim.setValue(40));
 
   	Animated.parallel([
   		Animated.stagger(100, this.state.opacity.map(anim => {
   			return Animated.timing(anim, {
   				toValue: 1,
-        	duration: 200
+        	duration: 300
   			})
   		})),
-  		Animated.stagger(500, this.state.tx.map(anim => {
+  		Animated.stagger(100, this.state.tx.map(anim => {
   			return Animated.timing(anim, {
   				toValue: 0,
-        	duration: 200
+        	duration: 300,
+        	easing: Easing.inOut(Easing.exp)
   			})
   		}))
   	]).start();
   }
 
-  animateOut () {
-
+  animateOut (cb = null) {
+  	Animated.parallel([
+  		Animated.stagger(50, this.state.opacity.map(anim => {
+  			return Animated.timing(anim, {
+  				toValue: 0,
+        	duration: 100
+  			})
+  		}))
+  	]).start(event => {
+  		if(event.finished) {
+  			if(cb !== null) {
+  				cb();
+  			}        
+      }
+  	});
   }
 
   getButtons () {
   	let btns = this.props.buttons.map((navItem, i) => {
-    	return 
-    		(<TouchableOpacity key={navItem.key} onPress={() => { this.props.onNavClick(navItem.key) }} style={styles.button}>
+    	const btn = (<TouchableOpacity key={navItem.key} onPress={() => { this.props.onNavClick(navItem.key) }} style={styles.button}>
           <Animated.Text
 	          style={[styles.textButton, { 
 		    			opacity: this.state.opacity[i],
-		    			transform: [{translateX: this.state.tx[i]}] 
+		    			transform: [{translateY: this.state.tx[i]}] 
   					}]}>
   						{navItem.label.toUpperCase()}
 					</Animated.Text>
 	      </TouchableOpacity>);
+
+    	return btn;
     });
 
     return btns;
   }
 
   render() {
-  	console.log('RENDER BOTTOMNAV')
     return (
       <View style={styles.container}>
-      	<Text>THIS IS BOTTOM NAV</Text>
       	{this.getButtons()}
       </View>
     );

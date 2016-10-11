@@ -41,7 +41,7 @@ export const monthNames = ["January", "February", "March", "April", "May", "June
 
 var LABEL_COLOR = '#242424';
 var INPUT_COLOR = '#242424';
-var ERROR_COLOR = '#FF0000';
+var ERROR_COLOR = '#AC0000';
 var HELP_COLOR = '#242424';
 var BORDER_COLOR = '#797979';
 var DISABLED_COLOR = '#FF0000';
@@ -76,6 +76,16 @@ export const formStyleSheet = {
       marginBottom: 3
     },
     error: {
+      flexDirection: 'row',
+      flex: 0,
+      alignItems: 'center',
+      borderBottomColor: BORDER_COLOR,
+      borderBottomWidth: 1,
+      paddingLeft: TEXT_PADDING,
+      paddingRight: TEXT_PADDING,
+      paddingTop:0,
+      paddingBottom:0,
+      marginBottom: 3
     }
   },
   controlLabel: {
@@ -90,8 +100,11 @@ export const formStyleSheet = {
     // the style applied when a validation error occours
     error: {
       color: ERROR_COLOR,
+      fontSize: FONT_SIZE,
       fontFamily: FONT,
-      fontSize: FONT_SIZE
+      padding: 7,
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+      letterSpacing: 1.3
     }
   },
   helpBlock: {
@@ -127,7 +140,8 @@ export const formStyleSheet = {
       height: 36,
       padding: 7,
       fontFamily: FONT,
-      letterSpacing: 1.3
+      letterSpacing: 1.3,
+      color: ERROR_COLOR
     },
     // the style applied when the textbox is not editable
     notEditable: {
@@ -223,12 +237,21 @@ export const bigFormStyleSheet = {
 	textbox: {
 		normal: {
     	fontSize: BIG_FONT_SIZE,
-  	}
+      height: 45
+  	},
+    error: {
+      fontSize: BIG_FONT_SIZE,
+      color: ERROR_COLOR,
+      height: 45
+    }
 	},
 	formGroup: {		
   	normal: {
   		borderBottomWidth: 3
-  	}
+  	}, error: {
+      borderBottomWidth: 3,
+      borderBottomColor: ERROR_COLOR
+    }
 	}
 };
 

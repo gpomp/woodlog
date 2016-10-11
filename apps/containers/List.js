@@ -75,11 +75,11 @@ class List extends Component {
     });
   }
 
-  animateOut () {
+  animateOut (key = 0, cb = null) {
     this.refs.mainView.scrollEnabled = false;
 
     for (var i = 0; i < this.props.list.length; i++) {
-      if(this.goToKey === i) continue;
+      if(key === i) continue;
       this.refs[`treeItem${i}`].animateOut();
     }
 
@@ -94,19 +94,17 @@ class List extends Component {
       })
     ]).start(event => {
       if(event.finished) {
-        NavActions.Tree({nextId: this.goToKey, imgPos: this.goToKey * 203 + 203 + 115 - this.scrollVal});
+        cb();
       }
     });
   }
 
   onNavClick (key) {
-    this.goToKey = key;
-
-    this.animateOut();
+    this.animateOut(key, () => { NavActions.Tree({nextId: key, imgPos: key * 203 + 203 + 115 - this.scrollVal}); });
   }
 
   onAddClick () {
-    NavActions.Edit();
+    this.animateOut(50, NavActions.Edit);
   }
 
   render () {

@@ -3,7 +3,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  ScrollView, StyleSheet, Text, TouchableOpacity
+  ScrollView, StyleSheet, Text, TouchableOpacity, Animated, Easing
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -13,6 +13,8 @@ import * as TreeActions from '../actions/treeActions';
 import Note from '../components/Note';
 
 import t from 'tcomb-form-native';
+
+import BottomNav from '../components/BottomNav';
 
 import { width, 
           height, 
@@ -45,11 +47,13 @@ let notess = mergeDeep({}, formStyleSheet);
 notess = mergeDeep(notess, {
   formGroup: {
     normal: {
-      backgroundColor: 'white'
+      
     }
   },
   textbox: {
     normal: {
+      paddingLeft: 0,
+      paddingRight: 0,
       height: 200
     }
   }
@@ -80,12 +84,47 @@ class Notes extends Component {
 
   constructor(props) {
     super(props);
+    this.addOpen = false;
+    this.state = { height: new Animated.Value(0) };
   }
 
   componentWillMount () {
     this.defaultValues = {
       note: '',
       date: new Date()
+    }
+  }
+
+  componentDidMount () {
+    this.state.height.setValue(0);
+    this.refs.bottomNav.animateIn();
+  }
+
+  onNavClick (key) {
+    switch(key) {
+      case 'back': 
+        NavActions.pop();
+      break;
+      case 'add':
+        this.addOpen = !this.addOpen;
+        this.toggleAddNote();
+      break;
+    }
+  }
+
+  toggleAddNote () {
+    if(this.addOpen) {
+      Animated.timing(this.state.height, {
+        duration: 500,
+        toValue: 370,
+        easing: Easing.inOut(Easing.exp)
+      }).start();
+    } else {
+      Animated.timing(this.state.height, {
+        duration: 500,
+        toValue: 0,
+        easing: Easing.inOut(Easing.exp)
+      }).start();
     }
   }
 
@@ -98,6 +137,8 @@ class Notes extends Component {
       formData.id = -1;
       this.props.actions.saveNote(formData);
       this.onNoteUpdate();
+      this.addOpen = false;
+      this.toggleAddNote();
     }
   }
 
@@ -117,19 +158,22 @@ class Notes extends Component {
       <ScrollView style={styles.container}> 
         <Text style={styles.title}>NOTES</Text>
         {noteList}
-        <Text style={{ marginTop: 30 }}>ADD NOTE</Text>
-        <Form 
-          ref="addNote"
-          type={NoteModel}
-          options={formOptions}
-          value={this.defaultValues}
-        />
-        <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
-          <Text style={styles.textButton}>SAVE NOTE</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => { NavActions.pop(); }} style={styles.button}>
-          <Text style={styles.textButton}>BACK</Text>
-        </TouchableOpacity>
+        <Animated.View style={{overflow:'hidden', height: this.state.height }}>
+          <Text style={[styles.textButton, { marginTop: 20, marginBottom: 10, paddingLeft: TEXT_PADDING, paddingRight: TEXT_PADDING }]}>ADD NOTE</Text>
+          <Form 
+            ref="addNote"
+            type={NoteModel}
+            options={formOptions}
+            value={this.defaultValues}
+          />
+          <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
+            <Text style={styles.textButton}>SAVE NOTE</Text>
+          </TouchableOpacity>
+        </Animated.View>
+        <BottomNav 
+              ref="bottomNav"
+              buttons={ [ { label: 'BACK', key: 'back' }, { label: 'ADD NOTE', key: 'add' } ] } 
+              onNavClick = {this.onNavClick.bind(this)} />
       </ScrollView>
     );
   }

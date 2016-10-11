@@ -13,6 +13,7 @@ const initialState = {
   id: -1,
   rawData: {
     name: '', 
+    type: '',
     species: '',
     age: null, 
     potType: '', 

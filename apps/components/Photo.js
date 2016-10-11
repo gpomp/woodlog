@@ -21,11 +21,12 @@ const styles = StyleSheet.create({
     fontSize: 10
   }),
   photo: {
-    width: 100,
-    height: 100
+    width: 90,
+    height: 90
   },
   photoView: {
-    width: 100,
+    width: 90,
+    height: 90,
     position: 'relative'
   }
 });
@@ -86,7 +87,6 @@ export default class Photo extends Component {
       <TouchableHighlight onPress={() => {this.props.onPhotoClick(this.props.arrayID);}}>
         {this.renderImage(src)}
       </TouchableHighlight>
-
       <TouchableOpacity onPress={() => { this.removeImage(); }} style={styles.button}>
         <Text style={styles.buttonText}>X</Text>
       </TouchableOpacity>

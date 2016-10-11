@@ -6,7 +6,9 @@ import React, {Component} from 'react';
 import {
   ScrollView,
   View,
-  StyleSheet
+  StyleSheet, 
+  Animated, 
+  Easing
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -166,12 +168,18 @@ class Edit extends Component {
 
   constructor(props) {
     super(props);
+    this.state = { scale: new Animated.Value(1.2), opacity: new Animated.Value(0) };
+
     this.formData = {};
   }
 
   componentWillMount() {
     this.formData = Object.assign({}, this.props.tree, this.formData);
     this.formData.date = new Date(this.formData.date);
+  }
+
+  componentDidMount () {
+    this.animateIn();
   }
 
   componentWillUpdate(nextProps) {
@@ -181,24 +189,64 @@ class Edit extends Component {
   componentDidUpdate(prevProps, prevState) { 
     // if(prevProps.id !== this.props.id) {
       if(this.props.id !== -1) {
-        NavActions.Tree({nextId: this.props.id});
+        this.animateOut(() => { NavActions.Tree({id: this.props.id}); });
       } else {
-        NavActions.List();
+        this.animateOut(NavActions.List);
       }
     // }
   }
 
+  animateIn () {
+    Animated.parallel([
+      Animated.timing(this.state.scale, {
+        duration: 1000,
+        toValue: 1,
+        easing: Easing.out(Easing.exp)
+      }),
+      Animated.timing(this.state.opacity, {
+        duration: 1000,
+        toValue: 1,
+        easing: Easing.out(Easing.exp)
+      })
+    ]).start(event => {
+      if(event.finished) {
+        this.refs.bottomNav.animateIn();
+      }
+    });
+  }
+
+  animateOut (cb = null) {
+    this.refs.bottomNav.animateOut();
+    Animated.parallel([
+      Animated.timing(this.state.scale, {
+        duration: 500,
+        toValue: 1.2,
+        easing: Easing.in(Easing.exp)
+      }),
+      Animated.timing(this.state.opacity, {
+        duration: 500,
+        toValue: 0,
+        easing: Easing.in(Easing.exp)
+      })
+    ]).start(event => {
+      if(event.finished) {
+        if(cb !== null) {
+          cb();
+        }
+      }
+    });
+  }
+
   onChange (value) {
-    console.log('value', value);
   }
 
   onNavClick (key) {
     switch(key) {
       case CANCEL:
         if(this.props.id !== -1) {
-          NavActions.Tree({id: this.props.id});
+          this.animateOut(() => { NavActions.Tree({id: this.props.id}); });
         } else {
-          NavActions.List();
+          this.animateOut(NavActions.List);
         }
       break;
       case SAVE:
@@ -224,7 +272,11 @@ class Edit extends Component {
     //const { name, species, age, potType, style, height, trunkWidth, canopyWidth, Source, date } = this.props.tree;
     return(
       <ScrollView style={styles.container} style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <Form
+          <Animated.View style={{
+            opacity: this.state.opacity, 
+            transform: [{scale: this.state.scale}]
+          }}>
+            <Form
               ref="editTree"
               type={Tree}
               options={formOptions}
@@ -232,8 +284,10 @@ class Edit extends Component {
               style={styles.formStyles}
               onChange={this.onChange.bind(this)}
             />
+          </Animated.View>
             <BottomNav 
-              items={ [ { label: 'Save', key: 'save' }, { label: 'Cancel', key: 'cancel' } ] } 
+              ref="bottomNav"
+              buttons={ [ { label: 'Save', key: 'save' }, { label: 'Cancel', key: 'cancel' } ] } 
               onNavClick = {this.onNavClick.bind(this)} />
       </ScrollView>
     );

@@ -77,14 +77,14 @@ class Tree extends Component {
   }
 
   componentDidUpdate () {    
-    if(this.state.saving) {
+    if(this.state.saving && !this.props.isPending) {
       this.setState({ saving: false });
       this.forceUpdate();
     }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.id !== this.props.id;
+    return (nextProps.id !== this.props.id || (nextState.saving && !nextProps.isPending));
   }
 
   animateIn () {
@@ -101,7 +101,24 @@ class Tree extends Component {
         this.refs.bottomNav.animateIn();
       }
     });
+  }
 
+  animateOut (cb = null) {
+    this.refs.bottomNav.animateOut(() => { this.finishAnimateOut(cb); });
+  }
+
+  finishAnimateOut (cb = null) {
+    this.refs.treeItem.animateOut();
+    Animated.timing(this.state.opacity, {
+      toValue: 0,
+      duration: 250
+    }).start(event => {
+      if(event.finished) {
+        if(cb !== null) {
+          cb();
+        }
+      }
+    });
   }
 
   onNavClick (key) {
@@ -110,10 +127,12 @@ class Tree extends Component {
         NavActions.Notes();
       break;
       case EDIT:
-        NavActions.Edit({id: this.props.nextId});
+        this.animateOut(() => { NavActions.Edit({id: this.props.nextId}); });
+        // NavActions.Edit({id: this.props.nextId});
       break;
       case BACK:
-        NavActions.List();
+        this.animateOut(NavActions.List);
+        // NavActions.List();
       break;
       case ADDPHOTO:
         this.showImagePicker();
@@ -258,8 +277,10 @@ const styles =  StyleSheet.create({
     width: width - REG_PADDING * 2 - TEXT_PADDING * 2
   }),
   photoContainer: {
-    flex: 0 , 
+    flex: 0 ,
+    width: width - REG_PADDING * 2 - TEXT_PADDING * 2,
     flexDirection: 'row',
+    flexWrap: 'wrap',
     paddingLeft: TEXT_PADDING,
     paddingRight: TEXT_PADDING,
     marginTop: 10,
