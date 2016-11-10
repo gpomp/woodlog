@@ -23,62 +23,12 @@ import { width,
           textReg, 
           TEXT_PADDING, 
           BIG_FONT_SIZE, 
-          formStyleSheet,
-          mediumFieldSS,
-          dateFieldSS,
-          formatDate } from '../utils/globalStyles';
-import datepicker from '../components/DatePickerCustomTemplate';
+          formatDate,
+          TRADE_GOTHIC } from '../utils/globalStyles';
 
 import {mergeDeep} from '../utils/utils';
 
-
-const Form = t.form.Form;
-t.form.Form.stylesheet = formStyleSheet;
-
-const NoteModel = t.struct({
-  note: t.String,
-  date: t.Date
-});
-
-let datess = mergeDeep({}, formStyleSheet);
-datess = mergeDeep(datess, dateFieldSS);
-
-let notess = mergeDeep({}, formStyleSheet);
-notess = mergeDeep(notess, {
-  formGroup: {
-    normal: {
-      
-    }
-  },
-  textbox: {
-    normal: {
-      paddingLeft: 0,
-      paddingRight: 0,
-      height: 200
-    }
-  }
-});
-
-const formOptions = {
-  auto: 'placeholders',
-  autoCapitalize: 'characters',
-  stylesheet: formStyleSheet,
-  fields: {
-    note: {
-      stylesheet: notess,
-      placeholder: 'YOUR NOTE',
-      multiline: true
-    },
-    date: {
-      template: datepicker,
-      stylesheet: datess,
-      label: 'NOTE\'S DATE',
-      config: {
-        format: formatDate
-      }
-    }
-  }
-};
+const ctnWidth = width - REG_PADDING * 2 - TEXT_PADDING * 2;
 
 class Notes extends Component {
 
@@ -89,10 +39,7 @@ class Notes extends Component {
   }
 
   componentWillMount () {
-    this.defaultValues = {
-      note: '',
-      date: new Date()
-    }
+
   }
 
   componentDidMount () {
@@ -105,40 +52,6 @@ class Notes extends Component {
       case 'back': 
         NavActions.pop();
       break;
-      case 'add':
-        this.addOpen = !this.addOpen;
-        this.toggleAddNote();
-      break;
-    }
-  }
-
-  toggleAddNote () {
-    if(this.addOpen) {
-      Animated.timing(this.state.height, {
-        duration: 500,
-        toValue: 370,
-        easing: Easing.inOut(Easing.exp)
-      }).start();
-    } else {
-      Animated.timing(this.state.height, {
-        duration: 500,
-        toValue: 0,
-        easing: Easing.inOut(Easing.exp)
-      }).start();
-    }
-  }
-
-  saveNote () {    
-    const validation = this.refs.addNote.validate();
-    if(validation.errors.length > 0) {
-
-    } else {
-      const formData = Object.assign({}, validation.value);
-      formData.id = -1;
-      this.props.actions.saveNote(formData);
-      this.onNoteUpdate();
-      this.addOpen = false;
-      this.toggleAddNote();
     }
   }
 
@@ -153,26 +66,14 @@ class Notes extends Component {
       const k = `tree-note-${i}`;
       return <Note date={ n.date } note={ n.note } arrayID={i} key={k} onNoteUpdate={this.onNoteUpdate.bind(this)} />
     });
-
     return(
-      <ScrollView style={styles.container}> 
+      <ScrollView style={styles.container} contentContainerStyle={styles.innerContainer}> 
         <Text style={styles.title}>NOTES</Text>
         {noteList}
-        <Animated.View style={{overflow:'hidden', height: this.state.height }}>
-          <Text style={[styles.textButton, { marginTop: 20, marginBottom: 10, paddingLeft: TEXT_PADDING, paddingRight: TEXT_PADDING }]}>ADD NOTE</Text>
-          <Form 
-            ref="addNote"
-            type={NoteModel}
-            options={formOptions}
-            value={this.defaultValues}
-          />
-          <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
-            <Text style={styles.textButton}>SAVE NOTE</Text>
-          </TouchableOpacity>
-        </Animated.View>
+        <Note date={ new Date().toString() } note="Add a new note here" arrayID={-1} key={-1} onNoteUpdate={this.onNoteUpdate.bind(this)} />
         <BottomNav 
               ref="bottomNav"
-              buttons={ [ { label: 'BACK', key: 'back' }, { label: 'ADD NOTE', key: 'add' } ] } 
+              buttons={ [ { label: 'BACK', key: 'back' } ] } 
               onNavClick = {this.onNavClick.bind(this)} />
       </ScrollView>
     );
@@ -181,6 +82,9 @@ class Notes extends Component {
 
 const styles =  StyleSheet.create({
   container: Object.assign({}, ctnStyles, {}),
+  innerContainer: { 
+    justifyContent: 'center'
+  },
   button: {
     padding: 10,
     alignItems: 'center',
@@ -192,7 +96,8 @@ const styles =  StyleSheet.create({
     opacity: 1
   }),
   title: Object.assign({}, textReg, {
-    opacity: 1
+    opacity: 1,
+    marginBottom: 35
   })
 });
 

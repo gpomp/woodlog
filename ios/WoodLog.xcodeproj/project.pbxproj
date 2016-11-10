@@ -24,6 +24,7 @@
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		2E25010B1DA5AF3500A54012 /* SEASANS.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 2E25010A1DA5AF3500A54012 /* SEASANS.TTF */; };
 		2E5634761DA5683400414506 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E5634731DA567BD00414506 /* libRNFS.a */; };
+		2EB764971DD3E715004EA728 /* TradeGothicLTStd-Cn18.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2EB764961DD3E70D004EA728 /* TradeGothicLTStd-Cn18.otf */; };
 		2EBF18321D84EDD400CD4B8A /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EBF18311D84EC3C00CD4B8A /* libRNImagePicker.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		E02D506CE42D47C1896DC5DA /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6109669B8CE24C208D7C275F /* libRNImagePicker.a */; };
@@ -152,6 +153,7 @@
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		2E25010A1DA5AF3500A54012 /* SEASANS.TTF */ = {isa = PBXFileReference; lastKnownFileType = file; path = SEASANS.TTF; sourceTree = "<group>"; };
 		2E5634641DA567BD00414506 /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
+		2EB764961DD3E70D004EA728 /* TradeGothicLTStd-Cn18.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "TradeGothicLTStd-Cn18.otf"; sourceTree = "<group>"; };
 		2EBF18221D84EC3C00CD4B8A /* RNImagePicker.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNImagePicker.xcodeproj; path = "../node_modules/react-native-image-picker/ios/RNImagePicker.xcodeproj"; sourceTree = "<group>"; };
 		6109669B8CE24C208D7C275F /* libRNImagePicker.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNImagePicker.a; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
@@ -347,6 +349,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				2EB764961DD3E70D004EA728 /* TradeGothicLTStd-Cn18.otf */,
 				2E25010A1DA5AF3500A54012 /* SEASANS.TTF */,
 				2E5634641DA567BD00414506 /* RNFS.xcodeproj */,
 				2EBF18221D84EC3C00CD4B8A /* RNImagePicker.xcodeproj */,
@@ -606,6 +609,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2EB764971DD3E715004EA728 /* TradeGothicLTStd-Cn18.otf in Resources */,
 				2E25010B1DA5AF3500A54012 /* SEASANS.TTF in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,

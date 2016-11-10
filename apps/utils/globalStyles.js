@@ -11,6 +11,7 @@ export const BLANK_IMAGE = require('../../assets/blank.jpg');
 export const REG_PADDING = 20;
 export const TEXT_PADDING = 30;
 export const BG_COLOR = '#f2f2f2';
+export const TRADE_GOTHIC = 'TradeGothicLTStd-Cn18';
 
 export const container = {
 	padding: REG_PADDING,
@@ -43,7 +44,7 @@ var LABEL_COLOR = '#242424';
 var INPUT_COLOR = '#242424';
 var ERROR_COLOR = '#AC0000';
 var HELP_COLOR = '#242424';
-var BORDER_COLOR = '#797979';
+export const BORDER_COLOR = '#797979';
 var DISABLED_COLOR = '#FF0000';
 var DISABLED_BACKGROUND_COLOR = '#FF0000';
 var FONT_SIZE = 20;

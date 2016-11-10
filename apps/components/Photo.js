@@ -43,7 +43,7 @@ export default class Photo extends Component {
       key: 'img',
       id: this.props.id
     }).then(res => {
-      console.log('get image!');
+      console.log('load photo', res.src);
       this.setState({ src: res.src, init: true });
     }).catch(err => {
       // console.warn('image error', err);

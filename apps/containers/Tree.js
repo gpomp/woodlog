@@ -36,7 +36,8 @@ const IPOptions = {
   noData: true,
   storageOptions: {
     skipBackup: true,
-    path: 'woodlog'
+    path: 'woodlog',
+    cameraRoll: 'false'
   }
 };
 
@@ -73,10 +74,10 @@ class Tree extends Component {
   }
 
   componentDidMount () {
-    this.animateIn();
+   this.animateIn();    
   }
 
-  componentDidUpdate () {    
+  componentDidUpdate (nextProps, nextState) {
     if(this.state.saving && !this.props.isPending) {
       this.setState({ saving: false });
       this.forceUpdate();
@@ -88,6 +89,7 @@ class Tree extends Component {
   }
 
   animateIn () {
+    console.log('tree animate in');
     this.state.opacity.setValue(0); 
     this.refs.treeItem.animateIn();
     Animated.timing(this.state.opacity, {
@@ -160,6 +162,7 @@ class Tree extends Component {
         } else {
           source = {uri: response.uri, isStatic: true};
         }
+        console.log('photo uri', source.uri);
         this.props.actions.savePhoto(source.uri);
         this.setState({ saving: true });
       }
@@ -197,11 +200,11 @@ class Tree extends Component {
 
   render () {
 
-    console.log('RENDER TREE');
-
     const { tree } = this.props;
 
     const list = [];
+
+    console.log('RENDER TREE', tree.photos);
 
     return(
       <View style={{backgroundColor: BG_COLOR}}>
@@ -213,6 +216,8 @@ class Tree extends Component {
             key={0} ukey={0}
             fromY={this.props.imgPos}
             toY={0}
+            initialized={this.props.initialized}
+            isPending={this.props.isPending}
             fromOpacity={1}
             onNavClick={ () => {} }
             styles={{ paddingLeft: REG_PADDING, paddingRight: REG_PADDING, paddingTop: REG_PADDING }} />
@@ -247,6 +252,11 @@ class Tree extends Component {
       </View>
     );
   }
+}
+
+Tree.defaultProps = {
+  initialized: false,
+  isPending: true
 }
 
 const styles =  StyleSheet.create({

@@ -42,6 +42,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>SEASANS.TTF</string>
+		<string>TradeGothicLTStd-Cn18.otf</string>
 	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>

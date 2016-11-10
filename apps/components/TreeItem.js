@@ -32,14 +32,29 @@ export default class TreeItem extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { y: new Animated.Value(this.props.fromY), opacity: new Animated.Value(this.props.fromOpacity) };
+    this.state = { y: new Animated.Value(this.props.fromY), opacity: new Animated.Value(this.props.fromOpacity), ready: false };
   }
 
   componentWillMount () {
+    this.getPicture(this.props);
+  }
+
+  componentDidMount () {
+    this.state.ready = true;
+  }
+
+  componentWillUpdate (nextProps, nextState) {
+    if(!this.props.initialized && nextProps.initialized) {
+      this.getPicture(nextProps);
+    }
+  }
+
+  getPicture (props) {
     this.setState({ init: false, error: false });
     this.imgSRC = {};
-    if(this.props.photos.length > 0) {
-      const pID = this.props.photos[0];
+    console.log('banner will mount');
+    if(props.photos.length > 0) {
+      const pID = props.photos[0];
       global.storage.load({
         key: 'img',
         id: pID
@@ -48,14 +63,11 @@ export default class TreeItem extends Component {
         this.setState({ init: true });
       }).catch(err => {
         // console.warn('image error', err);
-        this.setState({ init: true, error: true })
+        this.setState({ init: true, error: true });
       });
     } else {
-      this.setState({ init: true, error: true })
+      this.setState({ init: true, error: true });
     }
-  }
-
-  componentDidMount () {
   }
 
   animateIn () {
@@ -102,7 +114,6 @@ export default class TreeItem extends Component {
       </Image>
       );
 
-
     return (this.props.photos.length > 0 && this.state.error !== true) ?
       <Image 
         onError={() => { this.setState({error: true}); }}
@@ -114,9 +125,6 @@ export default class TreeItem extends Component {
 
   render() {
     const { ukey, label } = this.props;
-    if(!this.state.init) {
-      return null;
-    }
 
     return (
       <Animated.View style={[this.props.styles, styles.view, { 
@@ -136,6 +144,8 @@ TreeItem.defaultProps = {
   fromOpacity: 0,
   toOpacity: 1,  
   fromY: 0,
+  photos: [],
   toY: 0,
-  styles: {}
+  styles: {},
+  initialized: false
 };
