@@ -119,6 +119,12 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden'
   },
+  insideCtn: {
+    flexDirection: 'row', 
+    alignItems: 'flex-start', 
+    justifyContent: 'center', 
+    flex: 1
+  },
   textCtn: {
     flex: ctnWidth * 0.75
   },
@@ -139,7 +145,8 @@ class Note extends Component {
     this.formData = {};
     this.state = { 
       formHeight: new Animated.Value(99999),
-      noteHeight: new Animated.Value(99999)
+      noteHeight: new Animated.Value(99999),
+      formOverflow: 'hidden'
     };
   }
 
@@ -172,16 +179,24 @@ class Note extends Component {
 
   toggleNote (showForm) {
     //this.setState({ editMode: !this.state.editMode });
+    this.setState({ formOverflow: 'hidden' });
     Animated.parallel([
     Animated.timing(this.state.formHeight, {
       toValue: showForm ? this.formHeight : 0,
-      duration: 500
+      duration: 250,
+      easing: Easing.inOut(Easing.exp)
     }),
     Animated.timing(this.state.noteHeight, {
       toValue: showForm ? 0 : this.noteHeight,
-      duration: 500
+      duration: 250,
+      easing: Easing.inOut(Easing.exp)
     })
-    ]).start();
+    ]).start(() => {
+      if(showForm) {
+        console.log('change form overflow');
+        this.setState({ formOverflow: 'visible' });
+      }
+    });
   }
 
   saveNote () {
@@ -192,9 +207,8 @@ class Note extends Component {
       this.formData = Object.assign({}, validation.value);
       this.props.actions.saveNote(this.formData, this.props.arrayID);
       this.setState({ saving: true });
+      this.toggleNote(false);
     }
-
-    
   }
 
   cancelNote () {
@@ -210,36 +224,43 @@ class Note extends Component {
     if(this.state.saving) {
       this.setState({ editMode: false, saving: false });
       this.props.onNoteUpdate();
+      this.toggleNote(false);
     }
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    return this.state.saving || nextState.editMode !== this.state.editMode;
+    return this.state.saving || nextState.editMode !== this.state.editMode || nextState.formOverflow !== this.state.formOverflow;
   }
 
   render() {
     const { date, note } = this.props;
     const d = new Date(date);
+    console.log('render note', this.state.formOverflow);
 
     return (
-      <View style={{width: width - REG_PADDING * 2, flexDirection: 'column', alignItems: 'center', marginBottom: 20}}> 
+      <View style={{width: width - REG_PADDING * 2, marginBottom: 20}}> 
         <Animated.View ref="noteView" style={[styles.ctn, {height: this.state.noteHeight}]}>
-          <View ref="noteInside" style={styles.textCtn}>
-            <TouchableOpacity onPress={() => { this.toggleNote(true) }}>
-              <Text style={styles.textText}>{note}</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.dateCtn}>
-            <TouchableOpacity onPress={() => { this.toggleNote(true) }}>
-              <Text style={styles.textText}>{`${d.getFullYear()}`}</Text>
-              <Text style={styles.textText}>{`${monthNames[d.getMonth()]} ${d.getDate()}`}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { this.removeNote() }} style={styles.button}>
-              <Text style={styles.textButton}>Remove</Text>
-            </TouchableOpacity>
+          <View ref="noteInside" style={styles.insideCtn}>
+            <View style={styles.textCtn}>
+              <TouchableOpacity onPress={() => { this.toggleNote(true) }}>
+                <Text style={styles.textText}>{note}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.dateCtn}>
+              <TouchableOpacity onPress={() => { this.toggleNote(true) }}>
+                <Text style={styles.textText}>{`${d.getFullYear()}`}</Text>
+                <Text style={styles.textText}>{`${monthNames[d.getMonth()]} ${d.getDate()}`}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => { this.removeNote() }} style={styles.button}>
+                <Text style={styles.textButton}>Remove</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </Animated.View>
-        <Animated.View ref="formView" style={[{ overflow: 'hidden' }, {height: this.state.formHeight}]}> 
+        <Animated.View ref="formView" style={[{ 
+          overflow: this.state.formOverflow }, 
+          (this.state.formOverflow === 'hidden' ? {height: this.state.formHeight} : {})
+          ]}> 
           <View ref="formInside">
             <Form
               ref="editNote"

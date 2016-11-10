@@ -56,6 +56,7 @@ class Notes extends Component {
   }
 
   onNoteUpdate () {
+    console.log('force update!!');
     this.forceUpdate();
   }
 
