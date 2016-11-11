@@ -29,7 +29,8 @@ class List extends Component {
   constructor(props) {
     super(props);  
     this.state = { 
-      opacity: new Animated.Value(0), 
+      opacity: new Animated.Value(0),
+      addY: new Animated.Value(0),
       logoHeight: new Animated.Value(height),
       logoOpacity: new Animated.Value(1)
     };
@@ -44,6 +45,7 @@ class List extends Component {
   }
 
   componentDidMount () {
+    this.state.addY.setValue(0);
     this.state.opacity.setValue(0);
     this.state.logoOpacity.setValue(1);
     this.state.logoHeight.setValue(height);
@@ -65,12 +67,19 @@ class List extends Component {
       Animated.timing(this.state.opacity, {
         toValue: 1,
         delay: 1250
-      })
+      }),      
     ]).start(event => {
       if(event.finished) {
         for (var i = 0; i < this.props.list.length; i++) {
           this.refs[`treeItem${i}`].animateIn();
         }
+
+        Animated.timing(this.state.addY, {
+          toValue: 203 * this.props.list.length,
+          easing: Easing.inOut(Easing.exp),
+          duration: 1000,
+          delay: 1 * 100
+        }).start();
       }
     });
   }
@@ -100,7 +109,7 @@ class List extends Component {
   }
 
   onNavClick (key) {
-    this.animateOut(key, () => { NavActions.Tree({nextId: key, imgPos: key * 203 + 203 + 115 - this.scrollVal}); });
+    this.animateOut(key, () => { NavActions.Tree({nextId: key, imgPos: (key) * 203 + 115 - this.scrollVal}); });
   }
 
   onAddClick () {
@@ -116,7 +125,7 @@ class List extends Component {
         ref={`treeItem${i}`} 
         length={this.props.list.length}
         fromY={0}
-        toY={203 * ( i + 1)}
+        toY={203 * (i)}
         label={ t.name } 
         photos={ t.photos } 
         key={k} ukey={ i } 
@@ -132,7 +141,7 @@ class List extends Component {
       <View>
         <View style={{ height: (this.props.list.length + 1) * 203 }}>
           {trees}
-          <Animated.View style={{opacity: this.state.opacity}}>
+          <Animated.View style={{opacity: this.state.opacity, transform: [{translateY: this.state.addY}]}}>
             <TouchableHighlight key="add-tree" onPress={() => { this.onAddClick() }} style={styles.button}>
               <Image resizeMode="cover" source={BLANK_IMAGE} style={styles.blankImage}>
                 <Text style={styles.addTree}>ADD A NEW TREE</Text>

@@ -1,5 +1,4 @@
 'use strict'
-
 import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
@@ -17,6 +16,8 @@ import BottomNav from '../components/BottomNav';
 
 import Photo from '../components/Photo';
 import TreeItem from '../components/TreeItem';
+
+import PhotoSlideShow from './PhotoSlideShow';
 
 import { width, 
         height, 
@@ -54,7 +55,7 @@ class Tree extends Component {
   }
 
   componentWillMount () {
-
+    console.log('targetFilePath', targetFilePath);
     this.setState({saving: false});
     this.props.actions.show(this.props.nextId);
 
@@ -91,7 +92,7 @@ class Tree extends Component {
   animateIn () {
     console.log('tree animate in');
     this.state.opacity.setValue(0); 
-    this.refs.treeItem.animateIn();
+    // this.refs.treeItem.animateIn();
     Animated.timing(this.state.opacity, {
       toValue: 1,
       duration: 500,
@@ -110,7 +111,7 @@ class Tree extends Component {
   }
 
   finishAnimateOut (cb = null) {
-    this.refs.treeItem.animateOut();
+    // this.refs.treeItem.animateOut();
     Animated.timing(this.state.opacity, {
       toValue: 0,
       duration: 250
@@ -162,8 +163,10 @@ class Tree extends Component {
         } else {
           source = {uri: response.uri, isStatic: true};
         }
-        console.log('photo uri', source.uri);
-        this.props.actions.savePhoto(source.uri);
+        const uriSplit = response.uri.split('/');
+        const fileName = uriSplit[uriSplit.length - 1];
+        console.log('photo uri', fileName);
+        this.props.actions.savePhoto(fileName);
         this.setState({ saving: true });
       }
     });
@@ -200,30 +203,20 @@ class Tree extends Component {
 
   render () {
 
+    if (this.props.id === -1) {
+      return null;
+    }
+
     const { tree } = this.props;
 
     const list = [];
 
-    console.log('RENDER TREE', tree.photos);
+    console.log('RENDER TREE', this.props.id);
 
     return(
       <View style={{backgroundColor: BG_COLOR}}>
-
-        <TreeItem
-            ref="treeItem"
-            label={ tree.name } 
-            photos={ tree.photos } 
-            key={0} ukey={0}
-            fromY={this.props.imgPos}
-            toY={0}
-            initialized={this.props.initialized}
-            isPending={this.props.isPending}
-            fromOpacity={1}
-            onNavClick={ () => {} }
-            styles={{ paddingLeft: REG_PADDING, paddingRight: REG_PADDING, paddingTop: REG_PADDING }} />
-
+        <PhotoSlideShow nextId={this.props.id} photos={tree.photos} />
         <ScrollView ref="scrollView" style={styles.container}>
-
           <Animated.View style={[styles.textView, {opacity: this.state.opacity}]}>
 
             <Text style={styles.title}>{this.getProp(tree.name)}</Text>
@@ -239,9 +232,9 @@ class Tree extends Component {
             <Text style={styles.text}>{this.getProp(tree.Source)}</Text>
             <Text style={styles.text}>{this.getProp(tree.potSize.width)}" x {this.getProp(tree.potSize.height)}" x {this.getProp(tree.potSize.depth)}"</Text>
             <Text style={styles.text}>DATE ACQUIRED {this.getFormatedDate(tree.date).toUpperCase()}</Text>
-            <View style={styles.photoContainer}>
-              {this.getPhotoList()}
-            </View>
+            {/*<View style={styles.photoContainer}>
+                          {this.getPhotoList()}
+                        </View>*/}
 
           </Animated.View>
           <BottomNav 
@@ -262,11 +255,12 @@ Tree.defaultProps = {
 const styles =  StyleSheet.create({
   container: Object.assign({}, ctnStyles, {
     padding: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0)' 
+    backgroundColor: 'rgba(0, 0, 0, 0)'
   }),
   textView: {
-    backgroundColor:BG_COLOR,
     marginTop: 220,
+    backgroundColor:BG_COLOR,
+    
     padding: REG_PADDING
   },
 

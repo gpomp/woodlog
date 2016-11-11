@@ -14,9 +14,10 @@ import Swiper from 'react-native-swiper';
 import {textReg, width, height} from '../utils/globalStyles';
 
 
-class PhotoSlideShow extends Component {
+export default class PhotoSlideShow extends Component {
 
   componentWillMount () {
+    console.log('slide IDS', this.props.photos);
     this.setState({init: false, imageList: []});
     storage.getBatchDataWithIds({
       key: 'img', 
@@ -32,10 +33,11 @@ class PhotoSlideShow extends Component {
 
   getImageList () {
     return this.state.imageList.map((p, i) => {
-      const src = {uri: p.src};
-
+      const path = `${global.targetFilePath}/${p.src}`;
+      const src = {uri: path};
+      console.log('slideshow path', path);
       return(
-          <Image resizeMode="contain" key={`ss-${i}`} source={src} style={styles.viewStyle} />
+          <Image resizeMode="cover" key={`ss-${i}`} source={src} style={[styles.viewStyle, { height: 203 }]} />
       );
     });
   }
@@ -46,13 +48,13 @@ class PhotoSlideShow extends Component {
       return null;
     }
 
-    return(<View>
-      <Swiper style={styles.wrapper} showsButtons={false} index={this.props.nextId}>
+    return(<View style={{height: 203, width, position: 'absolute', top: 0, left: 0, overflow:'hidden'}}>
+      <Swiper style={styles.wrapper} showsButtons={false} index={0}>
         {this.getImageList()}
       </Swiper>
-      <TouchableOpacity onPress={() => { NavActions.pop(); }} style={styles.button}>
-        <Text style={styles.buttonText}>X</Text>
-      </TouchableOpacity>
+      {/*<TouchableOpacity onPress={() => { NavActions.pop(); }} style={styles.button}>
+              <Text style={styles.buttonText}>X</Text>
+            </TouchableOpacity>*/}
     </View>);    
   }
 
@@ -60,38 +62,13 @@ class PhotoSlideShow extends Component {
 
 const styles =  StyleSheet.create({
   wrapper: {
-    
+    flex: 0,
+    height: 203
   },
   slide: {
-    flex: 1
+    height: 203
   },
   viewStyle: {
-        width,
-    height
-  },
-  button: {
-    position: 'absolute',
-    top: 25,
-    right: 15,
-    backgroundColor: 'black',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  buttonText: Object.assign({}, textReg, {
-    color: 'white',
-    opacity: 1,
-    fontSize: 10
-  })
-});
-
-
-const stateToProps = (state) => {
-  return {
-    photos: state.tree.rawData.photos
+    width
   }
-}
-
-export default connect(stateToProps)(PhotoSlideShow)
+});

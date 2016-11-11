@@ -52,14 +52,15 @@ export default class TreeItem extends Component {
   getPicture (props) {
     this.setState({ init: false, error: false });
     this.imgSRC = {};
-    console.log('banner will mount');
+    console.log('banner will mount', global.targetFilePath);
     if(props.photos.length > 0) {
       const pID = props.photos[0];
       global.storage.load({
         key: 'img',
         id: pID
       }).then(res => {
-        this.imgSRC = {uri: res.src, isStatic: true, width, height};
+        const path = `${global.targetFilePath}/${res.src}`;
+        this.imgSRC = {uri: path, isStatic: true, width, height};
         this.setState({ init: true });
       }).catch(err => {
         // console.warn('image error', err);

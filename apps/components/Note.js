@@ -34,11 +34,27 @@ const NoteModel = t.struct({
   date: t.Date
 });
 
-const ctnWidth = width - REG_PADDING * 2 - TEXT_PADDING * 2;
+const ctnWidth = width - REG_PADDING * 2;
 
 let datess = mergeDeep({}, formStyleSheet);
 datess = mergeDeep(datess, dateFieldSS);
 datess = mergeDeep(datess, {
+  formGroup: {
+    normal: {
+      paddingLeft: 0,
+      width: ctnWidth * 0.75
+    }
+  },
+  dateTouchable: {
+    normal: {
+      width: ctnWidth * 0.75
+    }
+  },
+  datepicker: {
+    normal: {
+      width: ctnWidth * 0.75
+    }
+  },
   dateValue: {
     normal: {
       fontFamily: TRADE_GOTHIC,
@@ -48,7 +64,8 @@ datess = mergeDeep(datess, {
   controlLabel: {
     normal: {
       fontFamily: TRADE_GOTHIC,
-      fontSize:12
+      fontSize:12,
+      width: ctnWidth * 0.75
     }
   }
 });
@@ -83,7 +100,6 @@ const formOptions = {
     date: {
       template: datepicker,
       stylesheet: datess,
-      label: 'NOTE\'S DATE',
       config: {
         format: formatDate
       }
@@ -126,7 +142,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   textCtn: {
-    flex: ctnWidth * 0.75
+    width: ctnWidth * 0.75
   },
   textText: Object.assign({}, textReg, {
     fontFamily: TRADE_GOTHIC,
@@ -135,7 +151,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   }),
   dateCtn: {
-    flex: ctnWidth * 0.25
+    width: ctnWidth * 0.25
   }
 });
 
@@ -146,7 +162,7 @@ class Note extends Component {
     this.state = { 
       formHeight: new Animated.Value(99999),
       noteHeight: new Animated.Value(99999),
-      formOverflow: 'hidden'
+      formOverflow: 'visible'
     };
   }
 
@@ -169,6 +185,7 @@ class Note extends Component {
       this.refs.formInside.measure((fx, fy, width, height) => { 
         this.formHeight = height;
         this.state.formHeight.setValue(0);
+        this.setState({formOverflow: 'hidden'});
       });
       this.refs.noteInside.measure((fx, fy, width, height) => { 
         this.noteHeight = height; 
@@ -180,6 +197,7 @@ class Note extends Component {
   toggleNote (showForm) {
     //this.setState({ editMode: !this.state.editMode });
     this.setState({ formOverflow: 'hidden' });
+    console.log(showForm ? this.formHeight : 0, showForm ? 0 : this.noteHeight);
     Animated.parallel([
     Animated.timing(this.state.formHeight, {
       toValue: showForm ? this.formHeight : 0,
@@ -193,7 +211,6 @@ class Note extends Component {
     })
     ]).start(() => {
       if(showForm) {
-        console.log('change form overflow');
         this.setState({ formOverflow: 'visible' });
       }
     });
@@ -251,9 +268,10 @@ class Note extends Component {
                 <Text style={styles.textText}>{`${d.getFullYear()}`}</Text>
                 <Text style={styles.textText}>{`${monthNames[d.getMonth()]} ${d.getDate()}`}</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => { this.removeNote() }} style={styles.button}>
-                <Text style={styles.textButton}>Remove</Text>
-              </TouchableOpacity>
+              {(this.props.arrayID === -1 ? null :
+                <TouchableOpacity onPress={() => { this.removeNote() }} style={styles.button}>
+                  <Text style={styles.textButton}>Remove</Text>
+                </TouchableOpacity>)}
             </View>
           </View>
         </Animated.View>
@@ -261,20 +279,22 @@ class Note extends Component {
           overflow: this.state.formOverflow }, 
           (this.state.formOverflow === 'hidden' ? {height: this.state.formHeight} : {})
           ]}> 
-          <View ref="formInside">
-            <Form
-              ref="editNote"
-              type={NoteModel}
-              options={formOptions}
-              value={this.defaultValues}
-            />
-            <View style={styles.btnCtn}>
+          <View ref="formInside" style={styles.ctn}>
+            <View style={styles.textCtn}>
+              <Form
+                ref="editNote"
+                type={NoteModel}
+                options={formOptions}
+                value={this.defaultValues}
+              />
+            </View>
+            <View style={styles.dateCtn}>
               <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
-                <Text style={styles.textButton}>SAVE</Text>
+                <Text style={styles.textButton}>Save</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => { this.cancelNote() }} style={styles.button}>
-                <Text style={styles.textButton}>CANCEL</Text>
+                <Text style={styles.textButton}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>

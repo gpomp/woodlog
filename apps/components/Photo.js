@@ -43,8 +43,9 @@ export default class Photo extends Component {
       key: 'img',
       id: this.props.id
     }).then(res => {
-      console.log('load photo', res.src);
-      this.setState({ src: res.src, init: true });
+      const path = `${global.targetFilePath}/${res.src}`;
+      console.log('load photo', path);
+      this.setState({ src: path, init: true });
     }).catch(err => {
       // console.warn('image error', err);
       this.setState({ init: true, error: true })
