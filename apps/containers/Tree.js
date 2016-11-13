@@ -1,9 +1,11 @@
 'use strict'
+const ADD_IMAGE = require('../../assets/add.png');
+const REM_IMAGE = require('../../assets/close.png');
 import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  ScrollView, StyleSheet, Text, Platform, View, Animated, Easing
+  ScrollView, StyleSheet, Text, Platform, View, Animated, Easing, Alert
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -21,8 +23,10 @@ import PhotoSlideShow from './PhotoSlideShow';
 import Notes from './Notes';
 
 import Swiper from 'react-native-swiper';
+import Icon from '../components/Icon';
 
 const timer = require('react-native-timer');
+const AnimatedSwiper = Animated.createAnimatedComponent(Swiper);
 
 import { width, 
         height, 
@@ -62,7 +66,7 @@ class Tree extends Component {
     this.state = { 
       opacity: new Animated.Value(0),
       photoY: new Animated.Value(0),
-      sliderHeight: 9999
+      sliderHeight: new Animated.Value(9999)
     };
   }
 
@@ -89,6 +93,7 @@ class Tree extends Component {
   }
 
   componentDidMount () {
+    this.currentPicture = 0;
     this.animateIn();
     // this.ticker();
   }
@@ -99,14 +104,14 @@ class Tree extends Component {
   }
 
   componentDidUpdate (nextProps, nextState) {
-    if(this.state.saving && !this.props.isPending) {
+    if(this.state.saving && !this.props.isPending && this.props.initialized) {
       this.setState({ saving: false });
-      this.forceUpdate();
     }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (nextProps.id !== this.props.id || (nextState.saving && !nextProps.isPending));
+    return nextProps.id !== this.props.id || 
+      (nextState.saving && !nextProps.isPending);
   }
 
   animateIn () {
@@ -194,8 +199,19 @@ class Tree extends Component {
     });
   }
 
-  removeImage (id) {
-    this.props.actions.removePhoto(id);
+  renderPhotoAlert () {
+    Alert.alert(
+      'Photo',
+      'Are you sure you want to delete this photo?',
+      [
+        {text: 'Cancel', onPress: () => {  }, style: 'cancel'},
+        {text: 'Delete', onPress: () => { this.removeImage(); }},
+      ],
+    );
+  }
+
+   removeImage () {
+    this.props.actions.removePhoto(this.currentPicture);
     this.setState({ saving: true });
   }
 
@@ -231,9 +247,14 @@ class Tree extends Component {
   resizeSwiper (index = 0) {
     const currView = index === 0 ? this.refs.bonsaiView : this.refs.notesView;
     currView.measure((fx, fy, width, height) => { 
-      this.setState({sliderHeight: height});
-      console.log(this.state.sliderHeight);
-      this.forceUpdate();
+      // this.state.sliderHeight.setValue(height);
+      Animated.timing(this.state.sliderHeight, {
+        toValue: height,
+        easing: Easing.inOut(Easing.exp),
+        duration: 300
+      }).start();
+      // console.log(this.state.sliderHeight);
+      // this.forceUpdate();
     });
   }
 
@@ -253,15 +274,22 @@ class Tree extends Component {
 
     const list = [];
 
-    console.log('RENDER TREE', this.props.id);
+    console.log('RENDER TREE', tree.photos);
 
     return(
       <View style={{backgroundColor: BG_COLOR}}>
         
         <ScrollView ref="scrollView" style={styles.container} scrollEventThrottle={1} onScroll={this.onScroll.bind(this)}>
-          <PhotoSlideShow nextId={this.props.id} photos={tree.photos} y={this.state.photoY} />
+          <PhotoSlideShow nextId={this.props.id} photos={tree.photos} y={this.state.photoY} onChangePicture={(index) => { this.currentPicture = index; }} />
           <Animated.View style={[styles.textView, {opacity: this.state.opacity}]}>
-            <Swiper ref="swiper" showsButtons={false} height={this.state.sliderHeight} style={{height: this.state.sliderHeight, flex: 0}} onMomentumScrollEnd={(e, state) => { this.resizeSwiper(state.index); }}>
+            <AnimatedSwiper 
+              ref="swiper" 
+              showsButtons={false} 
+              height={this.state.sliderHeight}
+              style={{flex: 0}} 
+              onScrollBeginDrag={(e, state) => { this.resizeSwiper(Math.abs(state.index - 1)); }}
+              onMomentumScrollEnd={(e, state) => { this.resizeSwiper(state.index); }}
+              showsPagination={false}>
               <View ref="bonsaiView">
                 <Text style={styles.title}>{this.getProp(tree.name)}</Text>
                 <Text style={styles.text}>{this.getProp(tree.species)}</Text>
@@ -283,13 +311,17 @@ class Tree extends Component {
               <View ref="notesView">
                 <Notes />
               </View>
-            </Swiper>
+            </AnimatedSwiper>
           </Animated.View>
           <BottomNav 
             ref="bottomNav"
-            buttons={ [ { label: 'Add Photo', key: ADDPHOTO }, { label: 'Edit', key: EDIT }, { label: 'Back', key: BACK } ] } 
+            buttons={ [ { label: 'Edit', key: EDIT }, { label: 'Back', key: BACK } ] } 
             onNavClick = {this.onNavClick.bind(this)} />
         </ScrollView>
+        <Icon src={ADD_IMAGE} onPress={() => { this.showImagePicker(); }} 
+          styles={{top: 20, left: 20}}/>
+        <Icon src={REM_IMAGE} onPress={() => { this.renderPhotoAlert(); }} 
+          styles={{top: 20, right: 20}}/>
       </View>
     );
   }

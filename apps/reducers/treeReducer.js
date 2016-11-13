@@ -68,7 +68,7 @@ export default TreeReducer = (state = initialState, action) => {
       global.storage.save(stateCopy);
 
       return {
-        ...state, rawData: stateCopy.rawData, isPending: false
+        ...state, rawData: Object.assign({}, state.rawData, stateCopy.rawData), isPending: false
       }
     break;
     case `${DELETEPHOTO}_FULFILLED`:

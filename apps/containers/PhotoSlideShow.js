@@ -1,5 +1,4 @@
 'use strict'
-
 import React, {Component} from 'react';
 import {
   View, Image, StyleSheet, Text, TouchableOpacity, Animated, Easing
@@ -13,26 +12,50 @@ import Swiper from 'react-native-swiper';
 
 import {textReg, width, height} from '../utils/globalStyles';
 
+import Icon from '../components/Icon';
+
 
 export default class PhotoSlideShow extends Component {
 
+  constructor(props) {
+    super(props);
+    
+    this.onRender = false;
+    this.imgList = [];
+  }
+
   componentWillMount () {
-    console.log('slide IDS', this.props.photos);
-    this.setState({init: false, imageList: []});
+
+    this.updatePhotosList();
+  }
+
+  componentWillUpdate (nextProps, nextState) {
+    if(!this.onRender) {
+      this.updatePhotosList();
+    }     
+  }
+ 
+  updatePhotosList () {
+    this.imgList = [];
+    // this.setState({imageList: []});
     storage.getBatchDataWithIds({
       key: 'img', 
       ids: this.props.photos
     }).then(res => {
-      this.setState({init: true, imageList: res});
+      this.imgList = res;
+      this.onRender = true;
+      this.forceUpdate();
+      // this.setState({ready: true});
+      // this.setState({imageList: res});
     });
   }
 
   componentDidUpdate() {
-
+    this.onRender = false;
   }
 
   getImageList () {
-    return this.state.imageList.map((p, i) => {
+    return this.imgList.map((p, i) => {
       const path = `${global.targetFilePath}/${p.src}`;
       const src = {uri: path};
       console.log('slideshow path', path);
@@ -43,13 +66,9 @@ export default class PhotoSlideShow extends Component {
   }
 
   render () {
-    
-    if(this.state.init !== true) {
-      return null;
-    }
-
+    console.log('render photos', this.imgList);
     return(<Animated.View style={[{height: 203, width, position: 'absolute', top: 0, left: 0, overflow:'hidden'}, {transform: [{translateY: this.props.y}] }]}>
-      <Swiper style={styles.wrapper} showsButtons={false} index={0}>
+      <Swiper style={styles.wrapper} showsButtons={false} onMomentumScrollEnd={(e, state) => { this.props.onChangePicture(state.index); }}>
         {this.getImageList()}
       </Swiper>
       {/*<TouchableOpacity onPress={() => { NavActions.pop(); }} style={styles.button}>

@@ -32,6 +32,8 @@ export default class App extends Component {
     });
     global.targetFilePath = [ RNFS.DocumentDirectoryPath, 'woodlog' ].join('/');
     global.storage = storage;
+    //global.storage.clearMap();
+
   }
 
   render() {
