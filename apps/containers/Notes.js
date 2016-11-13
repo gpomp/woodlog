@@ -3,7 +3,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  ScrollView, StyleSheet, Text, TouchableOpacity, Animated, Easing
+  View, StyleSheet, Text, TouchableOpacity, Animated, Easing
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -44,7 +44,7 @@ class Notes extends Component {
 
   componentDidMount () {
     this.state.height.setValue(0);
-    this.refs.bottomNav.animateIn();
+    // this.refs.bottomNav.animateIn();
   }
 
   onNavClick (key) {
@@ -68,15 +68,15 @@ class Notes extends Component {
       return <Note date={ n.date } note={ n.note } arrayID={i} key={k} onNoteUpdate={this.onNoteUpdate.bind(this)} />
     });
     return(
-      <ScrollView style={styles.container} contentContainerStyle={styles.innerContainer}> 
+      <View style={{flex: 1, justifyContent: 'center'}}> 
         <Text style={styles.title}>NOTES</Text>
         {noteList}
         <Note date={ new Date().toString() } note="Add a new note here" arrayID={-1} key={-1} onNoteUpdate={this.onNoteUpdate.bind(this)} />
-        <BottomNav 
-              ref="bottomNav"
-              buttons={ [ { label: 'BACK', key: 'back' } ] } 
-              onNavClick = {this.onNavClick.bind(this)} />
-      </ScrollView>
+        {/*<BottomNav 
+                      ref="bottomNav"
+                      buttons={ [ { label: 'BACK', key: 'back' } ] } 
+                      onNavClick = {this.onNavClick.bind(this)} />*/}
+      </View>
     );
   }
 }
@@ -98,7 +98,8 @@ const styles =  StyleSheet.create({
   }),
   title: Object.assign({}, textReg, {
     opacity: 1,
-    marginBottom: 35
+    marginBottom: 35,
+    width: ctnWidth
   })
 });
 

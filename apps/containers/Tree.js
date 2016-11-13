@@ -18,6 +18,11 @@ import Photo from '../components/Photo';
 import TreeItem from '../components/TreeItem';
 
 import PhotoSlideShow from './PhotoSlideShow';
+import Notes from './Notes';
+
+import Swiper from 'react-native-swiper';
+
+const timer = require('react-native-timer');
 
 import { width, 
         height, 
@@ -30,6 +35,8 @@ import { width,
         BG_COLOR,
         monthNames 
       } from '../utils/globalStyles';
+
+const ctnWidth = width - REG_PADDING * 2;
 
 const IPOptions = {
   title: 'Add a picture to this Bonsai...',
@@ -51,13 +58,20 @@ export const ADDPHOTO = 'add_Photo';
 class Tree extends Component {
   constructor(props) {
     super(props);
-    this.state = { opacity: new Animated.Value(0) };
+    global.raf = -1;
+    this.state = { 
+      opacity: new Animated.Value(0),
+      photoY: new Animated.Value(0),
+      sliderHeight: 9999
+    };
   }
 
   componentWillMount () {
     console.log('targetFilePath', targetFilePath);
     this.setState({saving: false});
     this.props.actions.show(this.props.nextId);
+    this.scrollY = 0;
+    // this.state.sliderHeight.setValue(9999);
 
     /*global.storage.load({
       key: 'tree',
@@ -75,7 +89,13 @@ class Tree extends Component {
   }
 
   componentDidMount () {
-   this.animateIn();    
+    this.animateIn();
+    // this.ticker();
+  }
+
+  componentWillUnmount () {
+    // if(global.raf !== -1) cancelAnimationFrame(global.raf);
+    // global.raf = -1;
   }
 
   componentDidUpdate (nextProps, nextState) {
@@ -102,6 +122,8 @@ class Tree extends Component {
 
         this.refs.scrollView.scrollEnabled = true;
         this.refs.bottomNav.animateIn();
+
+        this.resizeSwiper(0);
       }
     });
   }
@@ -201,6 +223,26 @@ class Tree extends Component {
     return p === null || p === undefined || p === 'undefined' ? '' : p.toString().toUpperCase();
   }
 
+  onScroll (event) {
+    this.scrollY = event.nativeEvent.contentOffset.y;
+    this.state.photoY.setValue(this.scrollY); 
+  }
+
+  resizeSwiper (index = 0) {
+    const currView = index === 0 ? this.refs.bonsaiView : this.refs.notesView;
+    currView.measure((fx, fy, width, height) => { 
+      this.setState({sliderHeight: height});
+      console.log(this.state.sliderHeight);
+      this.forceUpdate();
+    });
+  }
+
+  /*ticker () {
+    this.state.photoY.setValue(this.scrollY); 
+
+    global.raf = requestAnimationFrame(this.ticker.bind(this));
+  }*/
+
   render () {
 
     if (this.props.id === -1) {
@@ -215,31 +257,37 @@ class Tree extends Component {
 
     return(
       <View style={{backgroundColor: BG_COLOR}}>
-        <PhotoSlideShow nextId={this.props.id} photos={tree.photos} />
-        <ScrollView ref="scrollView" style={styles.container}>
+        
+        <ScrollView ref="scrollView" style={styles.container} scrollEventThrottle={1} onScroll={this.onScroll.bind(this)}>
+          <PhotoSlideShow nextId={this.props.id} photos={tree.photos} y={this.state.photoY} />
           <Animated.View style={[styles.textView, {opacity: this.state.opacity}]}>
-
-            <Text style={styles.title}>{this.getProp(tree.name)}</Text>
-            <Text style={styles.text}>{this.getProp(tree.species)}</Text>
-            <Text style={styles.text}>{this.getProp(tree.age)}</Text>
-            <Text style={styles.text}>{this.getProp(tree.potType)}</Text>
-            <Text style={styles.text}>{this.getProp(tree.style)}</Text>
-            <Text>{"\n"}</Text>
-            <Text style={styles.text}>{this.getProp(tree.height)}"</Text>
-            <Text style={styles.text}>{this.getProp(tree.trunkWidth)}"</Text>
-            <Text style={styles.text}>{this.getProp(tree.canopyWidth)}"</Text>
-            <Text>{"\n"}</Text>
-            <Text style={styles.text}>{this.getProp(tree.Source)}</Text>
-            <Text style={styles.text}>{this.getProp(tree.potSize.width)}" x {this.getProp(tree.potSize.height)}" x {this.getProp(tree.potSize.depth)}"</Text>
-            <Text style={styles.text}>DATE ACQUIRED {this.getFormatedDate(tree.date).toUpperCase()}</Text>
-            {/*<View style={styles.photoContainer}>
-                          {this.getPhotoList()}
-                        </View>*/}
-
+            <Swiper ref="swiper" showsButtons={false} height={this.state.sliderHeight} style={{height: this.state.sliderHeight, flex: 0}} onMomentumScrollEnd={(e, state) => { this.resizeSwiper(state.index); }}>
+              <View ref="bonsaiView">
+                <Text style={styles.title}>{this.getProp(tree.name)}</Text>
+                <Text style={styles.text}>{this.getProp(tree.species)}</Text>
+                <Text style={styles.text}>{this.getProp(tree.age)}</Text>
+                <Text style={styles.text}>{this.getProp(tree.potType)}</Text>
+                <Text style={styles.text}>{this.getProp(tree.style)}</Text>
+                <Text>{"\n"}</Text>
+                <Text style={styles.text}>{this.getProp(tree.height)}"</Text>
+                <Text style={styles.text}>{this.getProp(tree.trunkWidth)}"</Text>
+                <Text style={styles.text}>{this.getProp(tree.canopyWidth)}"</Text>
+                <Text>{"\n"}</Text>
+                <Text style={styles.text}>{this.getProp(tree.Source)}</Text>
+                <Text style={styles.text}>{this.getProp(tree.potSize.width)}" x {this.getProp(tree.potSize.height)}" x {this.getProp(tree.potSize.depth)}"</Text>
+                <Text style={styles.text}>DATE ACQUIRED {this.getFormatedDate(tree.date).toUpperCase()}</Text>
+                {/*<View style={styles.photoContainer}>
+                              {this.getPhotoList()}
+                            </View>*/}
+              </View>
+              <View ref="notesView">
+                <Notes />
+              </View>
+            </Swiper>
           </Animated.View>
           <BottomNav 
             ref="bottomNav"
-            buttons={ [ { label: 'See Notes', key: SEENOTES }, { label: 'Add Photo', key: ADDPHOTO }, { label: 'Edit', key: EDIT }, { label: 'Back', key: BACK } ] } 
+            buttons={ [ { label: 'Add Photo', key: ADDPHOTO }, { label: 'Edit', key: EDIT }, { label: 'Back', key: BACK } ] } 
             onNavClick = {this.onNavClick.bind(this)} />
         </ScrollView>
       </View>
@@ -267,26 +315,20 @@ const styles =  StyleSheet.create({
   title: Object.assign({}, textReg, {
     fontSize: 35,
     opacity: 1,
-    paddingLeft: TEXT_PADDING,
-    paddingRight: TEXT_PADDING,
     textAlign: 'left',
-    width: width - REG_PADDING * 2 - TEXT_PADDING * 2
+    width: width - REG_PADDING * 2
   }),
   text: Object.assign({}, textReg, {
     fontSize: 15,
     opacity: 1,
-    paddingLeft: TEXT_PADDING,
-    paddingRight: TEXT_PADDING,
     textAlign: 'left',
-    width: width - REG_PADDING * 2 - TEXT_PADDING * 2
+    width: width - REG_PADDING * 2
   }),
   photoContainer: {
     flex: 0 ,
-    width: width - REG_PADDING * 2 - TEXT_PADDING * 2,
+    width: width - REG_PADDING * 2,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingLeft: TEXT_PADDING,
-    paddingRight: TEXT_PADDING,
     marginTop: 10,
     marginBottom: 10
   }

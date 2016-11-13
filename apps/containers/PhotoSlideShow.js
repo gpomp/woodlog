@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {
-  View, Image, StyleSheet, Text, TouchableOpacity
+  View, Image, StyleSheet, Text, TouchableOpacity, Animated, Easing
 } from 'react-native'
 import { Actions as NavActions } from 'react-native-router-flux';
 
@@ -48,14 +48,14 @@ export default class PhotoSlideShow extends Component {
       return null;
     }
 
-    return(<View style={{height: 203, width, position: 'absolute', top: 0, left: 0, overflow:'hidden'}}>
+    return(<Animated.View style={[{height: 203, width, position: 'absolute', top: 0, left: 0, overflow:'hidden'}, {transform: [{translateY: this.props.y}] }]}>
       <Swiper style={styles.wrapper} showsButtons={false} index={0}>
         {this.getImageList()}
       </Swiper>
       {/*<TouchableOpacity onPress={() => { NavActions.pop(); }} style={styles.button}>
               <Text style={styles.buttonText}>X</Text>
             </TouchableOpacity>*/}
-    </View>);    
+    </Animated.View>);    
   }
 
 }
