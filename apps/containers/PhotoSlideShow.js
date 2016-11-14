@@ -22,20 +22,30 @@ export default class PhotoSlideShow extends Component {
     
     this.onRender = false;
     this.imgList = [];
+    this.state = {
+      width: new Animated.Value(width),
+      y: new Animated.Value(0),
+      opacity: new Animated.Value(0),
+      isLoading: false
+    }
   }
 
   componentWillMount () {
-
-    this.updatePhotosList();
+    this.setState({isLoading: true});
+    // this.updatePhotosList();
   }
 
   componentWillUpdate (nextProps, nextState) {
-    if(!this.onRender) {
+    if(this.state.isLoading) {
       this.updatePhotosList();
-    }     
+    }
+    // if(!this.onRender && this.props.photos.length !== 0) {
+    //   
+    // }     
   }
  
   updatePhotosList () {
+    console.log('updatePhotosList');
     this.imgList = [];
     // this.setState({imageList: []});
     storage.getBatchDataWithIds({
@@ -43,37 +53,59 @@ export default class PhotoSlideShow extends Component {
       ids: this.props.photos
     }).then(res => {
       this.imgList = res;
-      this.onRender = true;
-      this.forceUpdate();
+      this.setState({isLoading: false});
       // this.setState({ready: true});
       // this.setState({imageList: res});
     });
   }
 
   componentDidUpdate() {
-    this.onRender = false;
+    // this.onRender = false;
   }
 
   getImageList () {
     return this.imgList.map((p, i) => {
       const path = `${global.targetFilePath}/${p.src}`;
       const src = {uri: path};
-      console.log('slideshow path', path);
+      // console.log('slideshow path', path);
       return(
-          <Image resizeMode="cover" key={`ss-${i}`} source={src} style={[styles.viewStyle, { height: 203 }]} />
+          <Animated.Image resizeMode="cover" key={`ss-${i}`} source={src} style={{ height: 203, width: this.state.width }} />
       );
-    });
+    })
   }
 
+  animateIn () {
+    this.state.opacity.setValue(1);
+    this.state.width.setValue(width - 40);
+
+    Animated.timing(this.state.width, {
+      toValue: width,
+      easing: Easing.inOut(Easing.exp),
+      duration: 1000
+    }).start();
+  }
+
+  animateOut (cb = null) {
+    Animated.timing(this.state.opacity, {
+      toValue: 0,
+      duration: 250
+    }).start((event) => {
+      if(event.finished) {
+        if(cb !== null) {
+          cb();
+        }        
+      }
+    });
+  }
+  // , opacity: this.state.opacity
   render () {
-    console.log('render photos', this.imgList);
-    return(<Animated.View style={[{height: 203, width, position: 'absolute', top: 0, left: 0, overflow:'hidden'}, {transform: [{translateY: this.props.y}] }]}>
-      <Swiper style={styles.wrapper} showsButtons={false} onMomentumScrollEnd={(e, state) => { this.props.onChangePicture(state.index); }}>
-        {this.getImageList()}
-      </Swiper>
-      {/*<TouchableOpacity onPress={() => { NavActions.pop(); }} style={styles.button}>
-              <Text style={styles.buttonText}>X</Text>
-            </TouchableOpacity>*/}
+    return(<Animated.View 
+      style={[{height: 203,position: 'absolute', top: 0, left: 0, overflow:'hidden', flex: 1, width, alignItems:'center'}, {transform: [{translateY: this.props.y}], opacity: this.state.opacity }]}>
+      <Animated.View style={{width: this.state.width, overflow:'hidden'}}>
+        <Swiper style={styles.wrapper} showsButtons={false} onMomentumScrollEnd={(e, state) => { this.props.onChangePicture(state.index); }}>
+          {this.getImageList()}
+        </Swiper>
+      </Animated.View>
     </Animated.View>);    
   }
 
@@ -86,8 +118,5 @@ const styles =  StyleSheet.create({
   },
   slide: {
     height: 203
-  },
-  viewStyle: {
-    width
   }
 });

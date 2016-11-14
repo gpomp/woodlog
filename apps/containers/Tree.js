@@ -68,13 +68,14 @@ class Tree extends Component {
       photoY: new Animated.Value(0),
       sliderHeight: new Animated.Value(9999)
     };
+
   }
 
   componentWillMount () {
-    console.log('targetFilePath', targetFilePath);
-    this.setState({saving: false});
-    this.props.actions.show(this.props.nextId);
+    // this.setState({saving: false});
     this.scrollY = 0;
+    this.initialized = false;
+    this.props.actions.show(this.props.nextId);
     // this.state.sliderHeight.setValue(9999);
 
     /*global.storage.load({
@@ -104,20 +105,33 @@ class Tree extends Component {
   }
 
   componentDidUpdate (nextProps, nextState) {
+
+    if(this.state.saving) {
+      this.refs.slideShow.setState({ isLoading: true });
+    }
+
     if(this.state.saving && !this.props.isPending && this.props.initialized) {
       this.setState({ saving: false });
     }
+
+    console.log('init', nextProps.initialized, this.props.initialized);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.id !== this.props.id || 
-      (nextState.saving && !nextProps.isPending);
-  }
+  /*shouldComponentUpdate(nextProps, nextState) {
+    return !this.props.isPending || 
+          (nextState.saving);
+  }*/
 
   animateIn () {
-    console.log('tree animate in');
     this.state.opacity.setValue(0); 
-    // this.refs.treeItem.animateIn();
+    this.refs.slideShow.animateIn();
+    this.state.photoY.setValue(this.props.imgPos);
+    
+    Animated.timing(this.state.photoY, {
+      toValue: 0,
+      easing: Easing.inOut(Easing.exp),
+      duration: 1000
+    }).start();
     Animated.timing(this.state.opacity, {
       toValue: 1,
       duration: 500,
@@ -131,6 +145,7 @@ class Tree extends Component {
         this.resizeSwiper(0);
       }
     });
+    this.initialized = true;
   }
 
   animateOut (cb = null) {
@@ -138,7 +153,7 @@ class Tree extends Component {
   }
 
   finishAnimateOut (cb = null) {
-    // this.refs.treeItem.animateOut();
+    this.refs.slideShow.animateOut();
     Animated.timing(this.state.opacity, {
       toValue: 0,
       duration: 250
@@ -211,7 +226,8 @@ class Tree extends Component {
   }
 
    removeImage () {
-    this.props.actions.removePhoto(this.currentPicture);
+    console.log('removeImage', this.currentPicture);
+    this.props.actions.removePhoto(this.props.tree.photos[this.currentPicture]);
     this.setState({ saving: true });
   }
 
@@ -266,21 +282,30 @@ class Tree extends Component {
 
   render () {
 
-    if (this.props.id === -1) {
-      return null;
-    }
+    /*if (this.props.id === -1) {
+      return <View />;
+    }*/
 
     const { tree } = this.props;
 
     const list = [];
 
-    console.log('RENDER TREE', tree.photos);
+    console.log('RENDER TREE', this.props.id);
 
     return(
-      <View style={{backgroundColor: BG_COLOR}}>
-        
-        <ScrollView ref="scrollView" style={styles.container} scrollEventThrottle={1} onScroll={this.onScroll.bind(this)}>
-          <PhotoSlideShow nextId={this.props.id} photos={tree.photos} y={this.state.photoY} onChangePicture={(index) => { this.currentPicture = index; }} />
+      <View style={{backgroundColor: BG_COLOR}}>        
+        <ScrollView 
+        ref="scrollView" 
+        style={styles.container} 
+        scrollEventThrottle={1} 
+        onScroll={this.onScroll.bind(this)}>
+          <PhotoSlideShow 
+            ref="slideShow" 
+            nextId={this.props.id} 
+            photos={tree.photos} 
+            y={this.state.photoY} 
+            fromY={this.props.imgPos}
+            onChangePicture={(index) => { this.currentPicture = index; }} />
           <Animated.View style={[styles.textView, {opacity: this.state.opacity}]}>
             <AnimatedSwiper 
               ref="swiper" 
