@@ -47,6 +47,10 @@ class Notes extends Component {
     // this.refs.bottomNav.animateIn();
   }
 
+  componentDidUpdate () {
+    this.props.onNoteUpdate();
+  }
+
   onNavClick (key) {
     switch(key) {
       case 'back': 
@@ -55,7 +59,7 @@ class Notes extends Component {
     }
   }
 
-  onNoteUpdate () {
+  noteUpdate () {
     console.log('force update!!');
     this.forceUpdate();
   }
@@ -65,13 +69,13 @@ class Notes extends Component {
     const d = new Date();
     const noteList = notes.map((n, i) => {
       const k = `tree-note-${i}`;
-      return <Note date={ n.date } note={ n.note } arrayID={i} key={k} onNoteUpdate={this.onNoteUpdate.bind(this)} />
+      return <Note date={ n.date } note={ n.note } arrayID={i} key={k} onNoteUpdate={this.noteUpdate.bind(this)} onToggleNote={this.props.onToggleNote} />
     });
     return(
       <View style={{flex: 1, justifyContent: 'center'}}> 
         <Text style={styles.title}>NOTES</Text>
         {noteList}
-        <Note date={ new Date().toString() } note="Add a new note here" arrayID={-1} key={-1} onNoteUpdate={this.onNoteUpdate.bind(this)} />
+        <Note date={ new Date().toString() } note="Add a new note here" arrayID={-1} key={-1} onNoteUpdate={this.noteUpdate.bind(this)} onToggleNote={this.props.onToggleNote}/>
         {/*<BottomNav 
                       ref="bottomNav"
                       buttons={ [ { label: 'BACK', key: 'back' } ] } 

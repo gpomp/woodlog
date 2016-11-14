@@ -36,6 +36,8 @@ export const getList = () => ({
   type: SHOWLIST,
   payload: new Promise(resolve => {
 
+
+
     global.storage.getAllDataForKey('tree').then(ret => {
       resolve({data: ret});
     });

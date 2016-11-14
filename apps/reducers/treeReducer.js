@@ -114,7 +114,7 @@ export default TreeReducer = (state = initialState, action) => {
       }
     break;
     default:
-      return state
+      return { ...state };
   }
 }
 

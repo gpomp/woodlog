@@ -71,7 +71,7 @@ export default class TreeItem extends Component {
     }
   }
 
-  animateIn () {
+  animateIn (duration = 1000, delay = 100) {
     this.state.opacity.setValue(this.props.fromOpacity);
     this.state.y.setValue(this.props.fromY);
     const id = this.props.ukey;
@@ -80,13 +80,13 @@ export default class TreeItem extends Component {
       Animated.timing(this.state.y, {
         toValue: this.props.toY,
         easing: Easing.inOut(Easing.exp),
-        duration: 1000,
-        delay: id * 100
+        duration: duration,
+        delay: id * delay
       }),
       Animated.timing(this.state.opacity, {
         toValue: this.props.toOpacity,
-        duration: 1000,
-        delay: id * 100
+        duration: duration,
+        delay: id * delay
       })
     ]).start();
   }

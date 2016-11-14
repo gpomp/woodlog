@@ -4,11 +4,16 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
+  findNodeHandle,
   ScrollView,
   View,
   StyleSheet, 
   Animated, 
-  Easing
+  Easing,
+  TextInput,
+  DeviceEventEmitter,
+  Dimensions,
+  StatusBar
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -77,6 +82,8 @@ const isLabel = {
   date: true
 }
 
+const fieldList = ['name', 'type', 'age', 'potType', 'style', 'potSize.width', 'potSize.height', 'potSize.depth', 'height', 'trunkWidth', 'canopyWidth', 'Source', 'date'];
+
 const ph = {
   name: 'BONSAI NAME',
   type: 'BONSAI TYPE',
@@ -129,6 +136,7 @@ for(var name in TreeStruct) {
     copy = mergeDeep(copy, ss[name].opts);
 
   }
+
   formOptions.fields[name] = copy;
 }
 
@@ -168,9 +176,38 @@ class Edit extends Component {
 
   constructor(props) {
     super(props);
+
+    let count = 0;
+
+    for(let i = 0; i < fieldList.length; i++) {
+      this.addNextField(fieldList[i], i + 1);
+    }
+
     this.state = { scale: new Animated.Value(1.2), opacity: new Animated.Value(0) };
 
     this.formData = {};
+  }
+
+  addNextField(name, count) {
+    let inputOpt;
+    if(count < fieldList.length - 1) {
+      if(name.indexOf('.') > -1) {
+        const names = name.split('.');
+        inputOpt = formOptions.fields[names[0]].fields[names[1]];
+      } else {
+        inputOpt = formOptions.fields[name];
+      }
+
+      inputOpt.onSubmitEditing = () => {
+        this.refs.editTree.getComponent(fieldList[count]).refs.input.focus();
+      };
+
+      inputOpt.onFocus = () => {
+        this.inputFocused(name);
+      }
+
+      // console.log('addNextField', name, fieldList[count]);
+    }
   }
 
   componentWillMount() {
@@ -182,17 +219,30 @@ class Edit extends Component {
     this.animateIn();
   }
 
+  inputFocused (refName) {
+    setTimeout(() => {
+      let scrollResponder = this.refs.scrollView.getScrollResponder();
+      scrollResponder.scrollResponderScrollNativeHandleToKeyboard(
+        findNodeHandle(this.refs.editTree.getComponent(refName).refs.input),
+        200, //additionalOffset
+        true
+      );
+    }, 50);
+  }
+
   componentWillUpdate(nextProps) {
     
   }
 
   componentDidUpdate(prevProps, prevState) { 
     // if(prevProps.id !== this.props.id) {
+      
       if(this.props.id !== -1) {
-        this.animateOut(() => { NavActions.Tree({id: this.props.id}); });
+        this.animateOut(() => { NavActions.Tree({nextId: this.props.id, imgPos: 0}); });
       } else {
-        this.animateOut(NavActions.List);
+        this.animateOut(NavActions.List({back: true}));
       }
+      
     // }
   }
 
@@ -244,9 +294,9 @@ class Edit extends Component {
     switch(key) {
       case CANCEL:
         if(this.props.id !== -1) {
-          this.animateOut(() => { NavActions.Tree({id: this.props.id}); });
+          this.animateOut(NavActions.Tree({nextId: this.props.id, imgPos: 0 }));
         } else {
-          this.animateOut(NavActions.List);
+          this.animateOut(NavActions.List({back: true}));
         }
       break;
       case SAVE:
@@ -261,7 +311,6 @@ class Edit extends Component {
               this.formData[prop] = '';
             }
           }
-
           this.props.actions.change(this.formData, this.props.id);
         }
       break;
@@ -271,10 +320,21 @@ class Edit extends Component {
   render () {
     //const { name, species, age, potType, style, height, trunkWidth, canopyWidth, Source, date } = this.props.tree;
     return(
-      <ScrollView style={styles.container} style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <ScrollView style={{ flex: 1 }}
+        ref="scrollView"
+        contentContainerStyle={styles.contentContainer}
+        keyboardShouldPersistTaps={true}
+        keyboardDismissMode='on-drag'>
+          <StatusBar hidden={true} />
           <Animated.View style={{
             opacity: this.state.opacity, 
             transform: [{scale: this.state.scale}]
+          }}
+           onStartShouldSetResponderCapture={(e) => {
+            const focusField = TextInput.State.currentlyFocusedField();
+            if (focusField != null && e.nativeEvent.target != focusField){
+               TextInput.State.blurTextInput(TextInput.State.currentlyFocusedField());
+            }
           }}>
             <Form
               ref="editTree"
@@ -308,13 +368,13 @@ const dispatchToProps = (dispatch) => {
 }
 
 const styles =  StyleSheet.create({
-  container: Object.assign({  }, ctnStyles),
+  container: Object.assign({  }, ctnStyles, { padding: 0 }),
   formStyles: {
     flexDirection: 'row',
     height,
     width: width - REG_PADDING * 2
   },
-  contentContainer: Object.assign({}, contentContainer)
+  contentContainer: Object.assign({}, contentContainer, { width, padding: 0, margin: 0 })
 });
 
 export default connect(stateToProps, dispatchToProps)(Edit)

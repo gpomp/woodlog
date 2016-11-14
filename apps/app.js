@@ -10,6 +10,7 @@ import List from './containers/List';
 import Edit from './containers/Edit';
 import Notes from './containers/Notes';
 // import SlideShow from './containers/PhotoSlideShow';
+console.ignoredYellowBox = ["You are setting the style"];
 
 export default class App extends Component {
   constructor(props) {
@@ -32,7 +33,14 @@ export default class App extends Component {
     });
     global.targetFilePath = [ RNFS.DocumentDirectoryPath, 'woodlog' ].join('/');
     global.storage = storage;
-    //global.storage.clearMap();
+    /*global.storage.getIdsForKey('tree').then(ids => {
+      console.log('ids', ids);
+    });
+    global.storage.remove({
+      key: 'tree',
+      id: '-1'
+    });*/
+    // global.storage.clearMap();
 
   }
 

@@ -1,7 +1,7 @@
 'use strict'
 import React, {Component} from 'react';
 import {
-  View, Image, StyleSheet, Text, TouchableOpacity, Animated, Easing
+  View, Image, StyleSheet, Text, TouchableOpacity, Animated, Easing, TouchableHighlight
 } from 'react-native'
 import { Actions as NavActions } from 'react-native-router-flux';
 
@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 
 import Swiper from 'react-native-swiper';
 
-import {textReg, width, height} from '../utils/globalStyles';
+import {textReg, width, height, BLANK_IMAGE, REG_PADDING} from '../utils/globalStyles';
 
 import Icon from '../components/Icon';
 
@@ -45,7 +45,7 @@ export default class PhotoSlideShow extends Component {
   }
  
   updatePhotosList () {
-    console.log('updatePhotosList');
+    console.log('updatePhotosList', this.props.photos);
     this.imgList = [];
     // this.setState({imageList: []});
     storage.getBatchDataWithIds({
@@ -61,17 +61,6 @@ export default class PhotoSlideShow extends Component {
 
   componentDidUpdate() {
     // this.onRender = false;
-  }
-
-  getImageList () {
-    return this.imgList.map((p, i) => {
-      const path = `${global.targetFilePath}/${p.src}`;
-      const src = {uri: path};
-      // console.log('slideshow path', path);
-      return(
-          <Animated.Image resizeMode="cover" key={`ss-${i}`} source={src} style={{ height: 203, width: this.state.width }} />
-      );
-    })
   }
 
   animateIn () {
@@ -97,14 +86,38 @@ export default class PhotoSlideShow extends Component {
       }
     });
   }
-  // , opacity: this.state.opacity
+
+  getImageList () {
+    return this.imgList.map((p, i) => {
+      const path = `${global.targetFilePath}/${p.src}`;
+      const src = {uri: path};
+      // console.log('slideshow path', path);
+      return(
+          <Animated.Image resizeMode="cover" key={`ss-${i}`} source={src} style={{ height: 203, width: this.state.width }} />
+      );
+    })
+  }
+
   render () {
+    console.log('render slideshow', this.imgList.length);
     return(<Animated.View 
       style={[{height: 203,position: 'absolute', top: 0, left: 0, overflow:'hidden', flex: 1, width, alignItems:'center'}, {transform: [{translateY: this.props.y}], opacity: this.state.opacity }]}>
       <Animated.View style={{width: this.state.width, overflow:'hidden'}}>
-        <Swiper style={styles.wrapper} showsButtons={false} onMomentumScrollEnd={(e, state) => { this.props.onChangePicture(state.index); }}>
-          {this.getImageList()}
-        </Swiper>
+        
+        {(this.props.photos.length > 0) ? 
+          <Swiper style={styles.wrapper} showsButtons={false} onMomentumScrollEnd={(e, state) => { this.props.onChangePicture(state.index); }}>
+            {this.getImageList()}
+          </Swiper> :
+          <TouchableHighlight onPress={() => { this.props.onAddImage(); }}>
+            <Image
+              resizeMode="cover" 
+              source={BLANK_IMAGE}
+              style={styles.blankImage} >
+                <Text style={styles.errorTree}>ADD AN IMAGE</Text>
+            </Image>
+          </TouchableHighlight>
+        }
+
       </Animated.View>
     </Animated.View>);    
   }
@@ -118,5 +131,16 @@ const styles =  StyleSheet.create({
   },
   slide: {
     height: 203
-  }
+  },
+  blankImage: {
+    flex: 1,
+    width,
+    height: 203,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  errorTree: Object.assign({
+    letterSpacing: 2,
+    backgroundColor: 'rgba(0,0,0,0)'
+  }, textReg)
 });

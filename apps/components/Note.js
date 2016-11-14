@@ -197,7 +197,8 @@ class Note extends Component {
   toggleNote (showForm) {
     //this.setState({ editMode: !this.state.editMode });
     this.setState({ formOverflow: 'hidden' });
-    console.log(showForm ? this.formHeight : 0, showForm ? 0 : this.noteHeight);
+    // console.log(showForm ? this.formHeight : 0, showForm ? 0 : this.noteHeight);
+    this.props.onToggleNote(showForm, this.formHeight, this.noteHeight);
     Animated.parallel([
     Animated.timing(this.state.formHeight, {
       toValue: showForm ? this.formHeight : 0,

@@ -1,11 +1,13 @@
 'use strict'
 const ADD_IMAGE = require('../../assets/add.png');
 const REM_IMAGE = require('../../assets/close.png');
+const EDIT_IMAGE = require('../../assets/edit.png');
+const BACK_IMAGE = require('../../assets/back.png');
 import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  ScrollView, StyleSheet, Text, Platform, View, Animated, Easing, Alert
+  ScrollView, StyleSheet, Text, Platform, View, Animated, Easing, Alert, StatusBar
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -13,8 +15,6 @@ import { connect } from 'react-redux'
 import * as TreeActions from '../actions/treeActions';
 
 import ImagePicker from 'react-native-image-picker';
-
-import BottomNav from '../components/BottomNav';
 
 import Photo from '../components/Photo';
 import TreeItem from '../components/TreeItem';
@@ -37,7 +37,7 @@ import { width,
         TEXT_PADDING, 
         BIG_FONT_SIZE, 
         BG_COLOR,
-        monthNames 
+        monthNames
       } from '../utils/globalStyles';
 
 const ctnWidth = width - REG_PADDING * 2;
@@ -53,16 +53,9 @@ const IPOptions = {
   }
 };
 
-
-export const SEENOTES = 'see_notes';
-export const EDIT = 'edit';
-export const BACK = 'back';
-export const ADDPHOTO = 'add_Photo';
-
 class Tree extends Component {
   constructor(props) {
     super(props);
-    global.raf = -1;
     this.state = { 
       opacity: new Animated.Value(0),
       photoY: new Animated.Value(0),
@@ -72,55 +65,35 @@ class Tree extends Component {
   }
 
   componentWillMount () {
-    // this.setState({saving: false});
+    // console.log('componentWillMount!!!!!', this.props.nextId);
     this.scrollY = 0;
     this.initialized = false;
     this.props.actions.show(this.props.nextId);
-    // this.state.sliderHeight.setValue(9999);
-
-    /*global.storage.load({
-      key: 'tree',
-      id: this.props.nextId
-    }).then((res) => {
-      const resCopy = Object.assign({}, res);
-      resCopy.type = '';
-      global.storage.save({
-        key: 'tree',
-        id: this.props.nextId,
-        rawData: resCopy,
-        expires: null
-      })
-    });*/
   }
 
   componentDidMount () {
     this.currentPicture = 0;
     this.animateIn();
-    // this.ticker();
   }
 
   componentWillUnmount () {
-    // if(global.raf !== -1) cancelAnimationFrame(global.raf);
-    // global.raf = -1;
+
   }
 
   componentDidUpdate (nextProps, nextState) {
 
-    if(this.state.saving) {
+    if(!this.props.isPending && this.props.initialized) {
       this.refs.slideShow.setState({ isLoading: true });
     }
 
     if(this.state.saving && !this.props.isPending && this.props.initialized) {
       this.setState({ saving: false });
     }
-
-    console.log('init', nextProps.initialized, this.props.initialized);
   }
 
-  /*shouldComponentUpdate(nextProps, nextState) {
-    return !this.props.isPending || 
-          (nextState.saving);
-  }*/
+  shouldComponentUpdate(nextProps, nextState) {
+    return !nextProps.isPending;
+  }
 
   animateIn () {
     this.state.opacity.setValue(0); 
@@ -140,7 +113,6 @@ class Tree extends Component {
       if(event.finished) {
 
         this.refs.scrollView.scrollEnabled = true;
-        this.refs.bottomNav.animateIn();
 
         this.resizeSwiper(0);
       }
@@ -149,7 +121,7 @@ class Tree extends Component {
   }
 
   animateOut (cb = null) {
-    this.refs.bottomNav.animateOut(() => { this.finishAnimateOut(cb); });
+    this.finishAnimateOut(cb);
   }
 
   finishAnimateOut (cb = null) {
@@ -164,25 +136,6 @@ class Tree extends Component {
         }
       }
     });
-  }
-
-  onNavClick (key) {
-    switch(key) {
-      case SEENOTES:
-        NavActions.Notes();
-      break;
-      case EDIT:
-        this.animateOut(() => { NavActions.Edit({id: this.props.nextId}); });
-        // NavActions.Edit({id: this.props.nextId});
-      break;
-      case BACK:
-        this.animateOut(NavActions.List);
-        // NavActions.List();
-      break;
-      case ADDPHOTO:
-        this.showImagePicker();
-      break;
-    }
   }
 
   showImagePicker () {
@@ -262,55 +215,64 @@ class Tree extends Component {
 
   resizeSwiper (index = 0) {
     const currView = index === 0 ? this.refs.bonsaiView : this.refs.notesView;
-    currView.measure((fx, fy, width, height) => { 
-      // this.state.sliderHeight.setValue(height);
+    currView.measure((fx, fy, width, height) => {
       Animated.timing(this.state.sliderHeight, {
         toValue: height,
         easing: Easing.inOut(Easing.exp),
         duration: 300
       }).start();
-      // console.log(this.state.sliderHeight);
-      // this.forceUpdate();
     });
   }
 
-  /*ticker () {
-    this.state.photoY.setValue(this.scrollY); 
+  toggleNote (showForm, formHeight, noteHeight) {
+    console.log('toggleNote', showForm, formHeight, noteHeight);
 
-    global.raf = requestAnimationFrame(this.ticker.bind(this));
-  }*/
+    let heightChange = -noteHeight + formHeight;
+    if(!showForm) {
+      heightChange = -formHeight + noteHeight;
+    }
+
+    this.refs.notesView.measure((fx, fy, width, height) => { 
+      // this.state.sliderHeight.setValue(height);
+      Animated.timing(this.state.sliderHeight, {
+        toValue: height + heightChange,
+        easing: Easing.inOut(Easing.exp),
+        duration: 250
+      }).start();
+    });
+  }
 
   render () {
-
-    /*if (this.props.id === -1) {
-      return <View />;
-    }*/
 
     const { tree } = this.props;
 
     const list = [];
 
-    console.log('RENDER TREE', this.props.id);
+    console.log('RENDER TREE', tree.photos);
 
     return(
-      <View style={{backgroundColor: BG_COLOR}}>        
+      <View style={{backgroundColor: BG_COLOR}}>
+        <StatusBar hidden={true} />
         <ScrollView 
         ref="scrollView" 
         style={styles.container} 
         scrollEventThrottle={1} 
-        onScroll={this.onScroll.bind(this)}>
+        onScroll={this.onScroll.bind(this)}
+        keyboardShouldPersistTaps={true}
+        keyboardDismissMode='on-drag'>
           <PhotoSlideShow 
             ref="slideShow" 
             nextId={this.props.id} 
             photos={tree.photos} 
             y={this.state.photoY} 
             fromY={this.props.imgPos}
+            onAddImage={() => { this.showImagePicker(); }}
             onChangePicture={(index) => { this.currentPicture = index; }} />
           <Animated.View style={[styles.textView, {opacity: this.state.opacity}]}>
             <AnimatedSwiper 
               ref="swiper" 
               showsButtons={false} 
-              height={this.state.sliderHeight}
+              height={this.state.sliderHeight}  
               style={{flex: 0}} 
               onScrollBeginDrag={(e, state) => { this.resizeSwiper(Math.abs(state.index - 1)); }}
               onMomentumScrollEnd={(e, state) => { this.resizeSwiper(state.index); }}
@@ -329,24 +291,25 @@ class Tree extends Component {
                 <Text style={styles.text}>{this.getProp(tree.Source)}</Text>
                 <Text style={styles.text}>{this.getProp(tree.potSize.width)}" x {this.getProp(tree.potSize.height)}" x {this.getProp(tree.potSize.depth)}"</Text>
                 <Text style={styles.text}>DATE ACQUIRED {this.getFormatedDate(tree.date).toUpperCase()}</Text>
-                {/*<View style={styles.photoContainer}>
-                              {this.getPhotoList()}
-                            </View>*/}
+
+                <Icon src={EDIT_IMAGE} onPress={() => { this.animateOut(() => { NavActions.Edit({id: this.props.nextId}); }); }} 
+                  styles={{top: 10, right: 40, backgroundColor: '#383735'}}/>
+
+                <Icon src={BACK_IMAGE} onPress={() => { this.animateOut(NavActions.List({back: true})); }} 
+                  styles={{top: 10, right: 100, backgroundColor: '#383735'}}/>
               </View>
               <View ref="notesView">
-                <Notes />
+                <Notes onNoteUpdate={() => { this.resizeSwiper(1); }} onToggleNote={(showForm, formHeight, noteHeight) => { this.toggleNote(showForm, formHeight, noteHeight); }} />
               </View>
-            </AnimatedSwiper>
+              </AnimatedSwiper>
           </Animated.View>
-          <BottomNav 
-            ref="bottomNav"
-            buttons={ [ { label: 'Edit', key: EDIT }, { label: 'Back', key: BACK } ] } 
-            onNavClick = {this.onNavClick.bind(this)} />
         </ScrollView>
-        <Icon src={ADD_IMAGE} onPress={() => { this.showImagePicker(); }} 
-          styles={{top: 20, left: 20}}/>
-        <Icon src={REM_IMAGE} onPress={() => { this.renderPhotoAlert(); }} 
-          styles={{top: 20, right: 20}}/>
+        {(tree.photos.length > 0) ? 
+          <Icon src={ADD_IMAGE} onPress={() => { this.showImagePicker(); }} 
+            styles={{top: 20, right: 20}}/> : null}
+        {(tree.photos.length > 0) ? 
+          <Icon src={REM_IMAGE} onPress={() => { this.renderPhotoAlert(); }} 
+            styles={{top: 70, right: 20}}/> : null}
       </View>
     );
   }

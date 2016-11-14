@@ -4,7 +4,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  ScrollView, View, StyleSheet, Text, TouchableHighlight, Image, Animated, Easing
+  ScrollView, View, StyleSheet, Text, TouchableHighlight, Image, Animated, Easing, StatusBar
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -58,27 +58,46 @@ class List extends Component {
   }
 
   animateIn () {
+    let delayLogo = 1000;
+    let delayOpacity = 1250;
+    let timing = 500;
+    if(this.props.back) {
+      this.state.logoHeight.setValue(90);
+      delayLogo = 50;
+      delayOpacity = 100;
+      timing = 500;
+    }
+
     Animated.parallel([
       Animated.timing(this.state.logoHeight, {
         toValue: 90,
-        delay: 1000,
+        delay: delayLogo,
+        duration: timing,
         easing: Easing.inOut(Easing.exp)
       }),
       Animated.timing(this.state.opacity, {
         toValue: 1,
-        delay: 1250
+        duration: timing,
+        delay: delayOpacity
       }),      
     ]).start(event => {
       if(event.finished) {
+        let timing = 1000;
+        let delay = 100;
+        if(this.props.back) {
+          timing = 250;
+          delay = 10;
+        }
+
         for (var i = 0; i < this.props.list.length; i++) {
-          this.refs[`treeItem${i}`].animateIn();
+          this.refs[`treeItem${i}`].animateIn(timing, delay);
         }
 
         Animated.timing(this.state.addY, {
           toValue: 203 * this.props.list.length,
           easing: Easing.inOut(Easing.exp),
-          duration: 1000,
-          delay: 1 * 100
+          duration: timing,
+          delay: 1 * delay
         }).start();
       }
     });
@@ -135,6 +154,7 @@ class List extends Component {
 
     return(
     <ScrollView ref="mainView" style={styles.container}  onScroll={(event) => { this.scrollVal = event.nativeEvent.contentOffset.y; }}>
+      <StatusBar hidden={true} />
       <Animated.View style={[styles.viewLogo, {height: this.state.logoHeight, opacity: this.state.logoOpacity}]}>
         <Image source={LOGO_IMAGE} style={styles.logoStyles} />
       </Animated.View>
