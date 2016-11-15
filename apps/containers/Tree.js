@@ -7,7 +7,7 @@ import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  ScrollView, StyleSheet, Text, Platform, View, Animated, Easing, Alert, StatusBar
+  ScrollView, StyleSheet, Text, Platform, View, Animated, Easing, Alert, StatusBar, findNodeHandle
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -104,31 +104,27 @@ class Tree extends Component {
       toValue: 0,
       easing: Easing.inOut(Easing.exp),
       duration: 1000
-    }).start();
-    Animated.timing(this.state.opacity, {
-      toValue: 1,
-      duration: 500,
-      delay: 1000
     }).start(event => {
       if(event.finished) {
+        this.resizeSwiper(0, true);
 
-        this.refs.scrollView.scrollEnabled = true;
+        Animated.timing(this.state.opacity, {
+          toValue: 1,
+          duration: 500
+        }).start();
 
-        this.resizeSwiper(0);
+        // this.refs.scrollView.scrollEnabled = true;
+
       }
     });
     this.initialized = true;
   }
 
   animateOut (cb = null) {
-    this.finishAnimateOut(cb);
-  }
-
-  finishAnimateOut (cb = null) {
-    this.refs.slideShow.animateOut();
+    this.refs.slideShow.animateOut(500);
     Animated.timing(this.state.opacity, {
       toValue: 0,
-      duration: 250
+      duration: 500
     }).start(event => {
       if(event.finished) {
         if(cb !== null) {
@@ -184,16 +180,6 @@ class Tree extends Component {
     this.setState({ saving: true });
   }
 
-  getPhotoList () {
-    let photos = [];
-    photos = this.props.tree.photos.map((p, i) => {
-      const k = `photos-${i}`;
-      return <Photo key={k} id={p} arrayID={i} removeImage={this.removeImage.bind(this)} onPhotoClick={(id) => {NavActions.SlideShow({nextId: id})}}/>
-    });
-
-    return photos;
-  }
-
   getFormatedDate (d) {
     const date = new Date(d);
     const day = date.getDate() + 1;
@@ -213,9 +199,14 @@ class Tree extends Component {
     this.state.photoY.setValue(this.scrollY); 
   }
 
-  resizeSwiper (index = 0) {
+  resizeSwiper (index = 0, noAnim = false) {
     const currView = index === 0 ? this.refs.bonsaiView : this.refs.notesView;
     currView.measure((fx, fy, width, height) => {
+      if(noAnim) {
+        this.state.sliderHeight.setValue(height);
+        return;
+      }
+
       Animated.timing(this.state.sliderHeight, {
         toValue: height,
         easing: Easing.inOut(Easing.exp),
@@ -224,13 +215,19 @@ class Tree extends Component {
     });
   }
 
-  toggleNote (showForm, formHeight, noteHeight) {
-    console.log('toggleNote', showForm, formHeight, noteHeight);
+  toggleNote (showForm, formHeight, noteHeight, dateField = 0) {
+    // console.log('toggleNote', showForm, formHeight, noteHeight);
 
     let heightChange = -noteHeight + formHeight;
     if(!showForm) {
       heightChange = -formHeight + noteHeight;
     }
+
+    if(showForm && dateField !== 0) {
+      heightChange = dateField;
+    }
+
+    console.log('heightChange', heightChange);
 
     this.refs.notesView.measure((fx, fy, width, height) => { 
       // this.state.sliderHeight.setValue(height);
@@ -240,6 +237,17 @@ class Tree extends Component {
         duration: 250
       }).start();
     });
+  }
+
+  inputFocused (note) {
+    setTimeout(() => {
+      let scrollResponder = this.refs.scrollView.getScrollResponder();
+      scrollResponder.scrollResponderScrollNativeHandleToKeyboard(
+        findNodeHandle(note),
+        200, //additionalOffset
+        true
+      );
+    }, 50);
   }
 
   render () {
@@ -270,6 +278,8 @@ class Tree extends Component {
             onChangePicture={(index) => { this.currentPicture = index; }} />
           <Animated.View style={[styles.textView, {opacity: this.state.opacity}]}>
             <AnimatedSwiper 
+              keyboardShouldPersistTaps={true}
+              keyboardDismissMode='on-drag'
               ref="swiper" 
               showsButtons={false} 
               height={this.state.sliderHeight}  
@@ -295,20 +305,25 @@ class Tree extends Component {
                 <Icon src={EDIT_IMAGE} onPress={() => { this.animateOut(() => { NavActions.Edit({id: this.props.nextId}); }); }} 
                   styles={{top: 10, right: 40, backgroundColor: '#383735'}}/>
 
-                <Icon src={BACK_IMAGE} onPress={() => { this.animateOut(NavActions.List({back: true})); }} 
+                <Icon src={BACK_IMAGE} onPress={() => { this.animateOut(() => { NavActions.List({back: true})}); }} 
                   styles={{top: 10, right: 100, backgroundColor: '#383735'}}/>
               </View>
               <View ref="notesView">
-                <Notes onNoteUpdate={() => { this.resizeSwiper(1); }} onToggleNote={(showForm, formHeight, noteHeight) => { this.toggleNote(showForm, formHeight, noteHeight); }} />
+                <Notes 
+                  onNoteUpdate={() => { this.resizeSwiper(1); }} 
+                  onToggleNote={(showForm, formHeight, noteHeight, dateField = 0) => { this.toggleNote(showForm, formHeight, noteHeight, dateField); }} 
+                  onFocusNote={(note) => { this.inputFocused(note); }}/>
               </View>
               </AnimatedSwiper>
           </Animated.View>
         </ScrollView>
         {(tree.photos.length > 0) ? 
-          <Icon src={ADD_IMAGE} onPress={() => { this.showImagePicker(); }} 
+          <Icon src={ADD_IMAGE} onPress={() => { this.showImagePicker(); }}
+            ctnStyles={{ opacity: this.state.opacity }}
             styles={{top: 20, right: 20}}/> : null}
         {(tree.photos.length > 0) ? 
           <Icon src={REM_IMAGE} onPress={() => { this.renderPhotoAlert(); }} 
+            ctnStyles={{ opacity: this.state.opacity }}
             styles={{top: 70, right: 20}}/> : null}
       </View>
     );

@@ -29,7 +29,11 @@ class DatePickerCustomTemplate extends React.Component {
     let animationConfig = {
       duration: 200
     };
+    let onToggleCollapse;
     if (locals.config) {
+      if(locals.config.onToggleCollapse) {
+        onToggleCollapse = locals.config.onToggleCollapse;
+      }
       if (locals.config.format) {
         formattedValue = locals.config.format(locals.value);
       }
@@ -45,6 +49,10 @@ class DatePickerCustomTemplate extends React.Component {
       <View style={{alignItems: 'flex-end'}}>
         <TouchableOpacity style={touchableStyle}
           onPress={() => {
+            if(onToggleCollapse) {
+              onToggleCollapse(this.state.isCollapsed);
+            }
+            
             animation(this.state.height, Object.assign({
               toValue: (this.state.isCollapsed) ? UIPICKER_HEIGHT : 0
             }, animationConfig)).start();

@@ -74,17 +74,11 @@ export default class PhotoSlideShow extends Component {
     }).start();
   }
 
-  animateOut (cb = null) {
+  animateOut (duration = 1000) {
     Animated.timing(this.state.opacity, {
       toValue: 0,
-      duration: 250
-    }).start((event) => {
-      if(event.finished) {
-        if(cb !== null) {
-          cb();
-        }        
-      }
-    });
+      duration: duration
+    }).start();
   }
 
   getImageList () {

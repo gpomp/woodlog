@@ -6,7 +6,8 @@ import {
   Image,
   StyleSheet,
   ActivityIndicatorIOS,
-  TouchableOpacity
+  TouchableOpacity,
+  Animated
 } from 'react-native';
 
 class Icon extends Component {
@@ -14,9 +15,11 @@ class Icon extends Component {
 
 	render() {
 		return(
-		<TouchableOpacity style={[styles.container, this.props.styles]} onPress={() => { this.props.onPress(); }}>
-			<Image style={styles.img} source={this.props.src} />
-		</TouchableOpacity>)
+		<Animated.View style={[styles.container, this.props.styles, this.props.ctnStyles]}>
+      <TouchableOpacity style={{flex: 1, alignItems: 'center', justifyContent: 'center'}} onPress={() => { this.props.onPress(); }}>
+        <Image style={styles.img} source={this.props.src} />
+      </TouchableOpacity>
+    </Animated.View>)
 	}
 }
 

@@ -69,13 +69,35 @@ class Notes extends Component {
     const d = new Date();
     const noteList = notes.map((n, i) => {
       const k = `tree-note-${i}`;
-      return <Note date={ n.date } note={ n.note } arrayID={i} key={k} onNoteUpdate={this.noteUpdate.bind(this)} onToggleNote={this.props.onToggleNote} />
+      const ref = `note${i}`;
+      return <Note 
+              date={ n.date } note={ n.note } arrayID={i} key={k} ref={ref}
+              onNoteUpdate={this.noteUpdate.bind(this)} 
+              onToggleNote={this.props.onToggleNote}
+              onFocusNote={(id) => {
+                let n;
+                if(id === -1) n = this.refs.addNote;
+                else {
+                  n = this.refs[`note${id}`];
+                }
+                this.props.onFocusNote(n); 
+              }} />
     });
     return(
       <View style={{flex: 1, justifyContent: 'center'}}> 
         <Text style={styles.title}>NOTES</Text>
         {noteList}
-        <Note date={ new Date().toString() } note="Add a new note here" arrayID={-1} key={-1} onNoteUpdate={this.noteUpdate.bind(this)} onToggleNote={this.props.onToggleNote}/>
+        <Note date={ new Date().toString() } note="Add a new note here" arrayID={-1} key={-1} ref='addNote'
+          onNoteUpdate={this.noteUpdate.bind(this)} 
+          onToggleNote={this.props.onToggleNote} 
+          onFocusNote={(id) => {
+            let n;
+            if(id === -1) n = this.refs.addNote;
+            else {
+              n = this.refs[`note${id}`];
+            }
+            this.props.onFocusNote(n); 
+          }}/>
         {/*<BottomNav 
                       ref="bottomNav"
                       buttons={ [ { label: 'BACK', key: 'back' } ] } 

@@ -164,10 +164,16 @@ class Note extends Component {
       noteHeight: new Animated.Value(99999),
       formOverflow: 'visible'
     };
+
+    formOptions.fields.date.config.onToggleCollapse = this.toggleCollapse.bind(this);
+  }
+
+  toggleCollapse (isCollapsed) {
+    const area = isCollapsed ? 200 : -200;
+    this.props.onToggleNote(true, 0, 0, area);
   }
 
   componentWillMount() {
-
     this.formData = Object.assign({}, this.props, this.formData);
     this.setState({ editMode: false, saving: false });
 
@@ -199,6 +205,10 @@ class Note extends Component {
     this.setState({ formOverflow: 'hidden' });
     // console.log(showForm ? this.formHeight : 0, showForm ? 0 : this.noteHeight);
     this.props.onToggleNote(showForm, this.formHeight, this.noteHeight);
+    if(showForm) {
+      this.refs.editNote.getComponent('note').refs.input.focus();
+      this.props.onFocusNote(this.props.arrayID);
+    }
     Animated.parallel([
     Animated.timing(this.state.formHeight, {
       toValue: showForm ? this.formHeight : 0,

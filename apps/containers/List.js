@@ -85,7 +85,7 @@ class List extends Component {
         let timing = 1000;
         let delay = 100;
         if(this.props.back) {
-          timing = 250;
+          timing = 500;
           delay = 10;
         }
 
