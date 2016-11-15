@@ -1,4 +1,5 @@
 'use strict'
+const BACK_IMAGE = require('../../assets/back_grey.png');
 import React, {Component} from 'react';
 import {
   View, Image, StyleSheet, Text, TouchableOpacity, Animated, Easing, TouchableHighlight
@@ -10,12 +11,12 @@ import { connect } from 'react-redux'
 
 import Swiper from 'react-native-swiper';
 import PhotoView from 'react-native-photo-view';
+import Icon from '../components/Icon';
 
 import {textReg, width, height, BLANK_IMAGE, REG_PADDING} from '../utils/globalStyles';
-const AnimatedTH = Animated.createAnimatedComponent(TouchableHighlight);
 
 
-export default class PhotoSlideShow extends Component {
+export default class FSSlideShow extends Component {
 
   constructor(props) {
     super(props);
@@ -23,25 +24,26 @@ export default class PhotoSlideShow extends Component {
     this.onRender = false;
     this.imgList = [];
     this.state = {
-      width: new Animated.Value(width),
-      y: new Animated.Value(0),
       opacity: new Animated.Value(0),
       isLoading: false
     }
   }
 
   componentWillMount () {
+    this.updatePhotosList();
     this.setState({isLoading: true});
     // this.updatePhotosList();
   }
 
   componentWillUpdate (nextProps, nextState) {
-    if(this.state.isLoading) {
-      this.updatePhotosList();
-    }
+    
     // if(!this.onRender && this.props.photos.length !== 0) {
     //   
     // }     
+  }
+
+  componentDidMount () {
+    this.animateIn();
   }
  
   updatePhotosList () {
@@ -64,12 +66,8 @@ export default class PhotoSlideShow extends Component {
   }
 
   animateIn () {
-    this.state.opacity.setValue(1);
-    this.state.width.setValue(width - 40);
-
-    Animated.timing(this.state.width, {
-      toValue: width,
-      easing: Easing.inOut(Easing.exp),
+    Animated.timing(this.state.opacity, {
+      toValue: 1,
       duration: 1000
     }).start();
   }
@@ -87,35 +85,29 @@ export default class PhotoSlideShow extends Component {
       const src = {uri: path};
       // console.log('slideshow path', path);
       return(
-        <AnimatedTH key={`ss-${i}`} onPress={() => { this.props.onPress(); }} style={{ height: 203, width: this.state.width }}>
-        <Animated.Image resizeMode="cover" source={src} style={{ height: 203, width: this.state.width }} />
-        </AnimatedTH>
+          <PhotoView 
+            resizeMode="contain" 
+            key={`ss-${i}`} 
+            source={src} 
+            style={{ height, width }}
+            resizeMode='contain'
+            minimumZoomScale={1}
+            maximumZoomScale={2} />
       );
     })
   }
 
   render () {
-    console.log('render slideshow', this.imgList.length);
+    console.log('render', this.imgList);
     return(<Animated.View 
-      style={[{height: 203,position: 'absolute', top: 0, left: 0, overflow:'hidden', flex: 1, width, alignItems:'center'}, {transform: [{translateY: this.props.y}], opacity: this.state.opacity }]}>
-      <Animated.View style={{width: this.state.width, overflow:'hidden'}}>
-        
-        {(this.props.photos.length > 0) ?
-          
-            <Swiper style={styles.wrapper} showsButtons={false} onMomentumScrollEnd={(e, state) => { this.props.onChangePicture(state.index); }}>
-              {this.getImageList()}
-            </Swiper> :
-          <TouchableHighlight onPress={() => { this.props.onAddImage(); }}>
-            <Image
-              resizeMode="cover" 
-              source={BLANK_IMAGE}
-              style={styles.blankImage} >
-                <Text style={styles.errorTree}>ADD AN IMAGE</Text>
-            </Image>
-          </TouchableHighlight>
-        }
-
-      </Animated.View>
+      style={{height, width, flex: 1, alignItems:'center', opacity: this.state.opacity }}>
+      <View style={{width, overflow:'hidden'}}>        
+          <Swiper style={styles.wrapper} showsButtons={false}>
+            {this.getImageList()}
+          </Swiper>
+      </View>
+      <Icon src={BACK_IMAGE} onPress={() => { NavActions.pop(); }} 
+                  styles={{ top: 20, left: 20 }}/>
     </Animated.View>);    
   }
 
@@ -124,15 +116,16 @@ export default class PhotoSlideShow extends Component {
 const styles =  StyleSheet.create({
   wrapper: {
     flex: 0,
-    height: 203
+    height,
+    backgroundColor: '#383735'
   },
   slide: {
-    height: 203
+    height
   },
   blankImage: {
     flex: 1,
     width,
-    height: 203,
+    height,
     alignItems: 'center',
     justifyContent: 'center'
   },

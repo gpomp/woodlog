@@ -239,12 +239,12 @@ class Tree extends Component {
     });
   }
 
-  inputFocused (note) {
+  inputFocused (note, offset = 0) {
     setTimeout(() => {
       let scrollResponder = this.refs.scrollView.getScrollResponder();
       scrollResponder.scrollResponderScrollNativeHandleToKeyboard(
         findNodeHandle(note),
-        200, //additionalOffset
+        200 + offset, //additionalOffset
         true
       );
     }, 50);
@@ -275,7 +275,8 @@ class Tree extends Component {
             y={this.state.photoY} 
             fromY={this.props.imgPos}
             onAddImage={() => { this.showImagePicker(); }}
-            onChangePicture={(index) => { this.currentPicture = index; }} />
+            onChangePicture={(index) => { this.currentPicture = index; }} 
+            onPress={() => { NavActions.SlideShow({photos: tree.photos}) }}/>
           <Animated.View style={[styles.textView, {opacity: this.state.opacity}]}>
             <AnimatedSwiper 
               keyboardShouldPersistTaps={true}
@@ -312,7 +313,7 @@ class Tree extends Component {
                 <Notes 
                   onNoteUpdate={() => { this.resizeSwiper(1); }} 
                   onToggleNote={(showForm, formHeight, noteHeight, dateField = 0) => { this.toggleNote(showForm, formHeight, noteHeight, dateField); }} 
-                  onFocusNote={(note) => { this.inputFocused(note); }}/>
+                  onFocusNote={(note, offset = 0) => { this.inputFocused(note, offset); }}/>
               </View>
               </AnimatedSwiper>
           </Animated.View>

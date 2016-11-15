@@ -9,7 +9,7 @@ import Tree from './containers/Tree';
 import List from './containers/List';
 import Edit from './containers/Edit';
 import Notes from './containers/Notes';
-// import SlideShow from './containers/PhotoSlideShow';
+import SlideShow from './containers/FSSlideShow';
 console.ignoredYellowBox = ["You are setting the style"];
 
 export default class App extends Component {
@@ -50,8 +50,8 @@ export default class App extends Component {
         <Scene type='replace' key="root">
           <Scene type='replace' key="List" component={List} title="Tree List" initial={true} hideNavBar={true}/>
           <Scene type='replace' key="Tree" component={Tree} title="Bonsai" hideNavBar={true}/>
-          {/*<Scene key="Notes" component={Notes} title="Notes"/>}
-          {<Scene key="SlideShow" component={SlideShow} title="Slide Show"/>*/}
+          {/*<Scene key="Notes" component={Notes} title="Notes"/>}*/}
+          <Scene key="SlideShow" component={SlideShow} title="Slide Show"/>
           <Scene type='replace' key="Edit" component={Edit} title="Edit Bonsai"  hideNavBar={true}/>
         </Scene>
       </Router>

@@ -1,4 +1,6 @@
 'use strict'
+const ADD_IMAGE = require('../../assets/add_white.png');
+const BACK_IMAGE = require('../../assets/back.png');
 
 import { Actions as NavActions } from 'react-native-router-flux';
 
@@ -22,6 +24,7 @@ import t from 'tcomb-form-native';
 import * as TreeActions from '../actions/treeActions';
 
 import BottomNav from '../components/BottomNav';
+import Icon from '../components/Icon';
 
 import {
   container as ctnStyles, 
@@ -260,13 +263,13 @@ class Edit extends Component {
       })
     ]).start(event => {
       if(event.finished) {
-        this.refs.bottomNav.animateIn();
+        // this.refs.bottomNav.animateIn();
       }
     });
   }
 
   animateOut (cb = null) {
-    this.refs.bottomNav.animateOut();
+    // this.refs.bottomNav.animateOut();
     Animated.parallel([
       Animated.timing(this.state.scale, {
         duration: 500,
@@ -317,6 +320,30 @@ class Edit extends Component {
     }
   }
 
+  cancelForm () {
+    if(this.props.id !== -1) {
+      this.animateOut(NavActions.Tree({nextId: this.props.id, imgPos: 0 }));
+    } else {
+      this.animateOut(NavActions.List({back: true}));
+    }
+  }
+
+  validateForm () {
+    const validation = this.refs.editTree.validate();
+      if(validation.errors.length > 0) {
+
+      } else {
+        this.formData = Object.assign(this.formData, validation.value);
+
+        for(const prop in this.formData) {
+          if(this.formData[prop] === null) {
+            this.formData[prop] = '';
+          }
+        }
+        this.props.actions.change(this.formData, this.props.id);
+      }
+  }
+
   render () {
     //const { name, species, age, potType, style, height, trunkWidth, canopyWidth, Source, date } = this.props.tree;
     return(
@@ -345,10 +372,19 @@ class Edit extends Component {
               onChange={this.onChange.bind(this)}
             />
           </Animated.View>
-            <BottomNav 
-              ref="bottomNav"
-              buttons={ [ { label: 'Save', key: 'save' }, { label: 'Cancel', key: 'cancel' } ] } 
-              onNavClick = {this.onNavClick.bind(this)} />
+          <View style={{marginTop:40}}>
+            <Icon src={ADD_IMAGE} onPress={() => { this.validateForm(); }}
+              ctnStyles={{ opacity: this.state.opacity }}
+              styles={{top: 0, left: 40, backgroundColor: '#383735'}}/>
+            <Icon src={BACK_IMAGE} onPress={() => { this.cancelForm(); }}
+              ctnStyles={{ opacity: this.state.opacity }}
+              styles={{top: 0, right: 40, backgroundColor: '#383735'}}/>
+          </View>
+
+            {/*<BottomNav 
+                          ref="bottomNav"
+                          buttons={ [ { label: 'Save', key: 'save' }, { label: 'Cancel', key: 'cancel' } ] } 
+                          onNavClick = {this.validateForm();} />*/}
       </ScrollView>
     );
   }

@@ -171,6 +171,7 @@ class Note extends Component {
   toggleCollapse (isCollapsed) {
     const area = isCollapsed ? 200 : -200;
     this.props.onToggleNote(true, 0, 0, area);
+    if(isCollapsed) this.props.onFocusNote(this.props.arrayID, 50);
   }
 
   componentWillMount() {
@@ -256,9 +257,9 @@ class Note extends Component {
     }
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
+  /*shouldComponentUpdate (nextProps, nextState) {
     return this.state.saving || nextState.editMode !== this.state.editMode || nextState.formOverflow !== this.state.formOverflow;
-  }
+  }*/
 
   render() {
     const { date, note } = this.props;
