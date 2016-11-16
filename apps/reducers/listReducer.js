@@ -2,13 +2,13 @@ import {
   SHOWLIST
 } from '../actions/treeActions'
 
-const initialState = {
+const listInitialState = {
   data: [],
   initialized: false,
   isPending: false
 }
 
-export default ListReducer = (state = initialState, action) => {
+export default ListReducer = (state = listInitialState, action) => {
   switch (action.type) {
     case `${SHOWLIST}_PENDING`:
       return {

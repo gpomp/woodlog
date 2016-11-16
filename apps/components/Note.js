@@ -189,11 +189,13 @@ class Note extends Component {
     this.noteHeight = 0;
     
     setTimeout(() => {
+      if (!this.refs.formInside) return;
       this.refs.formInside.measure((fx, fy, width, height) => { 
         this.formHeight = height;
         this.state.formHeight.setValue(0);
         this.setState({formOverflow: 'hidden'});
       });
+      if (!this.refs.noteInside) return;
       this.refs.noteInside.measure((fx, fy, width, height) => { 
         this.noteHeight = height; 
         this.state.noteHeight.setValue(this.noteHeight);
@@ -234,7 +236,7 @@ class Note extends Component {
 
     } else {
       this.formData = Object.assign({}, validation.value);
-      this.props.actions.saveNote(this.formData, this.props.arrayID);
+      this.props.actions.saveNote(this.props.treeID, this.props.noteID, this.props.arrayID, this.formData.note, this.formData.date, []);
       this.setState({ saving: true });
       this.toggleNote(false);
     }
@@ -245,14 +247,14 @@ class Note extends Component {
   }
 
   removeNote () {
-    this.props.actions.removeNote(this.props.arrayID);
+    console.log('noteID', this.props.noteID);
+    this.props.actions.removeNote(this.props.treeID, this.props.noteID, this.props.arrayID);
     this.setState({ saving: true });
   }
 
   componentDidUpdate () {
     if(this.state.saving) {
       this.setState({ editMode: false, saving: false });
-      this.props.onNoteUpdate();
       this.toggleNote(false);
     }
   }

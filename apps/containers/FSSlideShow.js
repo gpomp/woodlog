@@ -9,6 +9,8 @@ import { Actions as NavActions } from 'react-native-router-flux';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
+import * as TreeActions from '../actions/treeActions';
+
 import Swiper from 'react-native-swiper';
 import PhotoView from 'react-native-photo-view';
 import Icon from '../components/Icon';
@@ -16,7 +18,7 @@ import Icon from '../components/Icon';
 import {textReg, width, height, BLANK_IMAGE, REG_PADDING} from '../utils/globalStyles';
 
 
-export default class FSSlideShow extends Component {
+class FSSlideShow extends Component {
 
   constructor(props) {
     super(props);
@@ -30,9 +32,8 @@ export default class FSSlideShow extends Component {
   }
 
   componentWillMount () {
-    this.updatePhotosList();
-    this.setState({isLoading: true});
     // this.updatePhotosList();
+    this.props.actions.showPhotos(this.props.photos);
   }
 
   componentWillUpdate (nextProps, nextState) {
@@ -44,25 +45,6 @@ export default class FSSlideShow extends Component {
 
   componentDidMount () {
     this.animateIn();
-  }
- 
-  updatePhotosList () {
-    console.log('updatePhotosList', this.props.photos);
-    this.imgList = [];
-    // this.setState({imageList: []});
-    storage.getBatchDataWithIds({
-      key: 'img', 
-      ids: this.props.photos
-    }).then(res => {
-      this.imgList = res;
-      this.setState({isLoading: false});
-      // this.setState({ready: true});
-      // this.setState({imageList: res});
-    });
-  }
-
-  componentDidUpdate() {
-    // this.onRender = false;
   }
 
   animateIn () {
@@ -80,7 +62,7 @@ export default class FSSlideShow extends Component {
   }
 
   getImageList () {
-    return this.imgList.map((p, i) => {
+    return this.props.imgList.map((p, i) => {
       const path = `${global.targetFilePath}/${p.src}`;
       const src = {uri: path};
       // console.log('slideshow path', path);
@@ -98,7 +80,6 @@ export default class FSSlideShow extends Component {
   }
 
   render () {
-    console.log('render', this.imgList);
     return(<Animated.View 
       style={{height, width, flex: 1, alignItems:'center', opacity: this.state.opacity }}>
       <View style={{width, overflow:'hidden'}}>        
@@ -134,3 +115,25 @@ const styles =  StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0)'
   }, textReg)
 });
+
+const stateToProps = (state) => {
+  return {
+    imgList: state.photos.list,
+    initialized: state.photos.initialized,
+    isPending: state.photos.isPending
+  }
+}
+
+const dispatchToProps = (dispatch) => {
+  return {
+    actions: bindActionCreators(TreeActions, dispatch)
+  }
+}
+
+FSSlideShow.defaultProps = {
+  imgList: [],
+  initialized: false,
+  isPending: false
+}
+
+export default connect(stateToProps, dispatchToProps)(FSSlideShow)

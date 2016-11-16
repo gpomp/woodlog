@@ -80,13 +80,21 @@ class Tree extends Component {
 
   }
 
+  componentWillUpdate (nextProps, nextState) {
+    console.log('update photos', nextProps.tree.photos);
+    this.props.actions.showPhotos(nextProps.tree.photos);
+    this.props.actions.showNotes(nextProps.tree.notes);
+  }
+
   componentDidUpdate (nextProps, nextState) {
 
-    if(!this.props.isPending && this.props.initialized) {
-      this.refs.slideShow.setState({ isLoading: true });
-    }
+    /*if(!this.props.isPending && this.props.initialized) {
+      this.refs.slideShow.getWrappedInstance().update();
+      this.refs.notes.getWrappedInstance().update();
+    }*/
 
     if(this.state.saving && !this.props.isPending && this.props.initialized) {
+      // this.slideShow.getWrappedInstance().update();
       this.setState({ saving: false });
     }
   }
@@ -97,7 +105,7 @@ class Tree extends Component {
 
   animateIn () {
     this.state.opacity.setValue(0); 
-    this.refs.slideShow.animateIn();
+    this.refs.slideShow.getWrappedInstance().animateIn();
     this.state.photoY.setValue(this.props.imgPos);
     
     Animated.timing(this.state.photoY, {
@@ -121,7 +129,7 @@ class Tree extends Component {
   }
 
   animateOut (cb = null) {
-    this.refs.slideShow.animateOut(500);
+    this.refs.slideShow.getWrappedInstance().animateOut(500);
     Animated.timing(this.state.opacity, {
       toValue: 0,
       duration: 500
@@ -256,7 +264,7 @@ class Tree extends Component {
 
     const list = [];
 
-    console.log('RENDER TREE', tree.photos);
+    // console.log('RENDER TREE', tree.photos);
 
     return(
       <View style={{backgroundColor: BG_COLOR}}>

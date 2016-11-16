@@ -51,17 +51,16 @@ class Notes extends Component {
     this.props.onNoteUpdate();
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return !nextProps.isPending;
+  }
+
   onNavClick (key) {
     switch(key) {
       case 'back': 
         NavActions.pop();
       break;
     }
-  }
-
-  noteUpdate () {
-    console.log('force update!!');
-    this.forceUpdate();
   }
 
   render () {
@@ -72,7 +71,8 @@ class Notes extends Component {
       const ref = `note${i}`;
       return <Note 
               date={ n.date } note={ n.note } arrayID={i} key={k} ref={ref}
-              onNoteUpdate={this.noteUpdate.bind(this)} 
+              treeID={this.props.treeID}
+              noteID={n.id}
               onToggleNote={this.props.onToggleNote}
               onFocusNote={(id) => {
                 let n;
@@ -88,7 +88,8 @@ class Notes extends Component {
         <Text style={styles.title}>NOTES</Text>
         {noteList}
         <Note date={ new Date().toString() } note="Add a new note here" arrayID={-1} key={-1} ref='addNote'
-          onNoteUpdate={this.noteUpdate.bind(this)} 
+          treeID={this.props.treeID}
+          noteID={-1}
           onToggleNote={this.props.onToggleNote} 
           onFocusNote={(id) => {
             let n;
@@ -98,10 +99,6 @@ class Notes extends Component {
             }
             this.props.onFocusNote(n); 
           }}/>
-        {/*<BottomNav 
-                      ref="bottomNav"
-                      buttons={ [ { label: 'BACK', key: 'back' } ] } 
-                      onNavClick = {this.onNavClick.bind(this)} />*/}
       </View>
     );
   }
@@ -131,8 +128,9 @@ const styles =  StyleSheet.create({
 
 const stateToProps = (state) => {
   return {
-    id: state.tree.id,
-    notes: state.tree.rawData.notes
+    notes: state.notes.list,
+    isPending: state.notes.isPending,
+    treeID: state.tree.id
   }
 }
 

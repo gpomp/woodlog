@@ -1,8 +1,8 @@
 import {
   CHANGETREE,
   SHOWTREE,
-  SAVENOTE,
-  REMOVENOTE,
+  // SAVENOTE,
+  // REMOVENOTE,
   RESET,
   SAVENEWPHOTO,
   DELETEPHOTO
@@ -88,30 +88,6 @@ export default TreeReducer = (state = initialState, action) => {
       return {
         ...state, rawData: stateCopy.rawData, isPending: false
       }      
-    break;
-    case REMOVENOTE:
-      stateCopy = Object.assign({}, state);
-
-      stateCopy.rawData.notes.splice(action.payload.id, 1);
-      global.storage.save(stateCopy);
-
-      return {
-        ...state, rawData: stateCopy.rawData
-      }      
-    break;
-    case SAVENOTE:
-      const {note, date} = action.payload.note;
-      stateCopy = Object.assign({}, state);
-      const noteCopy = stateCopy.rawData.notes;
-      if(isNaN(action.payload.id) || action.payload.id < 0) {
-        noteCopy.push({note, date});
-      }
-      else noteCopy[action.payload.id] = action.payload.note;
-      global.storage.save(stateCopy);
-
-      return {
-        ...state, rawData: stateCopy.rawData
-      }
     break;
     default:
       return { ...state };

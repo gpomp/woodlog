@@ -6,19 +6,23 @@ import {
 import { Actions as NavActions } from 'react-native-router-flux';
 
 import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
+
+import * as TreeActions from '../actions/treeActions';
 
 import Swiper from 'react-native-swiper';
 import PhotoView from 'react-native-photo-view';
+import compareArrays from '../utils/utils';
 
 import {textReg, width, height, BLANK_IMAGE, REG_PADDING} from '../utils/globalStyles';
 const AnimatedTH = Animated.createAnimatedComponent(TouchableHighlight);
 
 
-export default class PhotoSlideShow extends Component {
+class PhotoSlideShow extends Component {
 
   constructor(props) {
     super(props);
+    console.log('create PhotoSlideShow');
     
     this.onRender = false;
     this.imgList = [];
@@ -31,20 +35,32 @@ export default class PhotoSlideShow extends Component {
   }
 
   componentWillMount () {
-    this.setState({isLoading: true});
+    // this.setState({isLoading: true});
     // this.updatePhotosList();
+    this.update();
   }
 
   componentWillUpdate (nextProps, nextState) {
-    if(this.state.isLoading) {
-      this.updatePhotosList();
-    }
-    // if(!this.onRender && this.props.photos.length !== 0) {
-    //   
-    // }     
+    // if(this.state.isLoading) {
+      // this.updatePhotosList();
+    // }
+    // console.log('componentWillUpdate', this.props.actions)
+
+    
+     
+  }
+
+  componentDidUpdate (nextProps, nextState) {
+    /*if(!compareArrays(nextProps.photos, this.props.photos)) {
+      this.props.actions.showPhotos(nextProps.photos);
+    }*/
+  }
+
+  update () {
+    // this.props.actions.showPhotos(this.props.photos);
   }
  
-  updatePhotosList () {
+  /*updatePhotosList () {
     console.log('updatePhotosList', this.props.photos);
     this.imgList = [];
     // this.setState({imageList: []});
@@ -57,11 +73,7 @@ export default class PhotoSlideShow extends Component {
       // this.setState({ready: true});
       // this.setState({imageList: res});
     });
-  }
-
-  componentDidUpdate() {
-    // this.onRender = false;
-  }
+  }*/
 
   animateIn () {
     this.state.opacity.setValue(1);
@@ -82,7 +94,7 @@ export default class PhotoSlideShow extends Component {
   }
 
   getImageList () {
-    return this.imgList.map((p, i) => {
+    return this.props.imgList.map((p, i) => {
       const path = `${global.targetFilePath}/${p.src}`;
       const src = {uri: path};
       // console.log('slideshow path', path);
@@ -95,7 +107,7 @@ export default class PhotoSlideShow extends Component {
   }
 
   render () {
-    console.log('render slideshow', this.imgList.length);
+    console.log('render slideshow', this.props.imgList.length);
     return(<Animated.View 
       style={[{height: 203,position: 'absolute', top: 0, left: 0, overflow:'hidden', flex: 1, width, alignItems:'center'}, {transform: [{translateY: this.props.y}], opacity: this.state.opacity }]}>
       <Animated.View style={{width: this.state.width, overflow:'hidden'}}>
@@ -141,3 +153,25 @@ const styles =  StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0)'
   }, textReg)
 });
+
+const stateToProps = (state) => {
+  return {
+    imgList: state.photos.list,
+    initialized: state.photos.initialized,
+    isPending: state.photos.isPending
+  }
+}
+
+const dispatchToProps = (dispatch) => {
+  return {
+    actions: bindActionCreators(TreeActions, dispatch)
+  }
+}
+
+PhotoSlideShow.defaultProps = {
+  imgList: [],
+  initialized: false,
+  isPending: false
+}
+
+export default connect(stateToProps, dispatchToProps)(PhotoSlideShow)
