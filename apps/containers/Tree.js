@@ -81,7 +81,6 @@ class Tree extends Component {
   }
 
   componentWillUpdate (nextProps, nextState) {
-    console.log('update photos', nextProps.tree.photos);
     this.props.actions.showPhotos(nextProps.tree.photos);
     this.props.actions.showNotes(nextProps.tree.notes);
   }
@@ -164,7 +163,6 @@ class Tree extends Component {
         }
         const uriSplit = response.uri.split('/');
         const fileName = uriSplit[uriSplit.length - 1];
-        console.log('photo uri', fileName);
         this.props.actions.savePhoto(fileName);
         this.setState({ saving: true });
       }
@@ -183,7 +181,6 @@ class Tree extends Component {
   }
 
    removeImage () {
-    console.log('removeImage', this.currentPicture);
     this.props.actions.removePhoto(this.props.tree.photos[this.currentPicture]);
     this.setState({ saving: true });
   }
@@ -234,8 +231,6 @@ class Tree extends Component {
     if(showForm && dateField !== 0) {
       heightChange = dateField;
     }
-
-    console.log('heightChange', heightChange);
 
     this.refs.notesView.measure((fx, fy, width, height) => { 
       // this.state.sliderHeight.setValue(height);

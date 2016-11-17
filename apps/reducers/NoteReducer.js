@@ -4,6 +4,8 @@ import {
   REMOVENOTE,
 } from '../actions/treeActions'
 
+import {findIDInList} from '../utils/utils';
+
 const noteInitialState = {
   note: '',
   date: null,
@@ -30,6 +32,7 @@ const notesInitialState = {
 
 export default NotesReducer = (state = notesInitialState, action) => {
   let list;
+  let noteI;
   switch (action.type) {
     case `${SHOWNOTES}_PENDING`:
     case `${SAVENOTE}_PENDING`:
@@ -46,9 +49,9 @@ export default NotesReducer = (state = notesInitialState, action) => {
     break;
     case `${SAVENOTE}_FULFILLED`:
       list = state.list.slice();
-
-      if(action.payload.id !== -1) {
-        list[action.payload.id] = action.payload.data;
+      noteI = findIDInList(list, action.payload.data.id);
+      if(noteI !== -1) {
+        list[noteI] = action.payload.data;
       } else {
         list.push(action.payload.data);
       }
@@ -56,7 +59,8 @@ export default NotesReducer = (state = notesInitialState, action) => {
     break;
     case `${REMOVENOTE}_FULFILLED`:
       list = state.list.slice();
-      list.splice(action.payload.id, 1);
+      noteI = findIDInList(list, action.payload.id);
+      list.splice(noteI, 1);
       return {list, isPending: false};
     break;
     default:

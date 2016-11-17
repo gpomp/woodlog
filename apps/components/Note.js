@@ -177,11 +177,6 @@ class Note extends Component {
   componentWillMount() {
     this.formData = Object.assign({}, this.props, this.formData);
     this.setState({ editMode: false, saving: false });
-
-    this.defaultValues = {
-      note: (this.props.arrayID === -1) ? '' : this.props.note,
-      date: new Date(this.props.date)
-    }
   }
 
   componentDidMount () {
@@ -201,6 +196,20 @@ class Note extends Component {
         this.state.noteHeight.setValue(this.noteHeight);
       });
     }, 0);
+  }
+
+  componentWillUpdate() {
+    this.defaultValues = {
+      note: (this.props.arrayID === -1) ? '' : this.props.note,
+      date: new Date(this.props.date)
+    }
+  }
+
+  componentDidUpdate () {
+    if(this.state.saving) {
+      this.setState({ editMode: false, saving: false });
+      this.toggleNote(false);
+    }
   }
 
   toggleNote (showForm) {
@@ -236,7 +245,7 @@ class Note extends Component {
 
     } else {
       this.formData = Object.assign({}, validation.value);
-      this.props.actions.saveNote(this.props.treeID, this.props.noteID, this.props.arrayID, this.formData.note, this.formData.date, []);
+      this.props.actions.saveNote(this.props.treeID, this.props.noteID, this.formData.note, this.formData.date, []);
       this.setState({ saving: true });
       this.toggleNote(false);
     }
@@ -248,25 +257,13 @@ class Note extends Component {
 
   removeNote () {
     console.log('noteID', this.props.noteID);
-    this.props.actions.removeNote(this.props.treeID, this.props.noteID, this.props.arrayID);
+    this.props.actions.removeNote(this.props.treeID, this.props.noteID);
     this.setState({ saving: true });
   }
-
-  componentDidUpdate () {
-    if(this.state.saving) {
-      this.setState({ editMode: false, saving: false });
-      this.toggleNote(false);
-    }
-  }
-
-  /*shouldComponentUpdate (nextProps, nextState) {
-    return this.state.saving || nextState.editMode !== this.state.editMode || nextState.formOverflow !== this.state.formOverflow;
-  }*/
 
   render() {
     const { date, note } = this.props;
     const d = new Date(date);
-    console.log('render note', this.state.formOverflow);
 
     return (
       <View style={{width: width - REG_PADDING * 2, marginBottom: 20}}> 
@@ -286,6 +283,7 @@ class Note extends Component {
                 <TouchableOpacity onPress={() => { this.removeNote() }} style={styles.button}>
                   <Text style={styles.textButton}>Remove</Text>
                 </TouchableOpacity>)}
+              
             </View>
           </View>
         </Animated.View>

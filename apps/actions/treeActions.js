@@ -1,5 +1,7 @@
 import RNFS from 'react-native-fs';
 
+import {findIDInList, getMaxID} from '../utils/utils';
+
 
 export const CHANGETREE = "CHANGE_TREE";
 export const SHOWTREE = "SHOW_TREE";
@@ -68,26 +70,21 @@ export const show = id => ({
 export const showNotes = ids => ({
   type: SHOWNOTES,
   payload: new Promise(resolve => {
-    /*global.storage.getAllDataForKey('note').then(ret => {
-      console.log('all notes in storage', ret);
-    });
-    console.log('ids', ids);*/
     storage.getBatchDataWithIds({
       key: 'note', 
       ids
     }).then(res => {
-      console.log('get notes', res);
       resolve({ notes: res, ids });
     });
   })
 });
 
-export const saveNote = (id, noteID, arrayID, note, date, photoList) => ({
+export const saveNote = (id, noteID, note, date, photoList) => ({
   type: SAVENOTE,
   payload: new Promise(resolve => {
     global.storage.getIdsForKey('note').then(ids => {
       if(ids === null) ids = [];
-      const storageID = isNaN(noteID) || noteID < 0 ? ids.length : noteID;
+      const storageID = noteID > -1 ? noteID : getMaxID(ids) + 1;
       const noteEntry = {
         key: 'note',
         id: storageID,
@@ -95,54 +92,59 @@ export const saveNote = (id, noteID, arrayID, note, date, photoList) => ({
         expires: null
       }
 
-      global.storage.save(noteEntry).then(res => {
+      global.storage.save(noteEntry).then(noteSaved => {
         global.storage.load({
           key: 'tree',
-          id: id
-        }).then(res => {
-          const copy = Object.assign({}, res);          
-          
-          if(noteID === -1) {
-            copy.notes.push(storageID);
-          }
-          const copyNote = Object.assign({}, noteEntry.rawData);
+          id
+        }).then(tree => {
+          const copy = Object.assign({}, tree);     
+          const copyNote = Object.assign({}, noteEntry.rawData);  
           copyNote.id = storageID;
-          global.storage.save({
-            key: 'tree',
-            id: id,
-            rawData: copy
-          }).then(res => {
-            resolve({data: copyNote, id: arrayID});
-          });
-         
+          if(noteID !== -1) {
+            resolve({data: copyNote});
+          } else {
+            copy.notes.push(storageID);
+
+            global.storage.save({
+              key: 'tree',
+              id,
+              rawData: copy
+            }).then(treeSaved => {
+              resolve({data: copyNote});
+            });
+
+          }
         });
       });
     });
   })
 });
 
-export const removeNote = (id, noteID, arrayID) => ({
+export const removeNote = (id, noteID) => ({
   // pass array id
   type: REMOVENOTE,
   payload: new Promise(resolve => {
     global.storage.remove({
-      key: 'note', 
+      key: 'note',
       id: noteID
-    }).then(res => {
+    }).then(notes => {
       global.storage.load({
         key: 'tree',
         id
-      }).then(res => {
-        const copy = Object.assign({}, res);
+      }).then(tree => {
+        const copy = Object.assign({}, tree);
 
-        copy.notes.splice(arrayID, 1);
+        const listI = findIDInList(copy.notes, noteID, true);
+        
+        if(listI === -1) console.error('List ID should be > 0');
+        copy.notes.splice(listI, 1);
           
         global.storage.save({
           key: 'tree',
-          id: id,
+          id,
           rawData: copy
-        }).then(res => {
-          resolve({id: arrayID});
+        }).then(trees => {
+          resolve({id: noteID});
         });
       });
     });
@@ -169,7 +171,7 @@ export const savePhoto = (src) => ({
 
       const img = {
         key: 'img',
-        id: ids.length,
+        id: getMaxID(ids) + 1,
         rawData: { src: src },
         expires: null
       }

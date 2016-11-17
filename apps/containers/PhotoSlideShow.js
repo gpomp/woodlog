@@ -22,7 +22,6 @@ class PhotoSlideShow extends Component {
 
   constructor(props) {
     super(props);
-    console.log('create PhotoSlideShow');
     
     this.onRender = false;
     this.imgList = [];
@@ -107,7 +106,6 @@ class PhotoSlideShow extends Component {
   }
 
   render () {
-    console.log('render slideshow', this.props.imgList.length);
     return(<Animated.View 
       style={[{height: 203,position: 'absolute', top: 0, left: 0, overflow:'hidden', flex: 1, width, alignItems:'center'}, {transform: [{translateY: this.props.y}], opacity: this.state.opacity }]}>
       <Animated.View style={{width: this.state.width, overflow:'hidden'}}>
