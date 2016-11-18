@@ -1,7 +1,10 @@
 'use strict'
+const ADD_IMAGE = require('../../assets/add.png');
+const REM_IMAGE = require('../../assets/close.png');
+import Icon from '../components/Icon';
 import React, {Component} from 'react';
 import {
-  View, Image, StyleSheet, Text, TouchableOpacity, Animated, Easing, TouchableHighlight
+  View, Image, StyleSheet, Text, TouchableOpacity, Animated, Easing, Alert, TouchableHighlight
 } from 'react-native'
 import { Actions as NavActions } from 'react-native-router-flux';
 
@@ -24,6 +27,8 @@ class PhotoSlideShow extends Component {
     super(props);
     
     this.onRender = false;
+    this.currentImage = -1;
+    this.currentIndex = -1;
     this.imgList = [];
     this.state = {
       width: new Animated.Value(width),
@@ -39,40 +44,27 @@ class PhotoSlideShow extends Component {
     this.update();
   }
 
-  componentWillUpdate (nextProps, nextState) {
-    // if(this.state.isLoading) {
-      // this.updatePhotosList();
-    // }
-    // console.log('componentWillUpdate', this.props.actions)
+  componentDidMount () {
+    this.currentIndex = this.getFilteredList().length > 0 ? this.getFilteredList()[0].id : 0;
+    if(this.props.noteID !== -1) {
+      this.state.opacity.setValue(1);
+    }
+  }
 
-    
+  componentWillUpdate (nextProps, nextState) {
      
   }
 
   componentDidUpdate (nextProps, nextState) {
-    /*if(!compareArrays(nextProps.photos, this.props.photos)) {
-      this.props.actions.showPhotos(nextProps.photos);
-    }*/
+
   }
 
   update () {
-    // this.props.actions.showPhotos(this.props.photos);
   }
- 
-  /*updatePhotosList () {
-    console.log('updatePhotosList', this.props.photos);
-    this.imgList = [];
-    // this.setState({imageList: []});
-    storage.getBatchDataWithIds({
-      key: 'img', 
-      ids: this.props.photos
-    }).then(res => {
-      this.imgList = res;
-      this.setState({isLoading: false});
-      // this.setState({ready: true});
-      // this.setState({imageList: res});
-    });
-  }*/
+
+  getCurrentIndex () {
+    return this.currentIndex;
+  }
 
   animateIn () {
     this.state.opacity.setValue(1);
@@ -85,6 +77,17 @@ class PhotoSlideShow extends Component {
     }).start();
   }
 
+  renderPhotoAlert () {
+    Alert.alert(
+      'Photo',
+      'Are you sure you want to delete this photo?',
+      [
+        {text: 'Cancel', onPress: () => {  }, style: 'cancel'},
+        {text: 'Delete', onPress: () => { this.props.onRemImage(); }},
+      ],
+    );
+  }
+
   animateOut (duration = 1000) {
     Animated.timing(this.state.opacity, {
       toValue: 0,
@@ -92,8 +95,12 @@ class PhotoSlideShow extends Component {
     }).start();
   }
 
+  getFilteredList () {
+    return this.props.imgList.filter((p) => { return p.note === this.props.noteID });
+  }
+
   getImageList () {
-    return this.props.imgList.map((p, i) => {
+    return this.getFilteredList().map((p, i) => {
       const path = `${global.targetFilePath}/${p.src}`;
       const src = {uri: path};
       // console.log('slideshow path', path);
@@ -107,14 +114,10 @@ class PhotoSlideShow extends Component {
 
   render () {
     return(<Animated.View 
-      style={[{height: 203,position: 'absolute', top: 0, left: 0, overflow:'hidden', flex: 1, width, alignItems:'center'}, {transform: [{translateY: this.props.y}], opacity: this.state.opacity }]}>
+      style={[{height: 203,position: 'absolute', top: 0, left: 0, overflow:'hidden', flex: 1, width, alignItems:'center'}, {transform: [{translateY: this.props.y}], opacity: this.state.opacity }, this.props.styles]}>
       <Animated.View style={{width: this.state.width, overflow:'hidden'}}>
         
-        {(this.props.photos.length > 0) ?
-          
-            <Swiper style={styles.wrapper} showsButtons={false} onMomentumScrollEnd={(e, state) => { this.props.onChangePicture(state.index); }}>
-              {this.getImageList()}
-            </Swiper> :
+        {(this.getFilteredList().length <= 0) ?
           <TouchableHighlight onPress={() => { this.props.onAddImage(); }}>
             <Image
               resizeMode="cover" 
@@ -122,10 +125,29 @@ class PhotoSlideShow extends Component {
               style={styles.blankImage} >
                 <Text style={styles.errorTree}>ADD AN IMAGE</Text>
             </Image>
-          </TouchableHighlight>
+          </TouchableHighlight> :
+          <Swiper 
+            style={styles.wrapper} 
+            ref="swiper"
+            showsButtons={false} 
+            onMomentumScrollEnd={(e, state) => { 
+              const a = this.getFilteredList();
+              const curr = state.index;
+              this.currentIndex = a[curr].id;
+            }}>
+            {this.getImageList()}
+          </Swiper>
         }
 
       </Animated.View>
+      {(this.getFilteredList().length > 0) ?
+        <Icon src={ADD_IMAGE} onPress={() => { this.props.onAddImage(); }}
+          ctnStyles={{ opacity: this.state.opacity }}
+          styles={{top: 20, right: 20}}/> : null}
+      {(this.getFilteredList().length > 0) ?
+        <Icon src={REM_IMAGE} onPress={() => { this.renderPhotoAlert(); }} 
+          ctnStyles={{ opacity: this.state.opacity }}
+          styles={{top: 70, right: 20}}/> : null}
     </Animated.View>);    
   }
 
@@ -169,7 +191,9 @@ const dispatchToProps = (dispatch) => {
 PhotoSlideShow.defaultProps = {
   imgList: [],
   initialized: false,
-  isPending: false
+  isPending: false,
+  styles: {},
+  noteID: -1
 }
 
 export default connect(stateToProps, dispatchToProps)(PhotoSlideShow)

@@ -5,8 +5,11 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import * as TreeActions from '../actions/treeActions';
+import { Actions as NavActions } from 'react-native-router-flux';
 
 import t from 'tcomb-form-native';
+
+import ImagePicker from 'react-native-image-picker';
 
 import { width, 
           height, 
@@ -23,8 +26,9 @@ import { width,
           TRADE_GOTHIC,
           BORDER_COLOR } from '../utils/globalStyles';
 
-import {mergeDeep} from '../utils/utils';
+import {mergeDeep, imgPickerResponse} from '../utils/utils';
 import datepicker from '../components/DatePickerCustomTemplate';
+import PhotoSlideShow from '../containers/PhotoSlideShow';
 
 const Form = t.form.Form;
 t.form.Form.stylesheet = formStyleSheet;
@@ -117,7 +121,6 @@ const styles = StyleSheet.create({
     fontFamily: TRADE_GOTHIC,
     fontSize: 15,
     opacity: 1
-
   }),
   title: Object.assign({}, textReg, {
     opacity: 1
@@ -210,6 +213,13 @@ class Note extends Component {
       this.setState({ editMode: false, saving: false });
       this.toggleNote(false);
     }
+
+    if(this.state.onRemove) {
+      console.log('on Remove...');
+      this.props.actions.removeNote(this.props.treeID, this.props.noteID);
+      this.setState({ onRemove: false });
+      this.setState({ saving: true });
+    }
   }
 
   toggleNote (showForm) {
@@ -256,8 +266,25 @@ class Note extends Component {
   }
 
   removeNote () {
-    console.log('noteID', this.props.noteID);
-    this.props.actions.removeNote(this.props.treeID, this.props.noteID);
+    // first remove all photos
+    const photos = this.refs.slideShow.getWrappedInstance().getFilteredList();
+    if(photos.length > 0) {
+      const ids = photos.map(p => { return p.id });      
+      this.props.actions.removePhoto(ids, this.props.treeID);
+
+    }    
+    this.setState({ onRemove: true });
+  }
+
+  savePhoto () {
+    imgPickerResponse((fileName = '') => {
+      this.props.actions.savePhoto(fileName, this.props.treeID, this.props.noteID);
+      this.setState({ saving: true });
+    });
+  }
+
+  removeImage () {
+    this.props.actions.removePhoto([this.refs.slideShow.getWrappedInstance().getCurrentIndex()], this.props.treeID);
     this.setState({ saving: true });
   }
 
@@ -311,6 +338,21 @@ class Note extends Component {
             </View>
           </View>
         </Animated.View>
+        {this.props.arrayID === -1 ? null :
+        <View>
+          <PhotoSlideShow 
+            ref="slideShow"
+            styles={{position:'relative', width: width - 40}}
+            nextId={0}
+            photos={this.props.photoList}
+            y={0} 
+            fromY={0}
+            noteID={this.props.noteID}
+            onAddImage={() => { this.savePhoto(); }}
+            onRemImage={() => { this.removeImage(); }}
+            onChangePicture={(index) => { this.currentPicture = index; }} 
+            onPress={() => { NavActions.SlideShow({photos: this.props.photoList, noteID: this.props.noteID}) }}/>
+        </View>}
       </View>);
   }
 }

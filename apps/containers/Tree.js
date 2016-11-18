@@ -42,16 +42,7 @@ import { width,
 
 const ctnWidth = width - REG_PADDING * 2;
 
-const IPOptions = {
-  title: 'Add a picture to this Bonsai...',
-  allowsEditing: true,
-  noData: true,
-  storageOptions: {
-    skipBackup: true,
-    path: 'woodlog',
-    cameraRoll: 'false'
-  }
-};
+import { imgPickerResponse } from '../utils/utils';
 
 class Tree extends Component {
   constructor(props) {
@@ -142,46 +133,16 @@ class Tree extends Component {
   }
 
   showImagePicker () {
-    ImagePicker.showImagePicker(IPOptions, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      }
-      else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      }
-      else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      }
-      else {
-        // You can display the image using either data...
-        let source; // = {uri: 'data:image/jpeg;base64,' + response.data, isStatic: true, isURL: false};
-
-        if (Platform.OS === 'ios') {
-          source = {uri: response.uri.replace('file://', ''), isStatic: true};
-        } else {
-          source = {uri: response.uri, isStatic: true};
-        }
-        const uriSplit = response.uri.split('/');
-        const fileName = uriSplit[uriSplit.length - 1];
-        this.props.actions.savePhoto(fileName);
-        this.setState({ saving: true });
-      }
-    });
+    imgPickerResponse((fileName = '') => {
+      this.props.actions.savePhoto(fileName, this.props.id);
+      this.setState({ saving: true });
+    })
+    
+    
   }
 
-  renderPhotoAlert () {
-    Alert.alert(
-      'Photo',
-      'Are you sure you want to delete this photo?',
-      [
-        {text: 'Cancel', onPress: () => {  }, style: 'cancel'},
-        {text: 'Delete', onPress: () => { this.removeImage(); }},
-      ],
-    );
-  }
-
-   removeImage () {
-    this.props.actions.removePhoto(this.props.tree.photos[this.currentPicture]);
+  removeImage () {
+    this.props.actions.removePhoto([this.refs.slideShow.getWrappedInstance().getCurrentIndex()], this.props.id);
     this.setState({ saving: true });
   }
 
@@ -277,7 +238,9 @@ class Tree extends Component {
             photos={tree.photos} 
             y={this.state.photoY} 
             fromY={this.props.imgPos}
+            noteID={-1}
             onAddImage={() => { this.showImagePicker(); }}
+            onRemImage={() => { this.removeImage(); }}
             onChangePicture={(index) => { this.currentPicture = index; }} 
             onPress={() => { NavActions.SlideShow({photos: tree.photos}) }}/>
           <Animated.View style={[styles.textView, {opacity: this.state.opacity}]}>
@@ -321,14 +284,7 @@ class Tree extends Component {
               </AnimatedSwiper>
           </Animated.View>
         </ScrollView>
-        {(tree.photos.length > 0) ? 
-          <Icon src={ADD_IMAGE} onPress={() => { this.showImagePicker(); }}
-            ctnStyles={{ opacity: this.state.opacity }}
-            styles={{top: 20, right: 20}}/> : null}
-        {(tree.photos.length > 0) ? 
-          <Icon src={REM_IMAGE} onPress={() => { this.renderPhotoAlert(); }} 
-            ctnStyles={{ opacity: this.state.opacity }}
-            styles={{top: 70, right: 20}}/> : null}
+        
       </View>
     );
   }

@@ -1,3 +1,48 @@
+import ImagePicker from 'react-native-image-picker';
+import { Platform } from 'react-native';
+
+export const IPOptions = {
+  title: 'Add a picture to this Bonsai...',
+  allowsEditing: true,
+  noData: true,
+  storageOptions: {
+    skipBackup: true,
+    path: 'woodlog',
+    cameraRoll: 'false'
+  }
+};
+
+export const imgPickerResponse = function (cb = null) {
+  ImagePicker.showImagePicker(IPOptions, (response) => {
+    if (response.didCancel) {
+      console.log('User cancelled image picker');
+    }
+    else if (response.error) {
+      console.log('ImagePicker Error: ', response.error);
+    }
+    else if (response.customButton) {
+      console.log('User tapped custom button: ', response.customButton);
+    }
+    else {
+      // You can display the image using either data...
+      let source; // = {uri: 'data:image/jpeg;base64,' + response.data, isStatic: true, isURL: false};
+
+      if (Platform.OS === 'ios') {
+        source = {uri: response.uri.replace('file://', ''), isStatic: true};
+      } else {
+        source = {uri: response.uri, isStatic: true};
+      }
+      const uriSplit = response.uri.split('/');
+      const fileName = uriSplit[uriSplit.length - 1];
+
+      if(cb !== null) {
+        return cb(fileName);
+      }
+    }
+  })
+  
+};
+
 /**
  * Simple is object check.
  * @param item

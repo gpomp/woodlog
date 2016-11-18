@@ -157,13 +157,17 @@ export const showPhotos = (photos) => ({
     storage.getBatchDataWithIds({
       key: 'img', 
       ids: photos
-    }).then(res => {
-      resolve({ data: res});
+    }).then(photoList => {
+      const copy = photoList.slice();
+      copy.map((p, i) => {
+        p.id = photos[i];
+      });
+      resolve({data: copy});
     });
   })
 });
 
-export const savePhoto = (src) => ({
+export const savePhoto = (src, tree, note = -1) => ({
   type: SAVENEWPHOTO,
   payload: new Promise(resolve => {
 
@@ -172,7 +176,7 @@ export const savePhoto = (src) => ({
       const img = {
         key: 'img',
         id: getMaxID(ids) + 1,
-        rawData: { src: src },
+        rawData: { src: src, tree, note },
         expires: null
       }
 
@@ -182,41 +186,83 @@ export const savePhoto = (src) => ({
   })
 });
 
-export const removePhoto = (id) => ({
+export const removePhoto = (ids, treeID) => ({
   type: DELETEPHOTO,
   payload: new Promise(resolve => {
     // Get the img url
-    checkPhotoList(id).then(isUsed => {
-      if(isUsed) {
-        resolve({id});
-        return;
-      }
-
-      global.storage.load({
-        key: 'img',
-        id
-      }).then(res => {
-        // Remove image from storage
-        global.storage.remove({
-          key: 'img', id
-        }).then(res => {
-          if(res === null) {
-            resolve({id});
-            return;
-          }
-          RNFS.unlink(res.src)
-          .then(() => {
-            resolve({id});
-          }).catch(err => {
-            resolve({id});
-          });
-        });     
-      }).catch(err => {
-        resolve({id});
+    let count = 0;
+    ids.forEach((id, i) => {
+      removePicture(id).then(id => {
+        count++;
+        if(count === ids.length) {
+          removeIDSFromTree(ids, treeID, resolve, id);
+        }
       });
     });
   })
 });
+
+const removeIDSFromTree = (ids, treeID, resolve, id) => {
+  global.storage.load({
+      key: 'tree',
+      id: treeID}).then(tree => {
+        const copy = Object.assign({}, tree);
+        
+        console.log('Will delete', ids.length);
+        for (var i = 0; i < ids.length; i++) {
+          const listI = findIDInList(copy.photos, ids[i], true);
+          console.log('delete photo at', ids[i], copy.photos, listI);
+        
+          if(listI === -1) console.error('List ID should be > 0');
+          copy.photos.splice(listI, 1);          
+        }
+
+        console.log('tree after deletation',copy);
+          
+        global.storage.save({
+          key: 'tree',
+          id: treeID,
+          rawData: copy
+        }).then(trees => {
+          resolve({data: copy});
+        });
+    });
+}
+
+const removePicture = (id) => {
+  return new Promise(resolve => {
+    checkPhotoList(id).then(isUsed => {
+      if(isUsed) {
+        console.log('ALREADY EXIST!');
+        resolve(id);
+        return;
+      }
+      global.storage.load({
+        key: 'img',
+        id
+      }).then(image => {
+        // Remove image from storage
+        global.storage.remove({
+          key: 'img', id
+        }).then(res => {
+          if(image === null) {
+            resolve(id);
+            return;
+          }
+          RNFS.unlink(image.src)
+          .then(() => {
+            resolve(id);
+          }).catch(err => {
+            resolve(id);
+          });
+        });     
+      }).catch(err => {
+        console.log('ERROR!', err);
+        resolve(id);
+    });
+    });
+  });
+} 
 
 const checkPhotoList = (id) => {
   return new Promise(resolve => {
@@ -226,7 +272,7 @@ const checkPhotoList = (id) => {
         for (var j = 0; j < ret[i].photos.length; j++) {
           if(ret[i].photos[j] === id) {
             count++;
-            if(count >= 2) {
+            if(count > 1) {
               resolve(true);
               return;
             }

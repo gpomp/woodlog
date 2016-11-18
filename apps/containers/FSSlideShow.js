@@ -62,7 +62,7 @@ class FSSlideShow extends Component {
   }
 
   getImageList () {
-    return this.props.imgList.map((p, i) => {
+    return this.props.imgList.filter((p) => { return p.note === this.props.noteID }).map((p, i) => {
       const path = `${global.targetFilePath}/${p.src}`;
       const src = {uri: path};
       // console.log('slideshow path', path);

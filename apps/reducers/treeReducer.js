@@ -72,21 +72,9 @@ export default TreeReducer = (state = initialState, action) => {
       }
     break;
     case `${DELETEPHOTO}_FULFILLED`:
-      stateCopy = Object.assign({}, state);
-      let arrayID = -1;
-      for (var i = 0; i < stateCopy.rawData.photos.length; i++) {
-        if(stateCopy.rawData.photos[i] === action.payload.id) {
-          arrayID = i;
-          break;
-        }
-      }
-      if(arrayID >= 0) {
-        stateCopy.rawData.photos.splice(arrayID, 1);
-      }
-      global.storage.save(stateCopy);
-
+      
       return {
-        ...state, rawData: stateCopy.rawData, isPending: false
+        ...state, rawData: action.payload.data, isPending: false
       }      
     break;
     default:

@@ -14,8 +14,8 @@ const logger = createLogger()
 //const store = createStoreWithMiddleware(rootReducer);
 const store = createStore(rootReducer, {}, applyMiddleware(
   thunk,
-  promiseMiddleware(),
-  logger
+  promiseMiddleware()
+  //, logger
 ));
 
 const wrapper = () => {

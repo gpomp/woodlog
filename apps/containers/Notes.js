@@ -70,7 +70,8 @@ class Notes extends Component {
       const k = `tree-note-${i}`;
       const ref = `note${i}`;
       return <Note 
-              date={ n.date } note={ n.note } arrayID={i} key={k} ref={ref}
+              date={ n.date } note={ n.note } arrayID={i} key={k} ref={ref} 
+              photoList={ this.props.photos }
               treeID={this.props.treeID}
               noteID={n.id}
               onToggleNote={this.props.onToggleNote}
@@ -129,6 +130,7 @@ const styles =  StyleSheet.create({
 const stateToProps = (state) => {
   return {
     notes: state.notes.list,
+    photos: state.tree.rawData.photos,
     isPending: state.notes.isPending,
     treeID: state.tree.id
   }
