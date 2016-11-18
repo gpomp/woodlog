@@ -75,6 +75,7 @@ class Notes extends Component {
               treeID={this.props.treeID}
               noteID={n.id}
               onToggleNote={this.props.onToggleNote}
+              onNoteUpdate={this.props.onNoteUpdate}
               onFocusNote={(id) => {
                 let n;
                 if(id === -1) n = this.refs.addNote;
@@ -92,6 +93,7 @@ class Notes extends Component {
           treeID={this.props.treeID}
           noteID={-1}
           onToggleNote={this.props.onToggleNote} 
+          onNoteUpdate={this.props.onNoteUpdate}
           onFocusNote={(id) => {
             let n;
             if(id === -1) n = this.refs.addNote;

@@ -133,12 +133,12 @@ class Tree extends Component {
   }
 
   showImagePicker () {
-    imgPickerResponse((fileName = '') => {
-      this.props.actions.savePhoto(fileName, this.props.id);
-      this.setState({ saving: true });
+    imgPickerResponse(-1, (noteID, fileName = '') => {
+      if(noteID === -1) {
+        this.props.actions.savePhoto(fileName, this.props.id);
+        this.setState({ saving: true });
+      }      
     })
-    
-    
   }
 
   removeImage () {
@@ -165,16 +165,17 @@ class Tree extends Component {
     this.state.photoY.setValue(this.scrollY); 
   }
 
-  resizeSwiper (index = 0, noAnim = false) {
+  resizeSwiper (index = 0, noAnim = false, offset = 0) {
     const currView = index === 0 ? this.refs.bonsaiView : this.refs.notesView;
     currView.measure((fx, fy, width, height) => {
       if(noAnim) {
-        this.state.sliderHeight.setValue(height);
+        this.state.sliderHeight.setValue(height + offset);
         return;
       }
+      // console.log('resizeSwiper', offset);
 
       Animated.timing(this.state.sliderHeight, {
-        toValue: height,
+        toValue: height + offset,
         easing: Easing.inOut(Easing.exp),
         duration: 300
       }).start();
@@ -193,14 +194,16 @@ class Tree extends Component {
       heightChange = dateField;
     }
 
-    this.refs.notesView.measure((fx, fy, width, height) => { 
-      // this.state.sliderHeight.setValue(height);
-      Animated.timing(this.state.sliderHeight, {
-        toValue: height + heightChange,
-        easing: Easing.inOut(Easing.exp),
-        duration: 250
-      }).start();
-    });
+    setTimeout(() => {
+      this.refs.notesView.measure((fx, fy, width, height) => { 
+        // this.state.sliderHeight.setValue(height);
+        Animated.timing(this.state.sliderHeight, {
+          toValue: height + heightChange,
+          easing: Easing.inOut(Easing.exp),
+          duration: 250
+        }).start();
+      });
+    }, 0);
   }
 
   inputFocused (note, offset = 0) {
@@ -242,7 +245,7 @@ class Tree extends Component {
             onAddImage={() => { this.showImagePicker(); }}
             onRemImage={() => { this.removeImage(); }}
             onChangePicture={(index) => { this.currentPicture = index; }} 
-            onPress={() => { NavActions.SlideShow({photos: tree.photos}) }}/>
+            onPress={() => { NavActions.SlideShow({photos: tree.photos, noteID: -1}) }}/>
           <Animated.View style={[styles.textView, {opacity: this.state.opacity}]}>
             <AnimatedSwiper 
               keyboardShouldPersistTaps={true}
@@ -277,7 +280,7 @@ class Tree extends Component {
               </View>
               <View ref="notesView">
                 <Notes 
-                  onNoteUpdate={() => { this.resizeSwiper(1); }} 
+                  onNoteUpdate={(offset) => { this.resizeSwiper(1, true, offset); }} 
                   onToggleNote={(showForm, formHeight, noteHeight, dateField = 0) => { this.toggleNote(showForm, formHeight, noteHeight, dateField); }} 
                   onFocusNote={(note, offset = 0) => { this.inputFocused(note, offset); }}/>
               </View>

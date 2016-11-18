@@ -165,13 +165,15 @@ class Note extends Component {
     this.state = { 
       formHeight: new Animated.Value(99999),
       noteHeight: new Animated.Value(99999),
-      formOverflow: 'visible'
+      formOverflow: 'visible',
+      onRemove: false
     };
 
     formOptions.fields.date.config.onToggleCollapse = this.toggleCollapse.bind(this);
   }
 
   toggleCollapse (isCollapsed) {
+    // console.log('toggleCollapse');
     const area = isCollapsed ? 200 : -200;
     this.props.onToggleNote(true, 0, 0, area);
     if(isCollapsed) this.props.onFocusNote(this.props.arrayID, 50);
@@ -212,13 +214,14 @@ class Note extends Component {
     if(this.state.saving) {
       this.setState({ editMode: false, saving: false });
       this.toggleNote(false);
+      // this.props.onNoteUpdate(300);
     }
 
-    if(this.state.onRemove) {
-      console.log('on Remove...');
+    if(this.state.onRemove === true) {
       this.props.actions.removeNote(this.props.treeID, this.props.noteID);
       this.setState({ onRemove: false });
       this.setState({ saving: true });
+      this.toggleNote(false);
     }
   }
 
@@ -277,9 +280,11 @@ class Note extends Component {
   }
 
   savePhoto () {
-    imgPickerResponse((fileName = '') => {
-      this.props.actions.savePhoto(fileName, this.props.treeID, this.props.noteID);
-      this.setState({ saving: true });
+    imgPickerResponse(this.props.noteID, (noteID, fileName = '') => {
+      if(noteID === this.props.noteID) {
+        this.props.actions.savePhoto(fileName, this.props.treeID, this.props.noteID);
+        this.setState({ saving: true });
+      }
     });
   }
 

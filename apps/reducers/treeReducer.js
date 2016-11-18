@@ -63,12 +63,9 @@ export default TreeReducer = (state = initialState, action) => {
       }
     break;
     case `${SAVENEWPHOTO}_FULFILLED`:
-      stateCopy = Object.assign({}, state);
-      stateCopy.rawData.photos.push(action.payload.id);
-      global.storage.save(stateCopy);
 
       return {
-        ...state, rawData: Object.assign({}, state.rawData, stateCopy.rawData), isPending: false
+        ...state, rawData: Object.assign({}, state.rawData, action.payload.rawData), isPending: false
       }
     break;
     case `${DELETEPHOTO}_FULFILLED`:

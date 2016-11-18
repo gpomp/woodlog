@@ -53,22 +53,22 @@ export default class TreeItem extends Component {
     this.setState({ init: false, error: false });
     this.imgSRC = {};
     console.log('banner will mount', global.targetFilePath);
-    if(props.photos.length > 0) {
-      const pID = props.photos[0];
-      global.storage.load({
+      global.storage.getBatchDataWithIds({
         key: 'img',
-        id: pID
+        ids: props.photos
       }).then(res => {
-        const path = `${global.targetFilePath}/${res.src}`;
-        this.imgSRC = {uri: path, isStatic: true, width, height};
-        this.setState({ init: true });
+        const pics = res.filter((p) => { return p.note === -1 });
+        if(pics.length > 0) {
+          const path = `${global.targetFilePath}/${pics[0].src}`;
+          this.imgSRC = {uri: path, isStatic: true, width, height};
+          this.setState({ init: true });
+        } else {
+          this.setState({ init: true, error: true });
+        }
       }).catch(err => {
         // console.warn('image error', err);
         this.setState({ init: true, error: true });
       });
-    } else {
-      this.setState({ init: true, error: true });
-    }
   }
 
   animateIn (duration = 1000, delay = 100) {

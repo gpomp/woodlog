@@ -12,7 +12,7 @@ export const IPOptions = {
   }
 };
 
-export const imgPickerResponse = function (cb = null) {
+export const imgPickerResponse = function (noteID, cb = null) {
   ImagePicker.showImagePicker(IPOptions, (response) => {
     if (response.didCancel) {
       console.log('User cancelled image picker');
@@ -36,7 +36,7 @@ export const imgPickerResponse = function (cb = null) {
       const fileName = uriSplit[uriSplit.length - 1];
 
       if(cb !== null) {
-        return cb(fileName);
+        return cb(noteID, fileName);
       }
     }
   })

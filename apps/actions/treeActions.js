@@ -167,7 +167,7 @@ export const showPhotos = (photos) => ({
   })
 });
 
-export const savePhoto = (src, tree, note = -1) => ({
+export const savePhoto = (src, treeID, note = -1) => ({
   type: SAVENEWPHOTO,
   payload: new Promise(resolve => {
 
@@ -176,12 +176,28 @@ export const savePhoto = (src, tree, note = -1) => ({
       const img = {
         key: 'img',
         id: getMaxID(ids) + 1,
-        rawData: { src: src, tree, note },
+        rawData: { src: src, treeID, note },
         expires: null
       }
 
-      global.storage.save(img);
-      resolve({id: img.id});
+      global.storage.save(img).then(photo => {
+        global.storage.load({
+          key: 'tree',
+          id: treeID
+        }).then(tree => {
+          const treeCopy = Object.assign({}, tree);
+          treeCopy.photos.push(img.id);
+
+          global.storage.save({
+            key: 'tree',
+            id: treeID,
+            rawData: treeCopy
+          }).then(treeSaved => {
+            resolve({rawData: treeCopy});
+          })
+        });
+      });
+      
     });
   })
 });
