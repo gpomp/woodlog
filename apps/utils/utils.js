@@ -1,5 +1,6 @@
 import ImagePicker from 'react-native-image-picker';
 import { Platform } from 'react-native';
+import RNCalendarEvents from 'react-native-calendar-events';
 
 export const IPOptions = {
   title: 'Add a picture to this Bonsai...',
@@ -40,8 +41,52 @@ export const imgPickerResponse = function (noteID, cb = null) {
       }
     }
   })
-  
 };
+
+export const addInCalendar = function (id, title, settings) {
+  return new Promise((resolve, reject) => {
+    RNCalendarEvents.authorizeEventStore()
+    .then(status => {
+      if(status === 'denied' || status === 'undetermined') {
+        console.log('Access to event calendar denied');
+        reject('Access to event calendar denied');
+        return;
+      }
+
+      if(id !== '-1') {
+        settings.id = id;
+      }
+
+      RNCalendarEvents.saveEvent(title, settings)
+      .then(idEvent => {
+        resolve(idEvent);
+      })
+      .catch(error => {
+        console.error('Event Error', error);
+        reject(error)
+      });
+    })
+    .catch(error => {
+      console.error('Event Error', error);
+      reject(error)
+    });
+  })
+}
+
+export const removeInCalendar = function (id) {
+  return new Promise((resolve, reject) => {
+    RNCalendarEvents.authorizeEventStore()
+    .then(status => {
+      RNCalendarEvents.removeEvent(id).then(success => {
+        resolve(success);
+      });
+    })
+    .catch(error => {
+      console.error('Event Error');
+      reject(error)
+    });
+  });
+}
 
 /**
  * Simple is object check.

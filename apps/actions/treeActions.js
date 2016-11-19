@@ -79,7 +79,7 @@ export const showNotes = ids => ({
   })
 });
 
-export const saveNote = (id, noteID, note, date, photoList) => ({
+export const saveNote = (id, noteID, note, date, eventID) => ({
   type: SAVENOTE,
   payload: new Promise(resolve => {
     global.storage.getIdsForKey('note').then(ids => {
@@ -88,7 +88,7 @@ export const saveNote = (id, noteID, note, date, photoList) => ({
       const noteEntry = {
         key: 'note',
         id: storageID,
-        rawData: { note, date, photoList },
+        rawData: { note, date, eventID },
         expires: null
       }
 

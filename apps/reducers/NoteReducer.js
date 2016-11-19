@@ -9,15 +9,15 @@ import {findIDInList} from '../utils/utils';
 const noteInitialState = {
   note: '',
   date: null,
-  photoList: []
+  eventID: '-1'
 }
 
 const note = (state = noteInitialState, type) => {
   switch (type) {
     case `${SHOWNOTES}_FULFILLED`:
-      const { id, note, date, photoList } = state;
+      const { id, note, date, eventID } = state;
       return {
-        id, note, date, photoList
+        id, note, date, eventID
       }
     break;
     default:

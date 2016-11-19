@@ -70,7 +70,7 @@ class Notes extends Component {
       const k = `tree-note-${i}`;
       const ref = `note${i}`;
       return <Note 
-              date={ n.date } note={ n.note } arrayID={i} key={k} ref={ref} 
+              date={ n.date } note={ n.note } eventID={ n.eventID } arrayID={i} key={k} ref={ref} 
               photoList={ this.props.photos }
               treeID={this.props.treeID}
               noteID={n.id}
@@ -89,7 +89,7 @@ class Notes extends Component {
       <View style={{flex: 1, justifyContent: 'center'}}> 
         <Text style={styles.title}>NOTES</Text>
         {noteList}
-        <Note date={ new Date().toString() } note="Add a new note here" arrayID={-1} key={-1} ref='addNote'
+        <Note date={ new Date().toString() } note="Add a new note here" eventID="-1" arrayID={-1} key={-1} ref='addNote'
           treeID={this.props.treeID}
           noteID={-1}
           onToggleNote={this.props.onToggleNote} 

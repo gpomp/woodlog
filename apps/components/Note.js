@@ -7,6 +7,8 @@ import { connect } from 'react-redux';
 import * as TreeActions from '../actions/treeActions';
 import { Actions as NavActions } from 'react-native-router-flux';
 
+import FakeCheckbox from './FakeCheckbox'; 
+
 import t from 'tcomb-form-native';
 
 import ImagePicker from 'react-native-image-picker';
@@ -26,7 +28,7 @@ import { width,
           TRADE_GOTHIC,
           BORDER_COLOR } from '../utils/globalStyles';
 
-import {mergeDeep, imgPickerResponse} from '../utils/utils';
+import {mergeDeep, imgPickerResponse, addInCalendar, removeInCalendar} from '../utils/utils';
 import datepicker from '../components/DatePickerCustomTemplate';
 import PhotoSlideShow from '../containers/PhotoSlideShow';
 
@@ -252,13 +254,13 @@ class Note extends Component {
     });
   }
 
-  saveNote () {
+  saveNote (eventID = '') {
     const validation = this.refs.editNote.validate();
     if(validation.errors.length > 0) {
 
     } else {
       this.formData = Object.assign({}, validation.value);
-      this.props.actions.saveNote(this.props.treeID, this.props.noteID, this.formData.note, this.formData.date, []);
+      this.props.actions.saveNote(this.props.treeID, this.props.noteID, this.formData.note, this.formData.date, eventID && eventID.length ? eventID : this.props.eventID);
       this.setState({ saving: true });
       this.toggleNote(false);
     }
@@ -293,10 +295,36 @@ class Note extends Component {
     this.setState({ saving: true });
   }
 
+  toggleInCalendar (toggle) {
+    if(toggle) {
+      const startDate = new Date(this.props.date);
+      startDate.setHours(8);
+      const endDate = new Date(this.props.date);
+      endDate.setHours(20);
+      //console.log('add event', startDate.toISOString(), endDate.toISOString(), this.props.note);
+      addInCalendar(this.props.eventID, 'Bonsai Event', {
+        notes: this.props.note,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      }).then(eventID => {
+        this.saveNote(eventID);
+      });
+    } else {
+      if(this.props.eventID !== '-1') {
+        removeInCalendar(this.props.eventID).then(success => {
+          if(success) {
+            this.saveNote('-1');
+          }          
+        });
+      }
+    }
+    
+  }
+
   render() {
     const { date, note } = this.props;
     const d = new Date(date);
-
+    console.log(typeof this.props.eventID); 
     return (
       <View style={{width: width - REG_PADDING * 2, marginBottom: 20}}> 
         <Animated.View ref="noteView" style={[styles.ctn, {height: this.state.noteHeight}]}>
@@ -343,6 +371,7 @@ class Note extends Component {
             </View>
           </View>
         </Animated.View>
+        <FakeCheckbox text="Add to calendar" onPress={(isChecked) => { this.toggleInCalendar(isChecked); }} checked={ this.props.eventID !== '-1' } />
         {this.props.arrayID === -1 ? null :
         <View>
           <PhotoSlideShow 

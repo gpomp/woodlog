@@ -78,13 +78,7 @@ class Tree extends Component {
 
   componentDidUpdate (nextProps, nextState) {
 
-    /*if(!this.props.isPending && this.props.initialized) {
-      this.refs.slideShow.getWrappedInstance().update();
-      this.refs.notes.getWrappedInstance().update();
-    }*/
-
     if(this.state.saving && !this.props.isPending && this.props.initialized) {
-      // this.slideShow.getWrappedInstance().update();
       this.setState({ saving: false });
     }
   }
@@ -110,9 +104,6 @@ class Tree extends Component {
           toValue: 1,
           duration: 500
         }).start();
-
-        // this.refs.scrollView.scrollEnabled = true;
-
       }
     });
     this.initialized = true;
