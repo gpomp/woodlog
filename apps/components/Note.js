@@ -324,7 +324,7 @@ class Note extends Component {
   render() {
     const { date, note } = this.props;
     const d = new Date(date);
-    console.log(typeof this.props.eventID); 
+    console.log(typeof this.props.eventID);
     return (
       <View style={{width: width - REG_PADDING * 2, marginBottom: 20}}> 
         <Animated.View ref="noteView" style={[styles.ctn, {height: this.state.noteHeight}]}>
@@ -371,7 +371,9 @@ class Note extends Component {
             </View>
           </View>
         </Animated.View>
-        <FakeCheckbox text="Add to calendar" onPress={(isChecked) => { this.toggleInCalendar(isChecked); }} checked={ this.props.eventID !== '-1' } />
+        {this.props.arrayID === -1 ? null :
+          <FakeCheckbox text="Add this note to your calendar" onPress={(isChecked) => { this.toggleInCalendar(isChecked); }} checked={ this.props.eventID !== '-1' } />
+        }
         {this.props.arrayID === -1 ? null :
         <View>
           <PhotoSlideShow 

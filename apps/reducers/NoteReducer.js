@@ -41,7 +41,11 @@ export default NotesReducer = (state = notesInitialState, action) => {
     break;
     case `${SHOWNOTES}_FULFILLED`:
       list = action.payload.notes.map((noteEntry, i) => {
-        const nEntry = Object.assign({}, noteEntry);
+        const nEntry = Object.assign({
+          note: '',
+          date: null,
+          eventID: '-1'
+        }, noteEntry);
         nEntry.id = action.payload.ids[i];
         return note(nEntry, action.type);
       });
