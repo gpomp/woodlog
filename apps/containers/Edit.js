@@ -103,9 +103,9 @@ const ph = {
 const ss = {
   name: { s: bigFormStyleSheet, opts: {  }},
   potSize: { s: nestedStructSS },
-  height: { s: mediumFieldSS, opts: { template: TextBoxCustomTemplate }},
-  trunkWidth: { s: mediumFieldSS, opts: { template: TextBoxCustomTemplate }},
-  canopyWidth: { s: mediumFieldSS, opts: { template: TextBoxCustomTemplate }},
+  height: { s: mediumFieldSS, opts: {  }},
+  trunkWidth: { s: mediumFieldSS, opts: {  }},
+  canopyWidth: { s: mediumFieldSS, opts: {  }},
   date: { s: dateFieldSS, 
     opts: {
       template: datepicker,
@@ -114,7 +114,7 @@ const ss = {
       }, multiline: true
     }
   },
-  Source: {s: autoFieldSS, opts: { template: TextBoxCustomTemplate }}
+  Source: {s: autoFieldSS, opts: {  }}
 }
 
 const formOptions = {
@@ -145,20 +145,17 @@ for(var name in TreeStruct) {
 
 const potFO = {
   width: {
-    template: TextBoxCustomTemplate,
     autoCapitalize: 'characters',
     label: 'POT SIZE',
     placeholder: 'W\"',
     help: 'x'
   },
   height: {
-    template: TextBoxCustomTemplate,
     autoCapitalize: 'characters',
     placeholder: 'H\"',
     help: 'x'
   },
   depth: {
-    template: TextBoxCustomTemplate,
     autoCapitalize: 'characters',
     placeholder: 'D\"'
   }

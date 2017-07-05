@@ -25,7 +25,6 @@ import Notes from './Notes';
 import Swiper from 'react-native-swiper';
 import Icon from '../components/Icon';
 
-const timer = require('react-native-timer');
 const AnimatedSwiper = Animated.createAnimatedComponent(Swiper);
 
 import { width, 

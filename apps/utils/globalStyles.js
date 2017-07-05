@@ -134,18 +134,29 @@ export const formStyleSheet = {
     fontSize: FONT_SIZE,
     color: ERROR_COLOR
   },
-  textbox: {
+  textboxView: {
     normal: {
-      color: INPUT_COLOR,
-      fontSize: FONT_SIZE,
-    	flex: 1,
+      flex: 1,
       height: 36,
       padding: 7,
+    },
+    error: {
+      flex: 1,
+      height: 36,
+      padding: 7,
+    }
+  },
+  textbox: {
+    normal: {
+      flex: 1,
+      color: INPUT_COLOR,
+      fontSize: FONT_SIZE,
       fontFamily: FONT,
       letterSpacing: 1.3
     },
     // the style applied when a validation error occours
     error: {
+      flex: 1,
       color: INPUT_COLOR,
       fontSize: FONT_SIZE,
     	flex: 1,
@@ -276,12 +287,16 @@ export const autoFieldSS = {
     	paddingRight: 0
     }
   },
-  textbox: {
-		normal: {
-    	borderBottomColor: BORDER_COLOR,
-    	borderBottomWidth: 1
-  	}
-	}
+  textboxView: {
+    normal: {
+      borderBottomColor: BORDER_COLOR,
+      borderBottomWidth: 1
+    },
+    error: {
+      borderBottomColor: ERROR_COLOR,
+      borderBottomWidth: 1
+    }
+  }
 };
 
 export const mediumFieldSS = {
@@ -294,12 +309,23 @@ export const mediumFieldSS = {
     	flexWrap: 'wrap'
     }
   },
+  textboxView: {
+    normal: {
+      width: (width - REG_PADDING * 2 - TEXT_PADDING) * 0.5,
+      flex: -1,
+      borderBottomColor: BORDER_COLOR,
+      borderBottomWidth: 1
+    },
+    error: {
+      width: (width - REG_PADDING * 2 - TEXT_PADDING) * 0.5,
+      flex: -1,
+      borderBottomColor: BORDER_COLOR,
+      borderBottomWidth: 1
+    }
+  },
   textbox: {
 		normal: {
-    	width: (width - REG_PADDING * 2 - TEXT_PADDING) * 0.5,
-      flex: -1,
-    	borderBottomColor: BORDER_COLOR,
-    	borderBottomWidth: 1
+    	
   	}
 	},
 	controlLabel: {
@@ -347,7 +373,6 @@ export const dateFieldSS = {
   datepicker: {
     normal: {
     	flex: 0,
-    	marginTop: 30,
     	width: (width - REG_PADDING * 2 - TEXT_PADDING)
     	
     }
@@ -382,14 +407,26 @@ export const nestedStructSS = {
 		}
 	},
 
+  textboxView: {
+    normal: {
+      paddingLeft: 5,
+      paddingRight: 5,
+      width: 33,
+      flex: -1,
+      borderBottomColor: BORDER_COLOR,
+      borderBottomWidth: 1,
+    },
+    error: {
+      paddingLeft: 5,
+      paddingRight: 5,
+      width: 33,
+      flex: -1,
+      borderBottomColor: BORDER_COLOR,
+      borderBottomWidth: 1,
+    }
+  },
 	textbox: {
 		normal: {
-			width: 33,
-			flex: -1,
-			paddingLeft: 5,
-			paddingRight: 5,
-    	borderBottomColor: BORDER_COLOR,
-    	borderBottomWidth: 1,
     	textAlign: 'center'
 		}
 	},
