@@ -43,10 +43,6 @@ const NoteModel = t.struct({
   note: t.String
 });
 
-const EventModel = t.struct({
-  date: t.Date
-});
-
 const ctnWidth = (width - REG_PADDING * 2);
 
 let datess = mergeDeep({}, formStyleSheet);
@@ -315,11 +311,7 @@ class Note extends Component {
     this.setState({ saving: true });
   }
 
-  toggleCalendar () {
-
-  }
-
-  toggleInCalendar (toggle) {
+  /*toggleInCalendar (toggle) {
     if(toggle) {
       const startDate = new Date(this.props.date);
       startDate.setHours(8);
@@ -343,7 +335,7 @@ class Note extends Component {
       }
     }
     
-  }
+  }*/
 
   getCurrentDate () {
     return new Date().getTime();
@@ -356,7 +348,7 @@ class Note extends Component {
   render() {
     const isPhoto = this.getFilteredList().length > 0;
     
-    const { date, note } = this.props;
+    const { date, note, eventID } = this.props;
     const d = new Date(date);
     return (
       <View style={{width: width, marginBottom: 20, paddingLeft: REG_PADDING, paddingRight: REG_PADDING, flexDirection: 'row'}}> 
@@ -439,20 +431,13 @@ class Note extends Component {
             </View>
             
           </Animated.View>
-          
-            
           {(this.props.arrayID === -1) ? null :
-            <Animated.View ref="addCalendarView" style={{height: this.state.formHeight, overflow: 'hidden'}}>
-              <TouchableOpacity onPress={() => { this.toggleCalendar(); }} style={styles.button}>
-                <Text style={styles.textButton}>Add a reminder to your calendar?</Text>
-              </TouchableOpacity>
-              <Form
-                ref="editcalEvent"
-                type={EventModel}
-                options={formOptions}
-                value={this.eventDefaultValues}
-              />
-            </Animated.View>
+            <TouchableOpacity onPress={() => { this.props.onEditEvent(); }} style={styles.button}>
+              {eventID === "-1"
+                ? <Text style={styles.textButton}>Add a reminder to your calendar?</Text>
+                : <Text style={styles.textButton}>Update/Remove this event</Text>
+              }
+            </TouchableOpacity>
           }
         </View>        
       </View>);

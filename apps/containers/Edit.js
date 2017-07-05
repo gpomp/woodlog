@@ -347,7 +347,7 @@ class Edit extends Component {
       <ScrollView style={{ flex: 1 }}
         ref="scrollView"
         contentContainerStyle={styles.contentContainer}
-        keyboardShouldPersistTaps={true}
+        keyboardShouldPersistTaps="always"
         keyboardDismissMode='on-drag'>
           <StatusBar hidden={true} />
           <Animated.View style={{

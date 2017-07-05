@@ -234,7 +234,7 @@ class Tree extends Component {
         style={styles.container} 
         scrollEventThrottle={1} 
         onScroll={this.onScroll.bind(this)}
-        keyboardShouldPersistTaps={true}
+        keyboardShouldPersistTaps="always"
         keyboardDismissMode='on-drag'>
           <PhotoSlideShow 
             ref="slideShow" 
@@ -249,7 +249,7 @@ class Tree extends Component {
             onPress={() => { NavActions.SlideShow({photos: tree.photos, noteID: -1}) }}/>
           <Animated.View style={[styles.textView, {opacity: this.state.opacity}]}>
             <AnimatedSwiper 
-              keyboardShouldPersistTaps={true}
+              keyboardShouldPersistTaps="always"
               keyboardDismissMode='on-drag'
               ref="swiper" 
               showsButtons={false} 

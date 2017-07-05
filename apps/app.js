@@ -1,16 +1,21 @@
 import React, { Component } from 'react';
 import RNFS from 'react-native-fs';
-import { Router, Scene } from 'react-native-router-flux';
+import { Router, Scene, Modal } from 'react-native-router-flux';
 
 import Storage from 'react-native-storage';
 import { AsyncStorage } from 'react-native';
+
+import { width, 
+        height, 
+      } from './utils/globalStyles';
 
 import Tree from './containers/Tree';
 import List from './containers/List';
 import Edit from './containers/Edit';
 import Notes from './containers/Notes';
 import SlideShow from './containers/FSSlideShow';
-console.ignoredYellowBox = ["You are setting the style"];
+import EventEdit from './containers/EventEdit';
+console.ignoredYellowBox = ["You are setting the style", "Warning: View: isMounted", "Warning: TouchableHighlight: isMounted"];
 
 export default class App extends Component {
   constructor(props) {
@@ -51,12 +56,15 @@ export default class App extends Component {
   render() {
     return (
       <Router>
-        <Scene type='replace' key="root">
-          <Scene type='replace' key="List" component={List} title="Tree List" initial={true} hideNavBar={true}/>
-          <Scene type='replace' key="Tree" component={Tree} title="Bonsai" hideNavBar={true}/>
-          {/*<Scene key="Notes" component={Notes} title="Notes"/>}*/}
-          <Scene key="SlideShow" component={SlideShow} title="Slide Show"/>
-          <Scene type='replace' key="Edit" component={Edit} title="Edit Bonsai"  hideNavBar={true}/>
+        <Scene key="modal" component={Modal}>
+          <Scene type='replace' key="root">
+            <Scene type='replace' key="List" component={List} title="Tree List" initial={true} hideNavBar={true}/>
+            <Scene type='replace' key="Tree" component={Tree} title="Bonsai" hideNavBar={true}/>
+            {/*<Scene key="Notes" component={Notes} title="Notes"/>}*/}
+            <Scene key="SlideShow" component={SlideShow} title="Slide Show"/>
+            <Scene type='replace' key="Edit" component={Edit} title="Edit Bonsai"  hideNavBar={true}/>
+          </Scene>
+          <Scene key="EventEdit" component={EventEdit} title="Edit Event"/>
         </Scene>
       </Router>
     )
