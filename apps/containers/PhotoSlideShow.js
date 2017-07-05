@@ -1,6 +1,6 @@
 'use strict'
 const ADD_IMAGE = require('../../assets/add.png');
-const REM_IMAGE = require('../../assets/close.png');
+const REM_IMAGE = require('../../assets/remove.png');
 import Icon from '../components/Icon';
 import React, {Component} from 'react';
 import {
@@ -17,7 +17,7 @@ import Swiper from 'react-native-swiper';
 import PhotoView from 'react-native-photo-view';
 import compareArrays from '../utils/utils';
 
-import {textReg, width, height, BLANK_IMAGE, REG_PADDING} from '../utils/globalStyles';
+import {textReg, width, height, BLANK_IMAGE, REG_PADDING, YELLOW_COLOR, TOP_IMAGE_SIZE} from '../utils/globalStyles';
 const AnimatedTH = Animated.createAnimatedComponent(TouchableHighlight);
 
 
@@ -105,8 +105,8 @@ class PhotoSlideShow extends Component {
       const src = {uri: path};
       // console.log('slideshow path', path);
       return(
-        <AnimatedTH key={`ss-${i}`} onPress={() => { this.props.onPress(); }} style={{ height: 203, width: this.state.width }}>
-        <Animated.Image resizeMode="cover" source={src} style={{ height: 203, width: this.state.width }} />
+        <AnimatedTH key={`ss-${i}`} onPress={() => { this.props.onPress(); }} style={{ height: TOP_IMAGE_SIZE, width: this.state.width }}>
+        <Animated.Image resizeMode="cover" source={src} style={{ height: TOP_IMAGE_SIZE, width: this.state.width }} />
         </AnimatedTH>
       );
     })
@@ -114,7 +114,7 @@ class PhotoSlideShow extends Component {
 
   render () {
     return(<Animated.View 
-      style={[{height: 203,position: 'absolute', top: 0, left: 0, overflow:'hidden', flex: 1, width, alignItems:'center'}, {transform: [{translateY: this.props.y}], opacity: this.state.opacity }, this.props.styles]}>
+      style={[{height: TOP_IMAGE_SIZE,position: 'absolute', top: 0, left: 0, overflow:'hidden', flex: 1, width, alignItems:'center'}, {transform: [{translateY: this.props.y}], opacity: this.state.opacity }, this.props.styles]}>
       <Animated.View style={{width: this.state.width, overflow:'hidden'}}>
         
         {(this.getFilteredList().length <= 0) ?
@@ -143,11 +143,11 @@ class PhotoSlideShow extends Component {
       {(this.getFilteredList().length > 0) ?
         <Icon src={ADD_IMAGE} onPress={() => { this.props.onAddImage(); }}
           ctnStyles={{ opacity: this.state.opacity }}
-          styles={{top: 20, right: 20}}/> : null}
+          styles={{top: REG_PADDING, right: REG_PADDING, borderColor: YELLOW_COLOR}}/> : null}
       {(this.getFilteredList().length > 0) ?
         <Icon src={REM_IMAGE} onPress={() => { this.renderPhotoAlert(); }} 
           ctnStyles={{ opacity: this.state.opacity }}
-          styles={{top: 70, right: 20}}/> : null}
+          styles={{top: REG_PADDING, left: REG_PADDING}}/> : null}
     </Animated.View>);    
   }
 
@@ -156,15 +156,15 @@ class PhotoSlideShow extends Component {
 const styles =  StyleSheet.create({
   wrapper: {
     flex: 0,
-    height: 203
+    height: TOP_IMAGE_SIZE
   },
   slide: {
-    height: 203
+    height: TOP_IMAGE_SIZE
   },
   blankImage: {
     flex: 1,
     width,
-    height: 203,
+    height: TOP_IMAGE_SIZE,
     alignItems: 'center',
     justifyContent: 'center'
   },

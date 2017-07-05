@@ -85,10 +85,9 @@ class Notes extends Component {
                 this.props.onFocusNote(n); 
               }} />
     });
+    noteList.reverse();
     return(
-      <View style={{flex: 1, justifyContent: 'center'}}> 
-        <Text style={styles.title}>NOTES</Text>
-        {noteList}
+      <View style={{paddingBottom: 55}}> 
         <Note date={ new Date().toString() } note="Add a new note here" eventID="-1" arrayID={-1} key={-1} ref='addNote'
           treeID={this.props.treeID}
           noteID={-1}
@@ -102,6 +101,7 @@ class Notes extends Component {
             }
             this.props.onFocusNote(n); 
           }}/>
+        {noteList}
       </View>
     );
   }

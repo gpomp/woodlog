@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, Animated, Easing} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity, Animated, Easing, Image} from 'react-native';
+const ADD_PHOTO = require('../../assets/addimage.png');
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -18,6 +19,7 @@ import { width,
           REG_PADDING, 
           container as ctnStyles, 
           textReg, 
+          titleReg, 
           TEXT_PADDING, 
           BIG_FONT_SIZE, 
           formStyleSheet,
@@ -26,7 +28,8 @@ import { width,
           monthNames,
           formatDate,
           TRADE_GOTHIC,
-          BORDER_COLOR } from '../utils/globalStyles';
+          BORDER_COLOR,
+          YELLOW_COLOR } from '../utils/globalStyles';
 
 import {mergeDeep, imgPickerResponse, addInCalendar, removeInCalendar} from '../utils/utils';
 import datepicker from '../components/DatePickerCustomTemplate';
@@ -36,11 +39,15 @@ const Form = t.form.Form;
 t.form.Form.stylesheet = formStyleSheet;
 
 const NoteModel = t.struct({
-  note: t.String,
+  date: t.Date,
+  note: t.String
+});
+
+const EventModel = t.struct({
   date: t.Date
 });
 
-const ctnWidth = width - REG_PADDING * 2;
+const ctnWidth = (width - REG_PADDING * 2);
 
 let datess = mergeDeep({}, formStyleSheet);
 datess = mergeDeep(datess, dateFieldSS);
@@ -134,17 +141,12 @@ const styles = StyleSheet.create({
     flex: 1
   },
   ctn: {
-    flexDirection: 'row', 
-    alignItems: 'flex-start', 
-    justifyContent: 'center', 
-    flex: 1,
-    overflow: 'hidden'
+    flex: 0,
+    overflow: 'hidden',
+    width: width * 0.75
   },
   insideCtn: {
-    flexDirection: 'row', 
-    alignItems: 'flex-start', 
-    justifyContent: 'center', 
-    flex: 1
+    flex: 0
   },
   textCtn: {
     width: ctnWidth * 0.75
@@ -152,11 +154,23 @@ const styles = StyleSheet.create({
   textText: Object.assign({}, textReg, {
     fontFamily: TRADE_GOTHIC,
     opacity: 1,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 'bold'
   }),
   dateCtn: {
-    width: ctnWidth * 0.25
+    width: ctnWidth * 0.75
+  },
+  notePhoto: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: YELLOW_COLOR
+  },
+  addPhoto: {
+    width: 20,
+    height: 20
   }
 });
 
@@ -167,6 +181,7 @@ class Note extends Component {
     this.state = { 
       formHeight: new Animated.Value(99999),
       noteHeight: new Animated.Value(99999),
+      eventHeight: new Animated.Value(99999),
       formOverflow: 'visible',
       onRemove: false
     };
@@ -189,18 +204,20 @@ class Note extends Component {
   componentDidMount () {
     this.formHeight = 0;
     this.noteHeight = 0;
+    this.eventHeight = 0;
     
     setTimeout(() => {
       if (!this.refs.formInside) return;
       this.refs.formInside.measure((fx, fy, width, height) => { 
-        this.formHeight = height;
+        this.formHeight = Math.max(height, 60);
         this.state.formHeight.setValue(0);
         this.setState({formOverflow: 'hidden'});
       });
       if (!this.refs.noteInside) return;
       this.refs.noteInside.measure((fx, fy, width, height) => { 
-        this.noteHeight = height; 
+        this.noteHeight = Math.max(height, 60); 
         this.state.noteHeight.setValue(this.noteHeight);
+        console.log('last note height', height, Math.max(height, 60));
       });
     }, 0);
   }
@@ -208,6 +225,9 @@ class Note extends Component {
   componentWillUpdate() {
     this.defaultValues = {
       note: (this.props.arrayID === -1) ? '' : this.props.note,
+      date: new Date(this.props.date)
+    }
+    this.eventDefaultValues = {
       date: new Date(this.props.date)
     }
   }
@@ -272,7 +292,7 @@ class Note extends Component {
 
   removeNote () {
     // first remove all photos
-    const photos = this.refs.slideShow.getWrappedInstance().getFilteredList();
+    const photos = this.getFilteredList();
     if(photos.length > 0) {
       const ids = photos.map(p => { return p.id });      
       this.props.actions.removePhoto(ids, this.props.treeID);
@@ -293,6 +313,10 @@ class Note extends Component {
   removeImage () {
     this.props.actions.removePhoto([this.refs.slideShow.getWrappedInstance().getCurrentIndex()], this.props.treeID);
     this.setState({ saving: true });
+  }
+
+  toggleCalendar () {
+
   }
 
   toggleInCalendar (toggle) {
@@ -321,79 +345,125 @@ class Note extends Component {
     
   }
 
+  getCurrentDate () {
+    return new Date().getTime();
+  }
+
+  getFilteredList () {
+    return this.props.imgList.filter((p) => { return p.note === this.props.noteID });
+  }
+
   render() {
+    const isPhoto = this.getFilteredList().length > 0;
+    
     const { date, note } = this.props;
     const d = new Date(date);
-    console.log(typeof this.props.eventID);
     return (
-      <View style={{width: width - REG_PADDING * 2, marginBottom: 20}}> 
-        <Animated.View ref="noteView" style={[styles.ctn, {height: this.state.noteHeight}]}>
-          <View ref="noteInside" style={styles.insideCtn}>
-            <View style={styles.textCtn}>
-              <TouchableOpacity onPress={() => { this.toggleNote(true) }}>
-                <Text style={styles.textText}>{note}</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.dateCtn}>
-              <TouchableOpacity onPress={() => { this.toggleNote(true) }}>
-                <Text style={styles.textText}>{`${d.getFullYear()}`}</Text>
-                <Text style={styles.textText}>{`${monthNames[d.getMonth()]} ${d.getDate()}`}</Text>
-              </TouchableOpacity>
-              {(this.props.arrayID === -1 ? null :
-                <TouchableOpacity onPress={() => { this.removeNote() }} style={styles.button}>
-                  <Text style={styles.textButton}>Remove</Text>
-                </TouchableOpacity>)}
-              
-            </View>
-          </View>
-        </Animated.View>
-        <Animated.View ref="formView" style={[{ 
-          overflow: this.state.formOverflow }, 
-          (this.state.formOverflow === 'hidden' ? {height: this.state.formHeight} : {})
-          ]}> 
-          <View ref="formInside" style={styles.ctn}>
-            <View style={styles.textCtn}>
-              <Form
-                ref="editNote"
-                type={NoteModel}
-                options={formOptions}
-                value={this.defaultValues}
-              />
-            </View>
-            <View style={styles.dateCtn}>
-              <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
-                <Text style={styles.textButton}>Save</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={() => { this.cancelNote() }} style={styles.button}>
-                <Text style={styles.textButton}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Animated.View>
-        {this.props.arrayID === -1 ? null :
-          <FakeCheckbox text="Add this note to your calendar" onPress={(isChecked) => { this.toggleInCalendar(isChecked); }} checked={ this.props.eventID !== '-1' } />
-        }
-        {this.props.arrayID === -1 ? null :
-        <View>
+      <View style={{width: width, marginBottom: 20, paddingLeft: REG_PADDING, paddingRight: REG_PADDING, flexDirection: 'row'}}> 
+        <View style={{width: ctnWidth * 0.25}}>
+          {
+            this.props.arrayID === -1 ? null :
+              <TouchableOpacity style={[styles.notePhoto, { borderWidth: !isPhoto ? 2 : 0 }]} onPress={() => {
+                if(!isPhoto) {
+                  this.savePhoto();
+                } else {
+                  NavActions.SlideShow({photos: this.props.photoList, noteID: this.props.noteID, showControls: true})
+                }
+              }}>
+            {
+              isPhoto ?
+                <Image style={styles.notePhoto} source={ {uri: `${global.targetFilePath}/${this.getFilteredList()[0].src}`} } /> :
+                <Image style={styles.addPhoto} source={ADD_PHOTO} />
+            }
+            </TouchableOpacity>
+          }
+        {/*this.props.arrayID === -1 ? null :
+        
+          
           <PhotoSlideShow 
-            ref="slideShow"
-            styles={{position:'relative', width: width - 40}}
-            nextId={0}
-            photos={this.props.photoList}
-            y={0} 
-            fromY={0}
-            noteID={this.props.noteID}
-            onAddImage={() => { this.savePhoto(); }}
-            onRemImage={() => { this.removeImage(); }}
-            onChangePicture={(index) => { this.currentPicture = index; }} 
-            onPress={() => { NavActions.SlideShow({photos: this.props.photoList, noteID: this.props.noteID}) }}/>
-        </View>}
+                      ref="slideShow"
+                      styles={{position:'relative', width: width - 40}}
+                      nextId={0}
+                      photos={this.props.photoList}
+                      y={0} 
+                      fromY={0}
+                      noteID={this.props.noteID}
+                      onAddImage={() => { this.savePhoto(); }}
+                      onRemImage={() => { this.removeImage(); }}
+                      onChangePicture={(index) => { this.currentPicture = index; }} 
+                      onPress={() => { NavActions.SlideShow({photos: this.props.photoList, noteID: this.props.noteID}) }}/>*/}
+        </View>
+        <View style={{width: ctnWidth * 0.75, flex: 0}}>
+          <Animated.View ref="noteView" style={[styles.ctn, {height: this.state.noteHeight}]}>
+              
+            <View ref="noteInside" style={styles.insideCtn}>
+              <View style={styles.dateCtn}>
+                <TouchableOpacity onPress={() => { this.toggleNote(true) }}>
+                  <Text style={[titleReg, { fontSize: 21, marginBottom: 10 }]}>{`${d.getFullYear()} ${monthNames[d.getMonth()].toUpperCase()} ${d.getDate()}`}</Text>
+                </TouchableOpacity>              
+              </View>
+              <View style={styles.textCtn}>
+                <TouchableOpacity onPress={() => { this.toggleNote(true) }}>
+                  <Text style={styles.textText}>{note}</Text>
+                </TouchableOpacity>
+
+                {(this.props.arrayID === -1 ? null :
+                  <TouchableOpacity onPress={() => { this.removeNote() }} style={styles.button}>
+                    <Text style={styles.textButton}>Remove</Text>
+                  </TouchableOpacity>)}
+              </View>
+            </View>
+          </Animated.View>
+          <Animated.View ref="formView" style={[{ 
+            overflow: this.state.formOverflow }, 
+            (this.state.formOverflow === 'hidden' ? {height: this.state.formHeight} : {})
+            ]}> 
+            <View ref="formInside" style={[styles.ctn, { flex: 0 }]}>
+              <View style={styles.textCtn}>
+                <Form
+                  ref="editNote"
+                  type={NoteModel}
+                  options={formOptions}
+                  value={this.defaultValues}
+                />
+              </View>
+              <View style={styles.dateCtn}>
+                <TouchableOpacity onPress={() => { this.saveNote() }} style={styles.button}>
+                  <Text style={styles.textButton}>Save</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => { this.cancelNote() }} style={styles.button}>
+                  <Text style={styles.textButton}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            
+          </Animated.View>
+          
+            
+          {(this.props.arrayID === -1) ? null :
+            <Animated.View ref="addCalendarView" style={{height: this.state.formHeight, overflow: 'hidden'}}>
+              <TouchableOpacity onPress={() => { this.toggleCalendar(); }} style={styles.button}>
+                <Text style={styles.textButton}>Add a reminder to your calendar?</Text>
+              </TouchableOpacity>
+              <Form
+                ref="editcalEvent"
+                type={EventModel}
+                options={formOptions}
+                value={this.eventDefaultValues}
+              />
+            </Animated.View>
+          }
+        </View>        
       </View>);
   }
 }
 
-
+const stateToProps = (state) => {
+  return {
+    imgList: state.photos.list
+  }
+}
 
 const dispatchToProps = (dispatch) => {
   return {
@@ -401,4 +471,4 @@ const dispatchToProps = (dispatch) => {
   }
 }
 
-export default connect(null, dispatchToProps)(Note)
+export default connect(stateToProps, dispatchToProps)(Note)

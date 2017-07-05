@@ -1,13 +1,13 @@
 'use strict'
 const ADD_IMAGE = require('../../assets/add.png');
 const REM_IMAGE = require('../../assets/close.png');
-const EDIT_IMAGE = require('../../assets/edit.png');
-const BACK_IMAGE = require('../../assets/back.png');
+const EDIT_IMAGE = require('../../assets/update.png');
+const BACK_IMAGE = require('../../assets/collection.png');
 import { Actions as NavActions } from 'react-native-router-flux';
 
 import React, {Component} from 'react';
 import {
-  ScrollView, StyleSheet, Text, Platform, View, Animated, Easing, Alert, StatusBar, findNodeHandle
+  ScrollView, StyleSheet, Text, Platform, View, Animated, Easing, Alert, StatusBar, findNodeHandle, TouchableOpacity, Image
 } from 'react-native'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -33,7 +33,8 @@ import { width,
         REG_PADDING, 
         container as ctnStyles, 
         contentContainer, 
-        textReg, 
+        textReg,
+        titleReg,
         TEXT_PADDING, 
         BIG_FONT_SIZE, 
         BG_COLOR,
@@ -147,10 +148,6 @@ class Tree extends Component {
     return `${monthNames[date.getMonth()]} ${day}${dim} ${date.getFullYear()}`;
   }
 
-  getProp (p) {
-    return p === null || p === undefined || p === 'undefined' ? '' : p.toString().toUpperCase();
-  }
-
   onScroll (event) {
     this.scrollY = event.nativeEvent.contentOffset.y;
     this.state.photoY.setValue(this.scrollY); 
@@ -208,6 +205,20 @@ class Tree extends Component {
     }, 50);
   }
 
+  getProp (p, style, unit = '', before = '') {
+    let data = '';
+    let dataSafe = '';
+    for (var i = 0; i < p.length; i++) {
+      if(p[i] !== null && p[i] !== undefined && p[i] !== 'undefined') {
+        data += p[i]+unit;
+        dataSafe += p[i];
+      }
+    }
+    if(dataSafe.length < 1) return null;
+    return (<Text style={style}>{before}{data}</Text>)
+    
+  }
+
   render () {
 
     const { tree } = this.props;
@@ -248,26 +259,26 @@ class Tree extends Component {
               onScrollBeginDrag={(e, state) => { this.resizeSwiper(Math.abs(state.index - 1)); }}
               onMomentumScrollEnd={(e, state) => { this.resizeSwiper(state.index); }}
               showsPagination={false}>
-              <View ref="bonsaiView">
-                <Text style={styles.title}>{this.getProp(tree.name)}</Text>
-                <Text style={styles.text}>{this.getProp(tree.species)}</Text>
-                <Text style={styles.text}>{this.getProp(tree.age)}</Text>
-                <Text style={styles.text}>{this.getProp(tree.potType)}</Text>
-                <Text style={styles.text}>{this.getProp(tree.style)}</Text>
-                <Text>{"\n"}</Text>
-                <Text style={styles.text}>{this.getProp(tree.height)}"</Text>
-                <Text style={styles.text}>{this.getProp(tree.trunkWidth)}"</Text>
-                <Text style={styles.text}>{this.getProp(tree.canopyWidth)}"</Text>
-                <Text>{"\n"}</Text>
-                <Text style={styles.text}>{this.getProp(tree.Source)}</Text>
-                <Text style={styles.text}>{this.getProp(tree.potSize.width)}" x {this.getProp(tree.potSize.height)}" x {this.getProp(tree.potSize.depth)}"</Text>
-                <Text style={styles.text}>DATE ACQUIRED {this.getFormatedDate(tree.date).toUpperCase()}</Text>
+              <View ref="bonsaiView" style={styles.innerSwiper}>
+                {this.getProp([tree.name], styles.title)}
+                {this.getProp([tree.species], styles.text)}
+                {this.getProp([tree.age], styles.text, ' years')}
+                {this.getProp([tree.potType], styles.text)}
+                {this.getProp([tree.style], [styles.text, {marginBottom: 20}])}
+                
+                {this.getProp([tree.height], styles.text, '\"')}
+                {this.getProp([tree.trunkWidth], styles.text, '\"')}
+                {this.getProp([tree.canopyWidth], [styles.text, {marginBottom: 20}], '\"')}
+                
+                {this.getProp([tree.potSize.width, tree.potSize.height, tree.potSize.depth], styles.text, ' x ')}
+                {this.getProp([tree.canopyWidth], styles.text, '\"')}
+                {this.getProp(this.getFormatedDate(tree.date).toUpperCase(), styles.text, '', 'DATE ACQUIERED ')}
 
-                <Icon src={EDIT_IMAGE} onPress={() => { this.animateOut(() => { NavActions.Edit({id: this.props.nextId}); }); }} 
-                  styles={{top: 10, right: 40, backgroundColor: '#383735'}}/>
-
-                <Icon src={BACK_IMAGE} onPress={() => { this.animateOut(() => { NavActions.List({back: true})}); }} 
-                  styles={{top: 10, right: 100, backgroundColor: '#383735'}}/>
+               {/*<Icon src={EDIT_IMAGE} onPress={() => { this.animateOut(() => { NavActions.Edit({id: this.props.nextId}); }); }} 
+                                 styles={{top: 10, right: 40, backgroundColor: '#383735'}}/>
+               
+                               <Icon src={BACK_IMAGE} onPress={() => { this.animateOut(() => { NavActions.List({back: true})}); }} 
+                                 styles={{top: 10, right: 100, backgroundColor: '#383735'}}/>*/}
               </View>
               <View ref="notesView">
                 <Notes 
@@ -278,7 +289,14 @@ class Tree extends Component {
               </AnimatedSwiper>
           </Animated.View>
         </ScrollView>
-        
+        <View ref="bottomBar" style={styles.bottomNav}>
+          <TouchableOpacity style={styles.bottomButton} onPress={() => { this.animateOut(() => { NavActions.List({back: true})}); }}>
+            <Image source={BACK_IMAGE} style={[styles.imgButton, {marginRight: 15}]} /><Text style={styles.bottomButtonText}>COLLECTION</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bottomButton} onPress={() => { this.animateOut(() => { NavActions.Edit({id: this.props.nextId}); }); }}>
+            <Text style={[styles.bottomButtonText, {marginRight: 15}]}>UPDATE</Text><Image source={EDIT_IMAGE} style={styles.imgButton} />
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -296,22 +314,16 @@ const styles =  StyleSheet.create({
   }),
   textView: {
     marginTop: 220,
-    backgroundColor:BG_COLOR,
-    
-    padding: REG_PADDING
+    backgroundColor:BG_COLOR
   },
 
-  title: Object.assign({}, textReg, {
-    fontSize: 35,
-    opacity: 1,
+  title: Object.assign({}, titleReg, {
     textAlign: 'left',
-    width: width - REG_PADDING * 2
+    marginBottom: 25
   }),
   text: Object.assign({}, textReg, {
-    fontSize: 15,
-    opacity: 1,
     textAlign: 'left',
-    width: width - REG_PADDING * 2
+    lineHeight: 25
   }),
   photoContainer: {
     flex: 0 ,
@@ -320,6 +332,35 @@ const styles =  StyleSheet.create({
     flexWrap: 'wrap',
     marginTop: 10,
     marginBottom: 10
+  },
+  innerSwiper: { paddingLeft: REG_PADDING + TEXT_PADDING, paddingRight: REG_PADDING + TEXT_PADDING },
+  bottomNav: {
+    position: 'absolute', 
+    bottom: 0, 
+    left: 0,
+    flexDirection: 'row', 
+    alignItems: 'flex-start', 
+    justifyContent: 'space-around', 
+    flex: 0, 
+    width: width,
+    paddingBottom: 30, 
+    paddingTop: 15, 
+    paddingLeft: REG_PADDING, 
+    paddingLeft: REG_PADDING,
+    backgroundColor: BG_COLOR 
+  },
+  bottomButton: {
+    flex: 0,
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center',
+  },
+  bottomButtonText: Object.assign({}, titleReg, {
+    fontSize: 15
+  }),
+  imgButton: {
+    width: 15,
+    height: 15
   }
 });
 

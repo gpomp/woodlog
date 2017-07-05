@@ -62,7 +62,7 @@ class List extends Component {
     let delayOpacity = 1250;
     let timing = 500;
     if(this.props.back) {
-      this.state.logoHeight.setValue(90);
+      this.state.logoHeight.setValue(65);
       delayLogo = 50;
       delayOpacity = 100;
       timing = 500;
@@ -70,7 +70,7 @@ class List extends Component {
 
     Animated.parallel([
       Animated.timing(this.state.logoHeight, {
-        toValue: 90,
+        toValue: 65,
         delay: delayLogo,
         duration: timing,
         easing: Easing.inOut(Easing.exp)
@@ -185,7 +185,7 @@ const styles =  StyleSheet.create({
   viewLogo: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 25
+    marginBottom: 20
 
   },
   button: {
@@ -202,8 +202,8 @@ const styles =  StyleSheet.create({
   }, textStyle),
 
   logoStyles: {
-    width: 90,
-    height: 90,
+    width: 65,
+    height: 65,
     alignItems: 'center',
     justifyContent: 'center'
   },

@@ -30,18 +30,19 @@ Icon.defaultProps = {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
-    width: 40,
-    height: 40,
-    borderRadius:20,
+    width: 33,
+    height: 33,
+    borderRadius:16.5,
     flex: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'absolute'
+    position: 'absolute',
+    borderWidth: 1,
+    borderColor: 'white'
   },
   img: {
-    width: 20,
-    height: 20
+    width: 8,
+    height: 8
   }
   });
 

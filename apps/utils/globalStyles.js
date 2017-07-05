@@ -8,10 +8,15 @@ export const { width, height } = Dimensions.get('window');
 export const LOGO_IMAGE = require('../../assets/logo.png');
 export const BLANK_IMAGE = require('../../assets/blank.jpg');
 
-export const REG_PADDING = 20;
-export const TEXT_PADDING = 30;
-export const BG_COLOR = '#f2f2f2';
+export const REG_PADDING = 11;
+export const TEXT_PADDING = 42;
 export const TRADE_GOTHIC = 'TradeGothicLTStd-Cn18';
+
+export const BG_COLOR = '#f2f2f2';
+export const YELLOW_COLOR = '#e7c55a';
+export const TEXT_COLOR = '#383735';
+
+export const TOP_IMAGE_SIZE = 203;
 
 export const container = {
 	padding: REG_PADDING,
@@ -28,12 +33,18 @@ export const contentContainer = {
   justifyContent: 'center'
 }
 
+export const titleReg = {
+  fontFamily: 'Seattle Sans',
+  color: TEXT_COLOR,
+  fontSize: 33,
+  letterSpacing: 1.3
+};
+
 export const textReg = {
-	fontFamily: 'Seattle Sans',
-	color: '#383735',
-	fontSize: 33,
-	letterSpacing: 1.3,
-	opacity: 0.6
+	fontFamily: 'AvenirNextCondensed-Regular',
+	color: TEXT_COLOR,
+	fontSize: 11,
+	letterSpacing: 1.3
 };
 
 export const monthNames = ["January", "February", "March", "April", "May", "June",
