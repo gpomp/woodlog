@@ -2,11 +2,12 @@ import React, {Component} from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import {
-  View, StyleSheet, Text, TouchableOpacity
+  View, StyleSheet, Text, TouchableOpacity, Animated, Easing
 } from 'react-native';
 import {mergeDeep, addInCalendar, removeInCalendar} from '../utils/utils';
 import * as TreeActions from '../actions/treeActions';
 import RNCalendarEvents from 'react-native-calendar-events';
+import { Actions as NavActions } from 'react-native-router-flux';
 
 import { width, 
   height, 
@@ -95,40 +96,92 @@ const formOptions = {
 
 class EventEdit extends Component {
 	constructor(props) {
-    	super(props);
-    	this.state = {
-    		hide: props.hide
-    	}
-    	this.defaultValues = {};
-    }
-
-  componentDidMount () {
-  	if (this.props.note.eventID !== '-1') {
-  		RNCalendarEvents.findEventById(this.props.note.eventID).then((event) => {
-  			this.defaultValues = {
-  				title: event.title,
-  				date:new Date(event.startDate)
-  			};
-  			this.forceUpdate();
-  		});
+  	super(props);
+  	this.defaultValues = {};
+  	this.state = {
+  		showed: false,
+  		bgOpacity: new Animated.Value(0),
+  		addY: new Animated.Value(50),
+  		insideOpacity: new Animated.Value(0),
   	}
   }
 
+  animateIn () {
+  	this.state.bgOpacity.setValue(0);
+  	this.state.addY.setValue(50);
+  	this.state.insideOpacity.setValue(0);
+
+  	Animated.parallel([
+      Animated.timing(this.state.bgOpacity, {
+        toValue: 1,
+        delay: 0,
+        duration: 300
+      }),
+      Animated.timing(this.state.addY, {
+        toValue: 0,
+        duration: 400,
+        delay: 200,
+        easing: Easing.out(Easing.exp)
+      }),
+      Animated.timing(this.state.insideOpacity, {
+        toValue: 1,
+        duration: 400,
+        delay: 200
+      }) 
+    ]).start();
+  }
+
+  animateOut () {
+
+  	Animated.parallel([
+      Animated.timing(this.state.bgOpacity, {
+        toValue: 0,
+        delay: 0,
+        duration: 100,
+        delay: 100
+      }),
+      Animated.timing(this.state.addY, {
+        toValue: 20,
+        duration: 100,
+        easing: Easing.in(Easing.exp)
+      }),
+      Animated.timing(this.state.insideOpacity, {
+        toValue: 0,
+        duration: 100
+      }) 
+    ]).start(event => {
+      if(event.finished) {
+        NavActions.pop();
+      }
+    });
+  }
+
+  componentDidMount () {
+  	console.log('componentDidMount');
+  	this.animateIn();
+  }
+
   componentWillUpdate (nextProps, nextState) {
-  	if (nextProps.hide === false && this.state.hide) {
-  		this.setState({hide: nextProps.hide});
+  	if (this.props.note.eventID !== '-1') {
+  		if (this.props.note.eventID !== nextProps.note.eventID
+				|| (!this.defaultValues.title)) {
+	  		RNCalendarEvents.findEventById(nextProps.note.eventID).then((event) => {
+	  			this.defaultValues = {
+	  				title: event.title,
+	  				date:new Date(event.startDate)
+	  			};
+	  			this.forceUpdate();
+	  		});
+  		}		
+  	} else if (this.props.note.eventID === '-1' && this.defaultValues.title) {
+  		this.defaultValues = {};
   	}
   }
 
   saveEvent () {
   	const validation = this.refs.editEvent.validate();
-    if(validation.errors.length > 0) {
-    	for (var i = 0; i < validation.errors.length; i++) {
-    		console.log(validation.errors[i]);
-    	}
-    } else {
+    if(validation.errors.length <= 0) {
       this.formData = Object.assign({}, validation.value);
-      console.log('this.formData', this.formData.title);
       const startDate = new Date(this.formData.date);
       startDate.setHours(8);
       const endDate = new Date(this.formData.date);
@@ -142,7 +195,7 @@ class EventEdit extends Component {
 			  }]
       }).then(eventID => {
         this.props.actions.saveNote(this.props.treeID, this.props.note.id, this.props.note.note, this.props.note.date, eventID);
-	    	this.setState({hide: true});
+      	this.animateOut();
       });
   		// addInCalendar(this.props.note.eventID, );
   	}
@@ -152,14 +205,20 @@ class EventEdit extends Component {
   	RNCalendarEvents.removeEvent(this.props.note.eventID)
 	  .then(success => {
 	    this.props.actions.saveNote(this.props.treeID, this.props.note.id, this.props.note.note, this.props.note.date, "-1");
-	    this.setState({hide: true});
+      this.animateOut();
 	  })
   }
 
   render () {
-  	if (this.state.hide) return (<View></View>);
-  	else return (<View style={styles.container}>
-  		<View style={styles.modalCtn}>
+  	var bgCol = "rgba(0, 0, 0, " + this.state.bgOpacity + ")";
+  	return (<Animated.View style={[styles.container, 
+  		{ backgroundColor: this.state.bgOpacity.interpolate({
+  			inputRange: [0, 1],
+  			outputRange: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.5)']
+  		})}]}>
+  		<Animated.View style={[styles.modalCtn, 
+  			{ opacity: this.state.insideOpacity, 
+  				transform: [{translateY: this.state.addY }] }]}>
   			
 				<View>
 					<Text style={styles.title}>Add to calendar</Text>
@@ -173,16 +232,18 @@ class EventEdit extends Component {
             <Text style={styles.textButton}>Save</Text>
           </TouchableOpacity>
 				</View>
-					{this.props.note.eventID !== -1 ? 
+					{this.props.note.eventID !== "-1" ? 
 					<TouchableOpacity onPress={() => { this.removeEvent(); }} style={styles.button}>
 	          <Text style={styles.textButton}>Remove Event</Text>
 	        </TouchableOpacity>
 					 : null}
-					<TouchableOpacity onPress={() => { this.setState({hide: true}); }} style={styles.button}>
+					<TouchableOpacity onPress={() => {
+      			this.animateOut();
+      			}} style={styles.button}>
 	          <Text style={styles.textButton}>Cancel</Text>
 	        </TouchableOpacity>
-  			</View>
-  		</View>);
+  			</Animated.View>
+  		</Animated.View>);
     }
 }
 
@@ -206,8 +267,7 @@ const styles =  StyleSheet.create({
   	position: 'absolute',
   	flexDirection: 'row',
   	alignItems: 'center',
-  	justifyContent: 'center',
-  	backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  	justifyContent: 'center'
   },
   modalCtn: {
   	padding: REG_PADDING,
@@ -229,9 +289,5 @@ const styles =  StyleSheet.create({
     marginBottom: 25
   })
 });
-
-EventEdit.defaultProps = {
-  //addingToCalendar: false
-}
 
 export default connect(stateToProps, dispatchToProps)(EventEdit)

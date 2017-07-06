@@ -76,7 +76,7 @@ class Notes extends Component {
               noteID={n.id}
               onToggleNote={this.props.onToggleNote}
               onNoteUpdate={this.props.onNoteUpdate}
-              onEditEvent={ () => { var noteEvent = { note: n, hide: false }; NavActions.EventEdit(noteEvent); } }
+              onEditEvent={ () => { NavActions.EventEdit({ note: n }); } }
               onFocusNote={(id) => {
                 let n;
                 if(id === -1) n = this.refs.addNote;
