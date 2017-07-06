@@ -162,7 +162,7 @@ const styles =  StyleSheet.create({
     height: TOP_IMAGE_SIZE
   },
   blankImage: {
-    flex: 1,
+    flexGrow: 1,
     width,
     height: TOP_IMAGE_SIZE,
     alignItems: 'center',

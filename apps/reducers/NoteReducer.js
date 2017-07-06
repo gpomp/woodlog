@@ -8,7 +8,7 @@ import {findIDInList} from '../utils/utils';
 
 const noteInitialState = {
   note: '',
-  date: null,
+  date: new Date(),
   eventID: '-1'
 }
 
